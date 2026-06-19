@@ -75,11 +75,18 @@ export default defineConfig({
           ],
         },
         {
-          label: "Providers & Backends",
+          label: "Providers",
           items: [
             { label: "Overview", slug: "providers" },
-            { label: "PostgreSQL provider", slug: "providers/postgres" },
-            { label: "State backends", slug: "providers/backends" },
+            { label: "PostgreSQL", slug: "providers/postgres" },
+          ],
+        },
+        {
+          label: "Backends",
+          items: [
+            { label: "Overview", slug: "backends" },
+            { label: "Local file", slug: "backends/file" },
+            { label: "Amazon S3", slug: "backends/s3" },
           ],
         },
         {

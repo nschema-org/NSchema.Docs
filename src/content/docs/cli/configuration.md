@@ -34,7 +34,7 @@ NSCHEMA (
 | Block | Purpose |
 | ----- | ------- |
 | `PROVIDER <label>` | The live database. `postgres` is the only label today. See the [PostgreSQL provider](/providers/postgres/). |
-| `BACKEND <label>` | The state store. `file` or `s3`. See [State backends](/providers/backends/). |
+| `BACKEND <label>` | The state backend. `file` or `s3`. See [Backends](/backends/). |
 | `NSCHEMA` | Project-level settings (no label). |
 
 The `BACKEND` block may instead select S3:
@@ -97,4 +97,4 @@ nschema plan                       # base only
 - [Environment variables](/cli/environment-variables/) — the full list of `NSCHEMA_*`
   overrides.
 - [PostgreSQL provider](/providers/postgres/) — every `PROVIDER postgres` attribute.
-- [State backends](/providers/backends/) — every `BACKEND file` / `BACKEND s3` attribute.
+- [Backends](/backends/) — the state backend, with a page per backend (`BACKEND file` / `BACKEND s3`).

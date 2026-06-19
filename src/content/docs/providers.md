@@ -1,31 +1,25 @@
 ---
-title: Providers & Backends
-description: The database providers and state backends NSchema supports, and how they're configured.
+title: Providers
+description: The database providers NSchema supports, and how they're configured.
 ---
 
-NSchema separates two concerns, each declared in a [config block](/cli/configuration/):
+A **provider** is the live database NSchema reads from and writes to. It's declared in a
+`PROVIDER` [config block](/cli/configuration/) — describing *where* your schema lives, like a
+Terraform backend, so it lives in config rather than CLI flags.
 
-- **Provider** — the *live database* NSchema reads from and writes to. Declared in a
-  `PROVIDER` block.
-- **Backend** — the optional *state store* that persists a snapshot of the last applied
-  schema, enabling [offline planning](/guides/state/) and [drift detection](/guides/drift/).
-  Declared in a `BACKEND` block.
-
-Both describe *where* your schema lives — like a Terraform backend — so they live in config
-blocks rather than CLI flags.
+The provider is separate from the optional [backend](/backends/), which persists a snapshot of
+the schema for offline planning. This section covers the live-database providers; see
+[Backends](/backends/) for the state backends.
 
 ## Supported today
 
-| Kind | Option | Page |
-| ---- | ------ | ---- |
-| Provider | PostgreSQL | [PostgreSQL provider](/providers/postgres/) |
-| Backend | Local file | [State backends](/providers/backends/#local-file) |
-| Backend | Amazon S3 | [State backends](/providers/backends/#amazon-s3) |
+| Provider | Page |
+| -------- | ---- |
+| PostgreSQL | [PostgreSQL provider](/providers/postgres/) |
 
 ## On the roadmap
 
-Additional providers (SQLite, SQL Server) and backends (Azure Blob Storage) are planned — see
-the [roadmap](/reference/roadmap/).
+Additional providers (SQLite, SQL Server) are planned — see the [roadmap](/reference/roadmap/).
 
 ## How a provider relates to the DDL
 

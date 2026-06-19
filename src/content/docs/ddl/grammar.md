@@ -181,7 +181,7 @@ core.
 :::tip
 This section describes the *language shape* of config blocks. For the attributes the
 **CLI** recognises in each block, see [Configuration blocks](/cli/configuration/),
-[PostgreSQL provider](/providers/postgres/), and [State backends](/providers/backends/).
+[PostgreSQL provider](/providers/postgres/), and [Backends](/backends/).
 :::
 
 ## Deployment scripts

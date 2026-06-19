@@ -12,7 +12,7 @@ of the last applied schema that planning can run against instead.
 
 ## Enabling a state store
 
-Declare a [`BACKEND` block](/providers/backends/). A local file:
+Declare a [`BACKEND` block](/backends/). A local file:
 
 ```sql
 BACKEND file (

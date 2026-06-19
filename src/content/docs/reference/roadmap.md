@@ -15,7 +15,7 @@ change before 1.0.
 ## Available today
 
 - **Provider:** PostgreSQL — see [PostgreSQL provider](/providers/postgres/).
-- **Backends:** local file and Amazon S3 — see [State backends](/providers/backends/).
+- **Backends:** local file and Amazon S3 — see [Backends](/backends/).
 - **Environments:** `*.env.<name>.sql` overlays selected with
   [`--environment`](/cli/configuration/#environments).
 
