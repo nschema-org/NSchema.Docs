@@ -62,3 +62,47 @@ discrete overrides are layered on top — see
 The SQL dialect is determined by the provider, so there is nothing to configure. NSchema's
 canonical [DDL types](/ddl/types/) are translated to PostgreSQL's spelling on output, and
 expressions in `DEFAULT` / `CHECK` / index `WHERE` are passed through verbatim.
+
+## Using the library
+
+When [embedding the engine](/library/embedding/) instead of the CLI, register Postgres with the
+`NSchema.Postgres` package:
+
+```sh
+dotnet add package NSchema.Core
+dotnet add package NSchema.Postgres
+```
+
+`UseCurrentSchemaPostgres` has four overloads. The three connection-aware overloads register an
+`NpgsqlDataSource` for you (via `AddNpgsqlDataSource`) and wire up both the current-schema
+provider and the SQL generator; the no-arg overload assumes you've already registered an
+`NpgsqlDataSource`:
+
+```csharp
+// 1. Connection string.
+builder.UseCurrentSchemaPostgres("Host=localhost;Database=app;Username=postgres;Password=postgres");
+
+// 2. Configure the NpgsqlDataSourceBuilder directly.
+builder.UseCurrentSchemaPostgres(b => b.EnableDynamicJson());
+
+// 3. As above, with access to the IServiceProvider.
+builder.UseCurrentSchemaPostgres((sp, b) => b.UseLoggerFactory(sp.GetRequiredService<ILoggerFactory>()));
+
+// 4. Bring your own data source (register it yourself first).
+builder.Services.AddNpgsqlDataSource(connectionString);
+builder.UseCurrentSchemaPostgres();
+```
+
+### Postgres-specific types
+
+`SqlTypePostgresExtensions` adds Postgres-only members to `SqlType` for code-built schemas:
+
+| Member           | Postgres type | Notes                                                   |
+|------------------|---------------|---------------------------------------------------------|
+| `SqlType.Citext` | `citext`      | Case-insensitive text. Requires the `citext` extension. |
+| `SqlType.Jsonb`  | `jsonb`       | Binary JSON.                                            |
+
+In [DDL](/ddl/types/) you write these as ordinary type names (`citext`, `jsonb`); unrecognised
+names pass through as custom types. `citext` requires the extension to exist in the target
+database — NSchema does not create it for you, so add a
+[deployment script](/guides/deployment-scripts/) (`CREATE EXTENSION IF NOT EXISTS citext;`).

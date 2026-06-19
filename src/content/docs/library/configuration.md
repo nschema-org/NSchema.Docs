@@ -126,7 +126,7 @@ Useful for deploying schemas independently of one another:
 ```csharp
 var app = builder
     .AddDdlSchemas("schemas")
-    .UsePostgres(connectionString)
+    .UseCurrentSchemaPostgres(connectionString)
     .Build();
 
 await app.Plan(new PlanArguments { Schemas = ["app"] });   // only "app" is read, validated, and diffed
@@ -168,7 +168,7 @@ database. This is typically done via a provider package like `NSchema.Postgres`:
 
 ```csharp
 // Using a provider package:
-builder.UsePostgres(connectionString);
+builder.UseCurrentSchemaPostgres(connectionString);
 
 // Or directly:
 builder.UseCurrentSchema<PostgresSchemaProvider>();

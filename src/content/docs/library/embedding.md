@@ -54,7 +54,7 @@ var builder = NSchemaApplication.CreateBuilder(args);
 
 builder
     .AddDdlSchemas("schemas")
-    .UsePostgres(connectionString)
+    .UseCurrentSchemaPostgres(connectionString)
     .WithDestructiveActionPolicy(DestructiveActionPolicy.Warn);
 
 var app = builder.Build();
