@@ -70,7 +70,7 @@ have them merged at runtime.
 Current state is accessed through `ICurrentSchemaProvider`, which wraps two optional sources:
 
 - **Online.** The live database, registered via `UseCurrentSchema<T>()` or a provider package
-  like `UsePostgres(...)`.
+  like `UseCurrentSchemaPostgres(...)`.
 - **Offline.** A persisted snapshot, enabled automatically when a `ISchemaStateStore` is
   registered via `UseStateStore<T>()`.
 
