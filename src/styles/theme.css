@@ -1,0 +1,20 @@
+/* NSchema brand theme — accent derived from the logo mark (#6b8fff on #3a3d4a). */
+
+:root {
+  /* Dark theme (default) — accents read against a dark background. */
+  --sl-color-accent-low: #1b2447;
+  --sl-color-accent: #4a6fe8;
+  --sl-color-accent-high: #c2cfff;
+}
+
+:root[data-theme="light"] {
+  /* Light theme — accents need more contrast against white. */
+  --sl-color-accent-low: #dbe2ff;
+  --sl-color-accent: #2f55d4;
+  --sl-color-accent-high: #182a63;
+}
+
+/* Slightly tighten the hero on the landing page. */
+.hero > .copy {
+  max-width: 40rem;
+}
