@@ -222,11 +222,9 @@ Notes on the shape:
   quotes without escaping; the inner content is taken verbatim (delimiters stripped,
   surrounding whitespace trimmed) and is **not** dialect-translated.
 
-:::note[CLI vs. inline scripts]
-The grammar above is the *inline* form used by the library. With the **CLI**, deployment
-scripts are written as separate raw-SQL files suffixed `*.pre.sql` / `*.post.sql` instead —
-see [Deployment scripts](/guides/deployment-scripts/). Either way they run on every apply and
-must be idempotent.
+:::note
+Deployment scripts run on every apply, so they must be idempotent — see
+[Deployment scripts](/guides/deployment-scripts/).
 :::
 
 ### Schemas

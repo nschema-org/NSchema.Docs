@@ -45,5 +45,5 @@ runs.
 If a [state store](/guides/state/) is configured, the resulting schema is captured to it
 after a successful apply, so later offline plans can run against that snapshot.
 
-[Deployment scripts](/guides/deployment-scripts/) (`*.pre.sql` / `*.post.sql`) run on every
-apply, before and after the migration respectively.
+[Deployment scripts](/guides/deployment-scripts/) (inline `PRE`/`POST DEPLOYMENT` blocks) run on
+every apply, before and after the migration respectively.

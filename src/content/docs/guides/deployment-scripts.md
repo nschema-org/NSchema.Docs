@@ -7,32 +7,9 @@ Some setup can't be expressed declaratively — creating an extension, a role, a
 backfilling data. For these, NSchema has **deployment scripts**: raw SQL that runs before or
 after the computed migration.
 
-## With the CLI: `.pre.sql` / `.post.sql` files
+## Declaring them inline: `PRE/POST DEPLOYMENT`
 
-With the [CLI](/cli/), deployment scripts are raw SQL files distinguished by suffix:
-
-- `*.pre.sql` files run (in filename order) **before** the migration;
-- `*.post.sql` files run (in filename order) **after** it.
-
-They can live anywhere under the project, alongside your schema files — the suffix is what
-marks them. They're **excluded** from the desired schema (never parsed as NSchema DDL).
-[`plan`](/cli/commands/plan/) previews them and [`apply`](/cli/commands/apply/) runs them. Use a
-numeric prefix to order them:
-
-```sql
--- 001_extensions.pre.sql
-CREATE EXTENSION IF NOT EXISTS citext;
-```
-
-```sql
--- 010_backfill.post.sql
-UPDATE app.users SET status = 'active' WHERE status IS NULL;
-```
-
-## With the library: inline `PRE/POST DEPLOYMENT`
-
-When [embedding the engine](/library/embedding/), deployment scripts are declared **inline** in
-the `.sql` files instead, with a dollar-quoted body:
+Deployment scripts are declared **inline** in your `.sql` files, with a dollar-quoted body:
 
 ```sql
 PRE DEPLOYMENT 'enable_citext' AS $$
@@ -44,9 +21,20 @@ POST DEPLOYMENT 'reindex' (run_outside_transaction = true) AS $$
 $$;
 ```
 
+- `PRE DEPLOYMENT` blocks run **before** the computed migration;
+- `POST DEPLOYMENT` blocks run **after** it.
+
+The name (a single-quoted string) appears in plan output and logs. The body is opaque SQL —
+NSchema runs it verbatim rather than parsing it as declarative schema. They sit right alongside
+your table and view declarations in the same files; [`plan`](/cli/commands/plan/) previews them
+and [`apply`](/cli/commands/apply/) runs them.
+
 The `run_outside_transaction = true` option is for statements the database forbids inside a
 transaction (e.g. `CREATE INDEX CONCURRENTLY`). See the
 [grammar reference](/ddl/grammar/#deployment-scripts) for the full syntax.
+
+This is the same whether you drive NSchema through the [CLI](/cli/) or by
+[embedding the engine](/library/embedding/) — scripts live in the DDL either way.
 
 ## They must be idempotent
 

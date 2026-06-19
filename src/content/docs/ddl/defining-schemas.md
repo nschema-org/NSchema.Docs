@@ -59,9 +59,9 @@ A few things to note, each covered in full by the [grammar reference](/ddl/gramm
 With the **CLI**, the desired schema is every `*.sql` file found recursively under the project
 directory (the [`--directory`](/cli/#global-flags) root). There is no format, directory, or
 glob to configure — split your schema across as many files as you like (one per schema, one
-per table, whatever suits). Files named `*.pre.sql` / `*.post.sql` are
-[deployment scripts](/guides/deployment-scripts/), not desired schema, and
-`*.env.<name>.sql` files are [environment overlays](/cli/configuration/#environments).
+per table, whatever suits). [Deployment scripts](/guides/deployment-scripts/) live inline in
+those same files as `PRE`/`POST DEPLOYMENT` blocks, and `*.env.<name>.sql` files are
+[environment overlays](/cli/configuration/#environments).
 
 With the **library**, files are registered explicitly with `AddDdlSchemas` — see
 [Configuration (C#)](/library/configuration/#configuring-desired-schemas).
