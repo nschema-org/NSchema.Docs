@@ -11,8 +11,8 @@ export default defineConfig({
       description:
         "A declarative database schema migration tool. Describe the schema you want; NSchema computes and applies the migration to get there.",
       logo: {
-        light: "./src/assets/nschema-mark.svg",
-        dark: "./src/assets/nschema-mark.svg"
+        light: "./assets/nschema-mark.svg",
+        dark: "./assets/nschema-mark.svg"
       },
       favicon: "/favicon.svg",
       customCss: ["./src/styles/theme.css"],
