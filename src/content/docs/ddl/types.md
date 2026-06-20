@@ -1,13 +1,11 @@
 ---
 title: Type reference
-draft: true
-description: The canonical, dialect-agnostic column types NSchema DDL accepts, and how SQL spellings normalize to them.
+description: The canonical, dialect-agnostic column types the NSchema DDL accepts.
 ---
 
-Column types in NSchema DDL are written as compact, **dialect-agnostic** strings. You write
-the canonical type; the provider maps it to the target database's spelling on output. Anything
-NSchema doesn't recognise is passed through verbatim as a custom type, so database-specific
-types still work.
+Column types in NSchema DDL are dialect-agnostic. You write the canonical type; the provider maps it to the target 
+database's spelling on output. Anything NSchema doesn't recognize is passed through verbatim as a custom type, so 
+database-specific types still work.
 
 ## Canonical types
 
@@ -25,13 +23,13 @@ Parameterless types are just their name; sized and precision types include their
 | `varbinary`, `varbinary(32)`                                 | `SqlType.VarBinary()`, `SqlType.VarBinary(32)`              |
 | any other value, e.g. `jsonb`                                | `SqlType.Custom("jsonb")`                                   |
 
-Any string that isn't a recognized built-in type becomes a **custom type**, which is how you
-target database-specific types like `jsonb` or a schema-qualified enum (`app.status`).
+Any string that isn't a recognized built-in type becomes a **custom type**, which is how you target database-specific 
+types like `jsonb` or a schema-qualified enum (`app.status`).
 
 ## SQL spelling aliases
 
-Common SQL spellings normalize to the canonical name, so a SQL-flavoured schema round-trips
-cleanly against database introspection:
+Common SQL spellings normalize to the canonical name, so a SQL-flavored schema round-trips cleanly against database 
+introspection:
 
 | You write                         | Normalizes to               |
 |-----------------------------------|-----------------------------|
@@ -48,8 +46,8 @@ cleanly against database introspection:
 
 ## Using enums, domains, and composite types as column types
 
-Types you declare with `CREATE ENUM`, `CREATE DOMAIN`, or `CREATE TYPE` are used by naming
-them as a column's type, schema-qualified:
+Types you declare with `CREATE ENUM`, `CREATE DOMAIN`, or `CREATE TYPE` are used by naming them as a column's type, 
+schema-qualified:
 
 ```sql
 CREATE ENUM app.order_status ('pending', 'shipped', 'delivered');
