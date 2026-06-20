@@ -1,18 +1,12 @@
 ---
 title: Destructive-action safety
-draft: true
 description: How NSchema guards against accidental data loss, and how to opt into destructive changes when you mean them.
 sidebar:
   order: 60
 ---
 
-NSchema treats **destructive changes** — dropping a table, dropping a column, and similar
-data-losing operations — with care. By default, a plan that contains one is an **error**, so
-you can't accidentally apply it.
-
-## The policy
-
-The destructive-action policy has three settings:
+By default, NSchema will error on destructive actions like dropping a table or column, so you can't cause data to be lost
+without opting in via the `--destructive-actions` option. It has three settings:
 
 | Value             | Behaviour                                                             |
 |-------------------|-----------------------------------------------------------------------|
@@ -22,7 +16,7 @@ The destructive-action policy has three settings:
 
 ## Setting it
 
-Set the policy in any of the three [configuration layers](/cli/configuration/#precedence):
+The destructive action policy can be set in any of the three [configuration layers](/cli/configuration/#precedence):
 
 ```sql
 -- in a config block (lowest precedence)
@@ -41,20 +35,15 @@ export NSCHEMA_DESTRUCTIVE_ACTION_POLICY=warn
 nschema apply --destructive-actions allow
 ```
 
-The flag applies to [`plan`](/cli/commands/plan/) and [`apply`](/cli/commands/apply/).
+The option applies to both [`plan`](/cli/commands/plan/) and [`apply`](/cli/commands/apply/).
 
-## Recommended approach
+## Recommendations
 
-- **Keep the default `error`** for normal development and CI, so a destructive change never
-  slips through unnoticed.
-- When you *intend* a destructive change, make it deliberate: review the plan, then re-run that
-  specific apply with `--destructive-actions allow` (or `warn`).
-- Prefer **renames over drop+recreate** where you can. Using `RENAMED FROM` on a schema, table,
-  or column tells the comparer to match the existing object instead of dropping it — preserving
-  the data. See the [grammar reference](/ddl/grammar/).
+- **Keep the default `error`** for normal development and CI, so a destructive change never slips through unnoticed.
+- When you _intend_ a destructive change, make it explicit: review the plan, then re-run that specific apply with `--destructive-actions allow` (or `warn`).
+- Prefer **renames over drop+recreate** where you can. Using `RENAMED FROM` tells the comparer to match the existing object instead of dropping it. See the [grammar reference](/ddl/grammar/).
 
 ## `destroy` is exempt
 
-[`nschema destroy`](/cli/commands/destroy/) is purely destructive by design and is **not**
-subject to this policy — it's the intended escape hatch for tearing a managed schema back down.
-It still prompts for confirmation unless you pass `--auto-approve`.
+[`nschema destroy`](/cli/commands/destroy/) is destructive by design and is **not** protected by this policy, although it does still require 
+the `--auto-approve` flag.

@@ -1,6 +1,5 @@
 ---
 title: Deployment scripts
-draft: true
 description: Run imperative SQL before or after a migration
 sidebar:
   order: 50
