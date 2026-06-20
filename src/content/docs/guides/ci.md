@@ -1,19 +1,19 @@
 ---
 title: Running in CI
-draft: true
-description: Patterns for running NSchema in continuous integration — non-interactive applies, exit-code gating, and offline planning.
+description: Patterns for running NSchema in a continuous integration environment.
 ---
 
-NSchema is built to run unattended. A few things make it CI-friendly: a strict
-[exit-code contract](/cli/exit-codes/), opt-in "did anything change?" signals, and
-[offline planning](/guides/state/) that needs no database at plan time.
+NSchema is built to run unattended and be easy to automate. A few things facilitate this: 
+- a strict [exit-code contract](/cli/exit-codes/),
+- opt-in "did anything change?" signals, 
+- [offline planning](/guides/state/) that needs no database at plan time,
+- and built-in linting, validation and drifting checks.
 
 ## Always pass `--auto-approve` for applies
 
-[`apply`](/cli/commands/apply/) and [`destroy`](/cli/commands/destroy/) prompt for confirmation
-by default. With no interactive terminal — as in CI — a run **without** `--auto-approve` makes
-no changes and exits `1`, so a forgotten flag fails the step loudly rather than silently doing
-nothing:
+Write actions like [`apply`](/cli/commands/apply/) and [`destroy`](/cli/commands/destroy/) will prompt for confirmation
+by default. When running in a non-interactive terminal, like in a build pipeline, `nschema` will exit `1` and make no changes, unless the `--auto-approve` flag is specified,
+this helps protect against executing changes unintentionally:
 
 ```sh
 nschema apply --auto-approve
@@ -21,8 +21,8 @@ nschema apply --auto-approve
 
 ## Supply secrets through the environment
 
-Put the connection string (and, if your platform splits them out, credentials) in CI secrets,
-not in committed config:
+While the `PROVIDER` block supports setting the connection string and password directly, it is _strongly_ recommended to
+provide them via environment variables instead. Connection strings don't belong in source control:
 
 ```sh
 export NSCHEMA_POSTGRES_CONNECTION_STRING="$DB_CONNECTION_STRING"
@@ -35,15 +35,14 @@ See [Environment variables](/cli/environment-variables/).
 
 ## Gate a pull request on "would this change the schema?"
 
-`plan` exits `0` by default even when there are changes. Add `--detailed-exitcode` to get the
-`2`-means-changes signal, so a check can fail (or comment) when a PR alters the schema:
+The `plan` command always exits `0` by default unless there was an error. If you opt in with`--detailed-exitcode`, 
+NSchema will return `2` when there are changes, so a check can fail (or comment) when a PR alters the schema:
 
 ```sh
 nschema plan --detailed-exitcode    # 0 = no changes, 2 = changes, 1 = error
 ```
 
-Pair it with a state store so this runs **without a database connection** — see
-[Offline planning & state](/guides/state/).
+If a state store is configured, this will run **without a database connection**. See [Offline planning & state](/guides/state/).
 
 ## Enforce formatting
 
@@ -55,16 +54,16 @@ nschema fmt --check    # exits 2 if files need formatting, 1 on error
 
 ## Validate schema files fast
 
-A quick, database-free correctness check, good as an early CI step:
+A quick, database-free correctness check, checks syntax and some basic structural checks like missing references or 
+empty tables:
 
 ```sh
 nschema validate
 ```
 
-## Review now, apply later
+## Plan now, apply later
 
-The safest pipeline splits planning from applying: compute and **save** a plan during review,
-then apply that **exact** file after approval — so what was reviewed is what runs.
+The safest pipeline splits planning from applying: by saving the plan output, you can `apply` that file at a later time, so you guarantee what runs.
 
 ```sh
 # in the PR pipeline:
@@ -74,9 +73,6 @@ nschema plan --out migration.nplan
 # in the deploy pipeline, after approval:
 nschema apply --plan-file migration.nplan --auto-approve
 ```
-
-The saved plan fixes its own scope, schema, and destructive-action policy, so the deploy step
-doesn't even need the `.sql` files — only a live database to write to.
 
 ## Monitor for drift on a schedule
 
@@ -88,13 +84,13 @@ nschema drift --detailed-exitcode    # 2 = drift detected
 
 See [Detecting drift](/guides/drift/).
 
-## Exit codes, summarised
+## Exit codes, summarized
 
-| Code | Meaning |
-| ---- | ------- |
-| `0` | Success / no changes. |
-| `1` | Error, or a declined `apply`/`destroy`. |
-| `2` | Changes present — only from `--detailed-exitcode` and `fmt --check`. |
-| `130` | Cancelled (Ctrl-C). |
+| Code  | Meaning                                                        |
+|-------|----------------------------------------------------------------|
+| `0`   | Success / no changes.                                          |
+| `1`   | Error, or a declined `apply`/`destroy`.                        |
+| `2`   | Changes present, from `--detailed-exitcode` and `fmt --check`. |
+| `130` | Cancelled (Ctrl-C).                                            |
 
 See the [full exit-code contract](/cli/exit-codes/).
