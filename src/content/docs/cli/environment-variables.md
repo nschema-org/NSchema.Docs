@@ -1,13 +1,10 @@
 ---
 title: Environment variables
-draft: true
 description: Every environment variable the nschema CLI reads as a configuration override.
 ---
 
-The CLI reads a small, fixed allow-list of environment variables as configuration overrides.
-Each is read by exactly one binding; no other variables are consulted. Environment values sit
-**above** config blocks and **below** command-line flags in
-[precedence](/cli/configuration/#precedence).
+The CLI offers a small list of environment variables as configuration overrides. Environment values sit above config 
+blocks and below command-line flags in [precedence](/cli/configuration/#precedence).
 
 | Variable                             | Overrides                      | Notes                                                                                                                                                                                     |
 |--------------------------------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -20,18 +17,17 @@ Each is read by exactly one binding; no other variables are consulted. Environme
 
 ## The connection string
 
-The connection string is a secret — supply it through the environment rather than committing
-it:
+The connection string is a secret. Supply it through the environment rather than committing it:
 
 ```sh
 export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
 ```
 
-## Credentials, separately
+## Separate credentials
 
-When your platform manages the database username and password apart from the rest of the
-connection (for example, AWS Secrets Manager injecting them out of band), keep only the
-non-secret host in the connection string and supply the credentials on their own:
+When your platform manages the database username and password apart from the rest of the connection (for example, AWS 
+Secrets Manager injecting them out of band), keep only the non-secret host in the connection string and supply the 
+credentials on their own:
 
 ```sh
 export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=db.internal;Port=5432;Database=app"
@@ -39,9 +35,7 @@ export NSCHEMA_POSTGRES_USERNAME="$DB_USER"
 export NSCHEMA_POSTGRES_PASSWORD="$DB_PASSWORD"
 ```
 
-`NSCHEMA_POSTGRES_USERNAME` / `NSCHEMA_POSTGRES_PASSWORD` (also settable as `username` /
-`password` in the `PROVIDER postgres` block) override any user/password embedded in the
-connection string, so you don't need to recombine the pieces into a single string yourself.
+`NSCHEMA_POSTGRES_USERNAME` / `NSCHEMA_POSTGRES_PASSWORD` (also settable as `username` / `password` in the `PROVIDER postgres` block) 
+override any user/password embedded in the connection string, so you don't need to recombine the pieces into a single string yourself.
 
-The base connection string is applied first, then these discrete overrides are layered on
-top.
+The base connection string is applied first, then these discrete overrides are layered on top.

@@ -44,7 +44,7 @@ export default defineConfig({
       sidebar: [
         { label: "Start Here", items: [{ autogenerate: { directory: "start" } }] },
         { label: "Guides", items: [{ autogenerate: { directory: "guides" } }] },
-        // { label: "CLI Reference", items: [{ autogenerate: { directory: "cli" } }] },
+        { label: "CLI Reference", items: [{ autogenerate: { directory: "cli" } }] },
         { label: "DDL Language", items: [{ autogenerate: { directory: "ddl" } }] },
         { label: "Providers", items: [{ autogenerate: { directory: "providers" } }] },
         { label: "Backends", items: [{ autogenerate: { directory: "backends" } }] },

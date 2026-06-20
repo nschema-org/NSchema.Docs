@@ -1,14 +1,12 @@
 ---
 title: nschema init
-draft: true
 description: Scaffold a new NSchema project in the current directory.
 sidebar:
   label: init
   order: 1
 ---
 
-Scaffold a simple project in the current directory, to get a new project going. It connects
-to nothing.
+Scaffold a simple project in the current directory, to get a new project going. It connects to nothing.
 
 ```sh
 nschema init
@@ -16,8 +14,7 @@ nschema init
 
 This writes:
 
-- `config.sql` — the project's provider/state configuration, as `PROVIDER` / `BACKEND`
-  [config blocks](/cli/configuration/).
+- `config.sql` — the project's provider/state configuration, as `PROVIDER` / `BACKEND` [config blocks](/cli/configuration/).
 - `schemas/example.sql` — a starter [desired-schema](/ddl/defining-schemas/) file.
 
 Edit those to point at your database and describe the schema you want, then
@@ -25,9 +22,9 @@ Edit those to point at your database and describe the schema you want, then
 
 ## Options
 
-- **`--force`** — initialize even if the directory is not empty. Without it, `init` refuses
-  to run in a non-empty directory so it can't clobber existing files.
+- **`--force`** — initialize even if the directory is not empty. Without it, `init` refuses to run in a non-empty 
+  directory so it can't clobber existing files.
 
 ## Needs
 
-Nothing — `init` only writes files.
+Nothing. `init` only writes files.
