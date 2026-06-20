@@ -48,7 +48,7 @@ export default defineConfig({
         { label: "DDL Language", items: [{ autogenerate: { directory: "ddl" } }] },
         { label: "Providers", items: [{ autogenerate: { directory: "providers" } }] },
         { label: "Backends", items: [{ autogenerate: { directory: "backends" } }] },
-        // { label: "Library (Core)", items: [{ autogenerate: { directory: "library" } }] },
+        { label: "Library (Core)", items: [{ autogenerate: { directory: "library" } }] },
         { label: "Reference", items: [{ autogenerate: { directory: "reference" } }] },
         // {
         //   // Generated from each package repo's GitHub releases by
