@@ -1,21 +1,15 @@
 ---
 title: Roadmap
-draft: true
-description: Where NSchema is headed — planned providers, backends, and features.
+description: "Where NSchema is headed: planned providers, backends, and features".
 ---
 
-NSchema is feature-complete for its first target — PostgreSQL, with file or S3 state — but
-there's more planned. This page sketches the direction; it's not a commitment, and priorities
-may shift.
+NSchema is feature-complete for its first target (PostgreSQL, with file or S3 state), but there's more planned. 
 
-:::caution[Pre-release]
-NSchema has no stable release yet. Everything here, including what already works, is subject to
-change before 1.0.
-:::
+This page sketches the direction; it's not a commitment, and priorities may shift.
 
 ## Available today
 
-- **Provider:** PostgreSQL — see [PostgreSQL provider](/providers/postgres/).
+- **Provider:** Postgres see [Postgres provider](/providers/postgres/).
 - **Backends:** local file and Amazon S3 — see [Backends](/backends/).
 - **Environments:** `*.env.<name>.sql` overlays selected with
   [`--environment`](/cli/configuration/#environments).
@@ -38,5 +32,4 @@ target a new database largely by switching the provider.
 
 ## Following along
 
-NSchema is developed in the open. Track progress, file issues, or ask questions on
-[GitHub](https://github.com/nschema-org/NSchema).
+NSchema is developed in the open. Track progress, file issues, or ask questions on [GitHub](https://github.com/nschema-org/NSchema).

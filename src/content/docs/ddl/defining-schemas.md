@@ -13,7 +13,7 @@ is the complete specification, and the [type reference](/ddl/types/) lists suppo
 --- The application schema.
 CREATE PARTIAL SCHEMA app;
 
---- All registered users.
+--- All regis tered users.
 CREATE TABLE app.users
 (
     id bigint NOT NULL IDENTITY,
