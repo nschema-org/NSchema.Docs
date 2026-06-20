@@ -47,13 +47,20 @@
 }
 
 :root[data-theme="light"] {
-  /* Light theme — accents need more contrast against white. */
+  /* Light theme — accents need more contrast against white. Base `:root`
+     above is Starlight's DARK theme, so every surface token tinted there must
+     be given a light value here too, or light mode inherits the dark surface. */
   --sl-color-accent-low: #dbe2ff;
   --sl-color-accent: #2f55d4;
   --sl-color-accent-high: #182a63;
 
+  /* Cool, faintly-blue light surfaces — the light-mode counterpart to the
+     dark tint, so the page is off-white rather than fully dark. */
+  --sl-color-bg: #fbfcff;
+  --sl-color-bg-nav: #f5f7ffe6;
   --sl-color-bg-sidebar: #f5f7ff;
   --sl-color-bg-inline-code: #eef1fb;
+  --sl-color-hairline-shade: #0000000d;
 }
 
 /* Frosted, translucent top nav that lets the hero glow show through. */
