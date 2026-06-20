@@ -117,43 +117,48 @@
 
 /* ── Cards: lift + accent edge ────────────────────────────────────────────── */
 /* Starlight cards are flat by default. Give them a left accent rule and a
-   subtle hover lift so the home-page grids feel deliberate. */
+   subtle hover lift so the home-page grids feel deliberate.
+
+   The lift is driven through `--card-lift` rather than set on `transform`
+   directly: CardGrid's `stagger` mode offsets even children with its own
+   `transform: translateY(--stagger-height)`, so overriding `transform` on hover
+   would cancel that offset and snap the card to the top. Folding the lift into
+   a variable lets it compose with the stagger offset below. */
 
 .card {
   border: 1px solid var(--sl-color-gray-5);
   border-left: 3px solid var(--sl-color-accent);
   border-radius: 0.6rem;
   background: color-mix(in oklab, var(--sl-color-gray-6) 60%, transparent);
-  transition:
-    transform 0.18s ease,
-    border-color 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  border-color: var(--sl-color-accent);
-  box-shadow: 0 0.6rem 1.6rem -0.6rem
-    color-mix(in oklab, var(--sl-color-accent) 50%, transparent);
 }
 
 .card .icon {
   color: var(--sl-color-accent-high);
 }
 
-/* Link cards (the "Start here" grid) get the same hover treatment. */
+.card,
 .sl-link-card {
+  --card-lift: 0px;
+  transform: translateY(var(--card-lift));
   transition:
     transform 0.18s ease,
     border-color 0.18s ease,
     box-shadow 0.18s ease;
 }
 
+.card:hover,
 .sl-link-card:hover {
-  transform: translateY(-3px);
+  --card-lift: -3px;
   border-color: var(--sl-color-accent);
   box-shadow: 0 0.6rem 1.6rem -0.6rem
     color-mix(in oklab, var(--sl-color-accent) 50%, transparent);
+}
+
+/* Re-declare the stagger offset to add the hover lift on top of it, so
+   staggered (right-column) cards rise by `--card-lift` instead of losing their
+   `--stagger-height` offset on hover. */
+.card-grid.stagger > :nth-child(2n) {
+  transform: translateY(calc(var(--stagger-height) + var(--card-lift)));
 }
 
 /* ── Code frames ──────────────────────────────────────────────────────────── */
