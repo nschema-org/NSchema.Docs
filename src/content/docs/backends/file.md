@@ -2,6 +2,8 @@
 title: Local file backend
 draft: true
 description: Persist NSchema state to a JSON file on the local filesystem.
+sidebar:
+  order: 20
 ---
 
 The **local file** backend persists state to a JSON file on the local filesystem. It's the

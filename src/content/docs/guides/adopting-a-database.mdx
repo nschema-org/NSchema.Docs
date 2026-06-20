@@ -1,0 +1,57 @@
+---
+title: Adopting an existing database
+description: Bring an existing PostgreSQL database under NSchema management with import.
+sidebar:
+  order: 20
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+If you already have a database with an unmanaged schema, you don't have to write your SQL from scratch. The
+[`nschema import`](/cli/commands/import/) command reads a live schema and writes it out as [DDL source files](/ddl/defining-schemas/), so
+you can adopt an existing database and manage it going forward.
+
+<Steps>
+
+1. **Point at the database.** Set the connection string (see [Configuration blocks](/cli/configuration/)):
+
+   ```sh
+   export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
+   ```
+
+2. **Import the schema** into a directory:
+
+   ```sh
+   nschema import --out-dir ./schemas
+   ```
+
+   This writes the live schema out as `.sql` files. To adopt only part of the database, you can use the same `--scope`
+   argument that works with `plan` and `apply`:
+
+   ```sh
+   nschema import --out-dir ./schemas --scope app --scope billing
+   ```
+
+   As a safety measure, `import` won't import into a directory that already contains `.sql` files; pass `--force` if you
+   really mean to re-import over existing files.
+
+3. **Review and commit.** Read the generated files, tidy them if you like, and check them into source control.
+
+4. **Verify a no-op plan.** A plan immediately after import should show no changes:
+
+   ```sh
+   nschema plan
+   ```
+
+5. **Manage changes from here.** Edit the `.sql` files and use the normal [plan / apply workflow](/guides/workflow/) from now on.
+
+</Steps>
+
+## Seeding state at the same time
+
+If you plan to use a [state store](/guides/state/) for offline planning, don't forget to seed it from the live database
+with [`nschema refresh`](/cli/commands/refresh/) once your `BACKEND` block is configured:
+
+```sh
+nschema refresh
+```

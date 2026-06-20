@@ -2,6 +2,8 @@
 title: Providers
 draft: true
 description: The database providers NSchema supports, and how they're configured.
+sidebar:
+  order: 10
 ---
 
 A **provider** is the live database NSchema reads from and writes to. It's declared in a

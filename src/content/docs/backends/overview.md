@@ -2,6 +2,8 @@
 title: Backends
 draft: true
 description: NSchema's optional state backend — what it's for, the backends available, and how it's configured.
+sidebar:
+  order: 10
 ---
 
 A **backend** is the optional place NSchema persists a snapshot of the last applied schema. It's
