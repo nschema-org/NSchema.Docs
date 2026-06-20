@@ -36,86 +36,25 @@ export default defineConfig({
       },
       tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 3 },
       sidebar: [
-        {
-          label: "Start Here",
-          items: [
-            { label: "What is NSchema?", slug: "start/introduction" },
-            { label: "Installation", slug: "start/installation" },
-            { label: "Quickstart", slug: "start/quickstart" },
-          ],
-        },
-        {
-          label: "Guides",
-          items: [
-            { label: "The plan / apply workflow", slug: "guides/workflow" },
-            { label: "Adopting an existing database", slug: "guides/adopting-a-database" },
-            { label: "Offline planning & state", slug: "guides/state" },
-            { label: "Detecting drift", slug: "guides/drift" },
-            { label: "Deployment scripts", slug: "guides/deployment-scripts" },
-            { label: "Destructive-action safety", slug: "guides/destructive-actions" },
-            { label: "Running in CI", slug: "guides/ci" },
-          ],
-        },
-        {
-          label: "CLI Reference",
-          items: [
-            { label: "Overview", slug: "cli/overview" },
-            {
-              label: "Commands",
-              items: [{ autogenerate: { directory: "cli/commands" } }],
-            },
-            { label: "Configuration blocks", slug: "cli/configuration" },
-            { label: "Environment variables", slug: "cli/environment-variables" },
-            { label: "Exit codes", slug: "cli/exit-codes" },
-          ],
-        },
-        {
-          label: "DDL Language",
-          items: [
-            { label: "Defining schemas", slug: "ddl/defining-schemas" },
-            { label: "Grammar reference", slug: "ddl/grammar" },
-            { label: "Type reference", slug: "ddl/types" },
-          ],
-        },
-        {
-          label: "Providers",
-          items: [
-            { label: "Overview", slug: "providers/overview" },
-            { label: "PostgreSQL", slug: "providers/postgres" },
-          ],
-        },
-        {
-          label: "Backends",
-          items: [
-            { label: "Overview", slug: "backends/overview" },
-            { label: "Local file", slug: "backends/file" },
-            { label: "Amazon S3", slug: "backends/s3" },
-          ],
-        },
-        {
-          label: "Library (Core)",
-          items: [
-            { label: "Embedding the engine", slug: "library/embedding" },
-            { label: "Concepts & pipeline", slug: "library/concepts" },
-            { label: "Configuration (C#)", slug: "library/configuration" },
-            { label: "Extension points", slug: "library/extension-points" },
-          ],
-        },
-        {
-          label: "Reference",
-          items: [{ label: "Roadmap", slug: "reference/roadmap" }],
-        },
-        {
-          // Generated from each package repo's GitHub releases by
-          // starlight-changelogs; bases must match src/content.config.ts.
-          label: "Changelog",
-          items: makeChangelogsSidebarLinks([
-            { type: "all", base: "changelog/cli", label: "CLI" },
-            { type: "all", base: "changelog/core", label: "Core" },
-            { type: "all", base: "changelog/postgres", label: "PostgreSQL" },
-            { type: "all", base: "changelog/aws", label: "AWS" },
-          ]),
-        },
+        { label: "Start Here", items: [{ autogenerate: { directory: "start" } }] },
+        { label: "Guides", items: [{ autogenerate: { directory: "guides" } }] },
+        // { label: "CLI Reference", items: [{ autogenerate: { directory: "cli" } }] },
+        // { label: "DDL Language", items: [{ autogenerate: { directory: "ddl" } }] },
+        // { label: "Providers", items: [{ autogenerate: { directory: "providers" } }] },
+        // { label: "Backends", items: [{ autogenerate: { directory: "backends" } }] },
+        // { label: "Library (Core)", items: [{ autogenerate: { directory: "library" } }] },
+        // { label: "Reference", items: [{ autogenerate: { directory: "reference" } }] },
+        // {
+        //   // Generated from each package repo's GitHub releases by
+        //   // starlight-changelogs; bases must match src/content.config.ts.
+        //   label: "Changelog",
+        //   items: makeChangelogsSidebarLinks([
+        //     { type: "all", base: "changelog/cli", label: "CLI" },
+        //     { type: "all", base: "changelog/core", label: "Core" },
+        //     { type: "all", base: "changelog/postgres", label: "PostgreSQL" },
+        //     { type: "all", base: "changelog/aws", label: "AWS" },
+        //   ]),
+        // },
       ],
     }),
   ],
