@@ -1,6 +1,8 @@
 ---
 title: The plan / apply workflow
 description: "The core NSchema development workflow: editing the schema, previewing the plan, and applying it."
+sidebar:
+  order: 10
 ---
 
 The core of working with NSchema is a short loop, the same shape as Terraform's and other declarative management tools:

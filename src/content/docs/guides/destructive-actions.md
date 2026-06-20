@@ -2,6 +2,8 @@
 title: Destructive-action safety
 draft: true
 description: How NSchema guards against accidental data loss, and how to opt into destructive changes when you mean them.
+sidebar:
+  order: 60
 ---
 
 NSchema treats **destructive changes** — dropping a table, dropping a column, and similar

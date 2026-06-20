@@ -2,6 +2,8 @@
 title: Detecting drift
 draft: true
 description: Use nschema drift to find out whether the live database has diverged from the recorded state.
+sidebar:
+  order: 40
 ---
 
 **Drift** is when the live database no longer matches what NSchema recorded — someone ran a
