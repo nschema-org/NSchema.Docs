@@ -2,8 +2,12 @@
 title: NSchema
 description: A declarative database schema migration tool. Describe the schema you want; NSchema computes and applies the migration to get there.
 template: splash
+banner:
+  content: |
+    <b>Warning!</b>
+    NSchema is not yet production ready, but a stable release is expected soon.
 hero:
-  tagline: Describe the schema you want. NSchema computes and applies the migration to get there — Terraform, for your database schema.
+  tagline: A declarative database schema migration tool. Describe the schema you want; NSchema computes and applies the migration to get there.
   image:
     alt: The NSchema logo
     file: ../../../assets/nschema-mark.svg
@@ -14,36 +18,29 @@ hero:
       variant: primary
     - text: View on GitHub
       link: https://github.com/nschema-org/NSchema
-      icon: external
-      variant: minimal
+      icon: github
+      variant: secondary
 ---
 
 import { Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-:::caution[Pre-release]
-NSchema is still young — there's no stable release yet. It's not production-ready, but you're welcome to follow along, try it out, and ask questions.
-:::
-
 ## Why NSchema?
 
 <CardGrid stagger>
-  <Card title="Declarative, not migrations" icon="document">
-    You write the *final shape* of your schema in SQL-flavoured DDL — no `ALTER`
-    steps, no migration files to number and order. NSchema diffs it against the
-    live database and computes the plan.
+  <Card title="Declarative SQL, not migrations" icon="document">
+    Declare your schema using only familiar `CREATE`-based SQL statements.
+    NSchema will diff the desired schema against the database (or a snapshot), and compute the migration automatically.
   </Card>
   <Card title="Plan before you apply" icon="approve-check">
-    Every run previews the exact changes first, Terraform-style. Save a plan and
-    apply that exact file later, so what you reviewed is what runs.
+    Every run previews the exact changes first, Terraform-style. See the schema and the exact SQL that will be executed before you apply.
+    Not ready to commit? Save the plan-file to disk, and `apply` it later.
   </Card>
   <Card title="Safe by default" icon="warning">
-    Destructive changes error out unless you opt in. Drift detection, offline
-    planning against persisted state, and idempotent deployment scripts round it
-    out.
+    Destructive changes are blocked by default unless overridden, drift checking prevents unintended changes,
+    and offline state snapshots allow you to produce plans without needing direct access to the database.
   </Card>
   <Card title="Adopt any database" icon="seti:db">
-    Point `import` at an existing PostgreSQL database and NSchema writes your
-    schema out as DDL, ready to check in and manage from there.
+   Connect to an existing database using a supported NSchema provider. Run `nschema import` and output your current schema out as DDL, ready to check in and manage from there.
   </Card>
 </CardGrid>
 
