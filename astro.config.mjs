@@ -28,7 +28,7 @@ export default defineConfig({
       // The DDL grammar pages use ```ebnf fences; Shiki has no EBNF grammar, so
       // render them as plain monospace rather than emitting a warning per block.
       expressiveCode: {
-        shiki: { langAlias: { ebnf: "ebnf" } },
+        shiki: { langAlias: { ebnf: "txt" } },
       },
       social: [
         {
