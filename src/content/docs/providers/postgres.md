@@ -2,6 +2,8 @@
 title: PostgreSQL provider
 draft: true
 description: Configure the PostgreSQL provider — the live database NSchema reads from and writes to.
+sidebar:
+  order: 20
 ---
 
 PostgreSQL is the provider NSchema supports today. Declare it with a `PROVIDER postgres`
@@ -18,12 +20,12 @@ The `postgres` label names the provider on its own — there's no separate provi
 
 ## Attributes
 
-| Attribute | Type | Description |
-| --------- | ---- | ----------- |
-| `connection_string` | string | The Npgsql connection string used to reach the database. Best supplied via the environment (see below). |
-| `username` | string | The username, supplied separately from the connection string. Overrides any user embedded in it. |
-| `password` | string | The password, supplied separately from the connection string. Overrides any password embedded in it. |
-| `command_timeout` | integer | The command timeout, in seconds. When omitted, Npgsql's default is used. |
+| Attribute           | Type    | Description                                                                                             |
+|---------------------|---------|---------------------------------------------------------------------------------------------------------|
+| `connection_string` | string  | The Npgsql connection string used to reach the database. Best supplied via the environment (see below). |
+| `username`          | string  | The username, supplied separately from the connection string. Overrides any user embedded in it.        |
+| `password`          | string  | The password, supplied separately from the connection string. Overrides any password embedded in it.    |
+| `command_timeout`   | integer | The command timeout, in seconds. When omitted, Npgsql's default is used.                                |
 
 Any attribute not listed here is rejected — a typo surfaces as an error rather than being
 silently ignored.
