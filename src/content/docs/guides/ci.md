@@ -35,7 +35,7 @@ export NSCHEMA_POSTGRES_PASSWORD="$DB_PASSWORD"
 
 See [Environment variables](/cli/environment-variables/).
 
-## Gate a pull request on "would this change the schema?"
+## Gate a pull request on changes
 
 The `plan` command always exits `0` by default unless there was an error. If you opt in with`--detailed-exitcode`, 
 NSchema will return `2` when there are changes, so a check can fail (or comment) when a PR alters the schema:
