@@ -1,5 +1,6 @@
 ---
 title: PostgreSQL provider
+draft: true
 description: Configure the PostgreSQL provider — the live database NSchema reads from and writes to.
 ---
 

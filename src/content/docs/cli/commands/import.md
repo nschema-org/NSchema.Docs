@@ -1,5 +1,6 @@
 ---
 title: nschema import
+draft: true
 description: Read the live database schema and write it out as desired-schema source files.
 sidebar:
   label: import

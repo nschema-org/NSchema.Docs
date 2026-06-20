@@ -8,8 +8,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "NSchema",
-      description:
-        "A declarative database schema migration tool. Describe the schema you want; NSchema computes and applies the migration to get there.",
+      description: "A declarative database schema migration tool. Describe the schema you want; NSchema computes and applies the migration to get there.",
       logo: {
         light: "./assets/nschema-mark.svg",
         dark: "./assets/nschema-mark.svg"
@@ -19,7 +18,7 @@ export default defineConfig({
       // The DDL grammar pages use ```ebnf fences; Shiki has no EBNF grammar, so
       // render them as plain monospace rather than emitting a warning per block.
       expressiveCode: {
-        shiki: { langAlias: { ebnf: "plaintext" } },
+        shiki: { langAlias: { ebnf: "ebnf" } },
       },
       social: [
         {

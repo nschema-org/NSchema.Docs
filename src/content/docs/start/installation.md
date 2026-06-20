@@ -1,18 +1,17 @@
 ---
 title: Installation
+draft: true
 description: Install the nschema .NET global tool.
 sidebar:
   order: 2
 ---
 
-NSchema ships as a **.NET global tool** named `nschema`.
+NSchema ships as a **[.NET tool](https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools)** named `nschema`.
 
 ## Prerequisites
 
-- **.NET SDK 10.0 or later.** The tool targets `net10.0`. Check with `dotnet --version`;
-  install from [dotnet.microsoft.com](https://dotnet.microsoft.com/download) if needed.
-- **A PostgreSQL database** to manage (for the commands that touch one). Planning can also
-  run offline against a [state store](/guides/state/), with no database connection.
+- **.NET SDK 10.0 or later.** The tool targets `net10.0`. Check with `dotnet --version`; install from [dotnet.microsoft.com](https://dotnet.microsoft.com/download) if needed.
+- **A database.** This tool is for managing database schemas after all. See [Providers](../providers/providers.md) for supported databases.
 
 ## Install
 

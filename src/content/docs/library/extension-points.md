@@ -1,5 +1,6 @@
 ---
 title: Extension points
+draft: true
 description: Every interface in the NSchema pipeline you can swap or extend, and how to register it.
 ---
 

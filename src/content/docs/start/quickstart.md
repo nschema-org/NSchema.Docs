@@ -1,5 +1,6 @@
 ---
 title: Quickstart
+draft: true
 description: From an empty directory to an applied schema in about five minutes.
 sidebar:
   order: 3

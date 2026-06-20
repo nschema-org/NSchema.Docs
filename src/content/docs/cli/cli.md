@@ -9,20 +9,20 @@ cross-cutting pieces they all share.
 
 ## Commands at a glance
 
-| Command | What it does |
-| ------- | ------------ |
-| [`init`](/cli/commands/init/) | Scaffold a new project in the current directory. |
-| [`validate`](/cli/commands/validate/) | Check that the desired-schema files are well-formed. |
-| [`fmt`](/cli/commands/fmt/) | Reformat `.sql` files to a canonical layout. |
-| [`plan`](/cli/commands/plan/) | Compute and show the migration plan, changing nothing. |
-| [`apply`](/cli/commands/apply/) | Compute the plan and apply it to the database. |
-| [`refresh`](/cli/commands/refresh/) | Read the live schema and write it to the state store. |
-| [`import`](/cli/commands/import/) | Write the live schema out as desired-schema files. |
-| [`destroy`](/cli/commands/destroy/) | Drop all managed schema objects from the database. |
-| [`show`](/cli/commands/show/) | Print the schema recorded in the state store. |
-| [`drift`](/cli/commands/drift/) | Report how the live database differs from recorded state. |
-| [`force-unlock`](/cli/commands/force-unlock/) | Forcibly release a stale state-store lock. |
-| [`completion`](/cli/commands/completion/) | Output a shell tab-completion script. |
+| Command                                       | What it does                                              |
+|-----------------------------------------------|-----------------------------------------------------------|
+| [`init`](/cli/commands/init/)                 | Scaffold a new project in the current directory.          |
+| [`validate`](/cli/commands/validate/)         | Check that the desired-schema files are well-formed.      |
+| [`fmt`](/cli/commands/fmt/)                   | Reformat `.sql` files to a canonical layout.              |
+| [`plan`](/cli/commands/plan/)                 | Compute and show the migration plan, changing nothing.    |
+| [`apply`](/cli/commands/apply/)               | Compute the plan and apply it to the database.            |
+| [`refresh`](/cli/commands/refresh/)           | Read the live schema and write it to the state store.     |
+| [`import`](/cli/commands/import/)             | Write the live schema out as desired-schema files.        |
+| [`destroy`](/cli/commands/destroy/)           | Drop all managed schema objects from the database.        |
+| [`show`](/cli/commands/show/)                 | Print the schema recorded in the state store.             |
+| [`drift`](/cli/commands/drift/)               | Report how the live database differs from recorded state. |
+| [`force-unlock`](/cli/commands/force-unlock/) | Forcibly release a stale state-store lock.                |
+| [`completion`](/cli/commands/completion/)     | Output a shell tab-completion script.                     |
 
 ## Global flags
 

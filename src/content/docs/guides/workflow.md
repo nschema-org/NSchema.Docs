@@ -1,5 +1,6 @@
 ---
 title: The plan / apply workflow
+draft: true
 description: The day-to-day NSchema loop — edit your schema, preview the plan, apply it — plus scoping and saved plans.
 ---
 

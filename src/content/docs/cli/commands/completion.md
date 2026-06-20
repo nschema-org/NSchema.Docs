@@ -1,5 +1,6 @@
 ---
 title: nschema completion
+draft: true
 description: Output a shell tab-completion script for nschema.
 sidebar:
   label: completion

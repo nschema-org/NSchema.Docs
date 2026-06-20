@@ -1,5 +1,6 @@
 ---
 title: nschema plan
+draft: true
 description: Compute and show the migration plan, without changing anything.
 sidebar:
   label: plan

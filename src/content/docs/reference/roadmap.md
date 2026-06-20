@@ -1,5 +1,6 @@
 ---
 title: Roadmap
+draft: true
 description: Where NSchema is headed — planned providers, backends, and features.
 ---
 

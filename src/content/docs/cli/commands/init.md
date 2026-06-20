@@ -1,5 +1,6 @@
 ---
 title: nschema init
+draft: true
 description: Scaffold a new NSchema project in the current directory.
 sidebar:
   label: init

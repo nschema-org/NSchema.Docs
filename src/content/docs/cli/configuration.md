@@ -1,5 +1,6 @@
 ---
 title: Configuration blocks
+draft: true
 description: Declare the database provider and state backend in SQL-shaped config blocks, alongside your schema.
 ---
 
@@ -31,11 +32,11 @@ NSCHEMA (
 );
 ```
 
-| Block | Purpose |
-| ----- | ------- |
+| Block              | Purpose                                                                                                     |
+|--------------------|-------------------------------------------------------------------------------------------------------------|
 | `PROVIDER <label>` | The live database. `postgres` is the only label today. See the [PostgreSQL provider](/providers/postgres/). |
-| `BACKEND <label>` | The state backend. `file` or `s3`. See [Backends](/backends/). |
-| `NSCHEMA` | Project-level settings (no label). |
+| `BACKEND <label>`  | The state backend. `file` or `s3`. See [Backends](/backends/).                                              |
+| `NSCHEMA`          | Project-level settings (no label).                                                                          |
 
 The `BACKEND` block may instead select S3:
 

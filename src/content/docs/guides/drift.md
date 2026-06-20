@@ -1,5 +1,6 @@
 ---
 title: Detecting drift
+draft: true
 description: Use nschema drift to find out whether the live database has diverged from the recorded state.
 ---
 

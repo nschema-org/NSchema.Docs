@@ -1,5 +1,6 @@
 ---
 title: Defining schemas
+draft: true
 description: A practical introduction to declaring schemas in NSchema DDL — a declarative, dialect-agnostic schema language.
 ---
 

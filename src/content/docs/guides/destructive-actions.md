@@ -1,5 +1,6 @@
 ---
 title: Destructive-action safety
+draft: true
 description: How NSchema guards against accidental data loss, and how to opt into destructive changes when you mean them.
 ---
 
@@ -11,11 +12,11 @@ you can't accidentally apply it.
 
 The destructive-action policy has three settings:
 
-| Value | Behaviour |
-| ----- | --------- |
-| `error` (default) | A destructive change fails the run. Nothing is applied. |
-| `warn` | A destructive change is reported as a warning, but the run continues. |
-| `allow` | Destructive changes are applied without warning. |
+| Value             | Behaviour                                                             |
+|-------------------|-----------------------------------------------------------------------|
+| `error` (default) | A destructive change fails the run. Nothing is applied.               |
+| `warn`            | A destructive change is reported as a warning, but the run continues. |
+| `allow`           | Destructive changes are applied without warning.                      |
 
 ## Setting it
 

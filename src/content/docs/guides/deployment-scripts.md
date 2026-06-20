@@ -1,5 +1,6 @@
 ---
 title: Deployment scripts
+draft: true
 description: Run raw, imperative SQL before or after a migration — for the things declarative DDL can't express.
 ---
 

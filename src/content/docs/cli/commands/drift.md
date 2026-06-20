@@ -1,5 +1,6 @@
 ---
 title: nschema drift
+draft: true
 description: Check whether the live database has drifted from the recorded state.
 sidebar:
   label: drift

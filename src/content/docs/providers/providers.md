@@ -1,5 +1,6 @@
 ---
 title: Providers
+draft: true
 description: The database providers NSchema supports, and how they're configured.
 ---
 
@@ -13,8 +14,8 @@ the schema for offline planning. This section covers the live-database providers
 
 ## Supported today
 
-| Provider | Page |
-| -------- | ---- |
+| Provider   | Page                                        |
+|------------|---------------------------------------------|
 | PostgreSQL | [PostgreSQL provider](/providers/postgres/) |
 
 ## On the roadmap

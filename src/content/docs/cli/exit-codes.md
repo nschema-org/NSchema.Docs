@@ -1,17 +1,18 @@
 ---
 title: Exit codes
+draft: true
 description: The exit-code contract every nschema command follows, so scripts and CI can branch on the result.
 ---
 
 Every command follows the same contract, so scripts and CI can branch on the result without
 parsing output:
 
-| Code | Meaning |
-| ---- | ------- |
-| `0` | **Success.** The command did what it set out to do. |
-| `1` | **Error.** Something failed — a bad config, a connection failure, a policy violation, or a *declined* [`apply`](/cli/commands/apply/) / [`destroy`](/cli/commands/destroy/) / [`force-unlock`](/cli/commands/force-unlock/). |
-| `2` | **Changes present.** Only from the *opt-in* checks: [`plan`](/cli/commands/plan/) / [`drift`](/cli/commands/drift/) with `--detailed-exitcode`, and [`fmt --check`](/cli/commands/fmt/). Never returned without opting in. |
-| `130` | **Cancelled** with Ctrl-C (`SIGINT`). |
+| Code  | Meaning                                                                                                                                                                                                                      |
+|-------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `0`   | **Success.** The command did what it set out to do.                                                                                                                                                                          |
+| `1`   | **Error.** Something failed — a bad config, a connection failure, a policy violation, or a *declined* [`apply`](/cli/commands/apply/) / [`destroy`](/cli/commands/destroy/) / [`force-unlock`](/cli/commands/force-unlock/). |
+| `2`   | **Changes present.** Only from the *opt-in* checks: [`plan`](/cli/commands/plan/) / [`drift`](/cli/commands/drift/) with `--detailed-exitcode`, and [`fmt --check`](/cli/commands/fmt/). Never returned without opting in.   |
+| `130` | **Cancelled** with Ctrl-C (`SIGINT`).                                                                                                                                                                                        |
 
 ## Two things worth calling out for automation
 

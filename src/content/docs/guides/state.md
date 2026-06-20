@@ -1,5 +1,6 @@
 ---
 title: Offline planning & state
+draft: true
 description: How NSchema's optional state store enables planning without a database, and how to seed and maintain it.
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: Local file backend
+draft: true
 description: Persist NSchema state to a JSON file on the local filesystem.
 ---
 
@@ -16,9 +17,9 @@ BACKEND file (
 
 ## Attributes
 
-| Attribute | Type | Description |
-| --------- | ---- | ----------- |
-| `path` | string | Path to the state file. Relative paths resolve against the project directory ([`--directory`](/cli/#global-flags)). |
+| Attribute | Type   | Description                                                                                                         |
+|-----------|--------|---------------------------------------------------------------------------------------------------------------------|
+| `path`    | string | Path to the state file. Relative paths resolve against the project directory ([`--directory`](/cli/#global-flags)). |
 
 Any attribute not listed here is rejected — a typo surfaces as an error rather than being
 silently ignored.

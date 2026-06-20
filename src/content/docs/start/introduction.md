@@ -1,21 +1,24 @@
 ---
 title: What is NSchema?
-description: NSchema is a declarative database schema migration tool — you describe the schema you want, and it computes and applies the migration to get there.
+draft: true
+description: NSchema is a declarative database schema migration tool. Describe the schema you want; NSchema computes and applies the migration to get there.
 sidebar:
   order: 1
 ---
 
-NSchema is a **declarative database schema migration tool**. You describe the schema you
-want — in a familiar, SQL-flavoured DDL — and NSchema compares it against the live database,
-computes the difference, and applies the changes needed to get there. Think of it as
-*Terraform for your database schema*.
+NSchema is a CLI tool for declaratively managing database schemas. Instead of writing your migrations by hand with 
+`ALTER` and `DROP` statements, you express your desired schema using plain `CREATE` statements, and NSchema will 
+work out the migration steps.
+
+The starting design goal was "Terraform for databases", so it's built to work in CI/CD environments, 
+and supports a very familiar command shape: `plan`, `apply`, `destroy`, etc.
 
 ## Declarative, not imperative
 
-Most migration tools are imperative: you hand-write an ordered sequence of `ALTER` steps,
-one file per change, and the tool replays them. NSchema works the other way around. You
-maintain a single, declarative description of the schema's **desired state** — the final
-shape you want — and the planner derives the steps to reach it:
+Most migration tools are imperative: you hand-write an ordered sequence of `ALTER` steps, one file per change, 
+and the tool replays them, usually either requiring the scripts to be idempotent, or keeping a history of which 
+scripts have already been run. NSchema works the other way around. You maintain a single, declarative description 
+of the desired schema, and NSchema's planner derives the steps to reach it:
 
 ```sql
 CREATE SCHEMA app;
@@ -27,7 +30,8 @@ CREATE TABLE app.widgets (
 );
 ```
 
-There is no `ALTER`. You add a column to the table above, run `nschema plan`, and NSchema
+In the example above, if you were to add a `price` column to the `app.widgets` table and run `nschema plan`, 
+the planner would see the database already contains an `app.widgets` table 
 works out that it needs to add exactly that column. This is the same model Terraform uses
 for infrastructure: describe the goal, let the tool find the path.
 

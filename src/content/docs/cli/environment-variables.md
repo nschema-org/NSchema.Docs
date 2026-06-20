@@ -1,5 +1,6 @@
 ---
 title: Environment variables
+draft: true
 description: Every environment variable the nschema CLI reads as a configuration override.
 ---
 
@@ -8,14 +9,14 @@ Each is read by exactly one binding; no other variables are consulted. Environme
 **above** config blocks and **below** command-line flags in
 [precedence](/cli/configuration/#precedence).
 
-| Variable | Overrides | Notes |
-| -------- | --------- | ----- |
+| Variable                             | Overrides                      | Notes                                                                                                                                                                                     |
+|--------------------------------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `NSCHEMA_POSTGRES_CONNECTION_STRING` | The Postgres connection string | Self-identifying — it names the Postgres provider on its own, and **takes precedence** over a `connection_string` set in a `PROVIDER postgres` block. The preferred place for the secret. |
-| `NSCHEMA_POSTGRES_USERNAME` | The Postgres username | Layered onto the connection string, overriding any user embedded in it. |
-| `NSCHEMA_POSTGRES_PASSWORD` | The Postgres password | Layered onto the connection string, overriding any password embedded in it. |
-| `NSCHEMA_DESTRUCTIVE_ACTION_POLICY` | The destructive-action policy | `error` (default), `warn`, or `allow`. Equivalent to `--destructive-actions`. |
-| `NSCHEMA_ENVIRONMENT` | The target environment | Selects the `*.env.<name>.sql` [overlay files](/cli/configuration/#environments). Equivalent to `--environment`. |
-| `NO_COLOR` | Colored output | The well-known [`NO_COLOR`](https://no-color.org) convention; any value disables color. Equivalent to `--no-color`. |
+| `NSCHEMA_POSTGRES_USERNAME`          | The Postgres username          | Layered onto the connection string, overriding any user embedded in it.                                                                                                                   |
+| `NSCHEMA_POSTGRES_PASSWORD`          | The Postgres password          | Layered onto the connection string, overriding any password embedded in it.                                                                                                               |
+| `NSCHEMA_DESTRUCTIVE_ACTION_POLICY`  | The destructive-action policy  | `error` (default), `warn`, or `allow`. Equivalent to `--destructive-actions`.                                                                                                             |
+| `NSCHEMA_ENVIRONMENT`                | The target environment         | Selects the `*.env.<name>.sql` [overlay files](/cli/configuration/#environments). Equivalent to `--environment`.                                                                          |
+| `NO_COLOR`                           | Colored output                 | The well-known [`NO_COLOR`](https://no-color.org) convention; any value disables color. Equivalent to `--no-color`.                                                                       |
 
 ## The connection string
 

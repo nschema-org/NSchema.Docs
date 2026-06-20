@@ -1,5 +1,6 @@
 ---
 title: nschema validate
+draft: true
 description: Check that your desired-schema files are well-formed and internally consistent, without touching a database.
 sidebar:
   label: validate
