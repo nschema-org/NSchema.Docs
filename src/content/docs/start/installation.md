@@ -41,7 +41,14 @@ dotnet tool uninstall --global nschema
 
 ## Shell completion
 
-NSchema can emit a completion script for your shell. See the [`completion` command](/cli/commands/completion/) for more details.
+NSchema can emit a completion script for your shell, and install it for you in one step:
+
+```sh
+nschema completion bash --install-autocomplete
+```
+
+Swap `bash` for `zsh`, `fish`, or `pwsh`. See the [`completion` command](/cli/commands/completion/)
+for manual installation and the `--uninstall-autocomplete` flag.
 
 ## Next steps
 

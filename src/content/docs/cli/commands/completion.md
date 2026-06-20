@@ -16,9 +16,39 @@ nschema completion <shell>
 
 Supported shells: `bash`, `zsh`, `fish`, `pwsh`.
 
-## Enabling completion
+## Installing automatically
 
-Source the script in your current shell, or install it permanently:
+The quickest way to enable completion permanently is `--install-autocomplete`, which wires it
+into your shell's startup file for you:
+
+```sh
+nschema completion bash --install-autocomplete
+```
+
+This inserts a small managed block into the shell's startup file — `~/.bashrc`, `~/.zshrc`,
+`~/.config/fish/config.fish`, or the PowerShell `$PROFILE` — that sources the completion script
+on each new session:
+
+```sh
+# >>> nschema completion >>>
+source <(nschema completion bash)
+# <<< nschema completion <<<
+```
+
+Because the block _sources_ `nschema completion <shell>` rather than embedding a copy of the
+script, your completions always track the installed binary — there's nothing to refresh after an
+upgrade. Re-running the command is safe: it replaces the existing block instead of duplicating it.
+
+Open a new shell (or re-source the startup file) to pick up completion. To remove the block again:
+
+```sh
+nschema completion bash --uninstall-autocomplete
+```
+
+## Installing manually
+
+Prefer to manage it yourself? Source the script in your current shell, or write it to your shell's
+completion directory:
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
@@ -56,6 +86,13 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
   </TabItem>
 </Tabs>
 
+## Options
+
+- **`--install-autocomplete`** — instead of printing the script, install completion for the given
+  shell by adding a managed block to its startup file.
+- **`--uninstall-autocomplete`** — remove the managed block that `--install-autocomplete` added.
+
 ## Needs
 
-Nothing — it only writes a script to stdout.
+Nothing — it writes a completion script to stdout, or (with the install flags) edits your shell's
+startup file.
