@@ -1,12 +1,10 @@
 ---
 title: CLI Reference
-draft: true
 description: Every nschema command, the global flags they share, and how configuration is resolved.
 ---
 
-The `nschema` CLI resolves your project's configuration and runs **one operation per
-invocation**. This section documents every command in detail; the pages below cover the
-cross-cutting pieces they all share.
+The `nschema` CLI resolves your project's configuration and runs one operation per invocation. This section documents 
+every command in detail; the pages below cover the cross-cutting pieces they all share.
 
 ## Commands at a glance
 
@@ -29,30 +27,21 @@ cross-cutting pieces they all share.
 
 Every command accepts these:
 
-- **`--directory <dir>`** — the project directory to run in. The `.sql` files and any
-  relative paths declared in them resolve against it, like `terraform -chdir`. Defaults to
-  the current directory.
-- **`--environment <name>`** — target environment. Layers the matching `*.env.<name>.sql`
-  overlay files over the base configuration. *(env `NSCHEMA_ENVIRONMENT`)* See
-  [Environments](/cli/configuration/#environments).
-- **`--no-color`** — disable colored output. *(env `NO_COLOR`)*
-- **`--json`** — emit machine-readable NDJSON output instead of formatted text.
-- **`--verbose`** / **`--quiet`** — raise or lower output verbosity.
-- **`--help`** — show contextual help for the command.
+- **`--directory <dir>`** Sets the current working directory for `nschema`.
+- **`--environment <name>`** Sets the target environment. Layers the matching `*.env.<name>.sql` overlay files over the base configuration. *(env `NSCHEMA_ENVIRONMENT`)* See [Environments](/cli/configuration/#environments).
+- **`--no-color`** Disables colored output. *(env `NO_COLOR`)*
+- **`--json`** Emits machine-readable NDJSON output instead of formatted text.
+- **`--verbose`** / **`--quiet`** Raises or lowers output verbosity.
+- **`--help`** Shows contextual help for the command.
 
 ## Where configuration comes from
 
 Settings are resolved from three layers, in increasing order of precedence:
 
-1. **[Configuration blocks](/cli/configuration/)** in your `.sql` files — `NSCHEMA`,
-   `PROVIDER`, and `BACKEND`.
-2. **[Environment variables](/cli/environment-variables/)** — `NSCHEMA_*` and `NO_COLOR`.
-3. **Command-line options** — the flags documented on each command page.
-
-The *where* of your project (which database, which state store) lives in config blocks; the
-*what* (your schema) lives in the `.sql` files; and CLI flags are the per-run workflow knobs.
+1. **[Configuration blocks](/cli/configuration/).** Config in your `.sql` files; `NSCHEMA`, `PROVIDER`, and `BACKEND` blocks.
+2. **[Environment variables](/cli/environment-variables/).** `NSCHEMA_*` and `NO_COLOR`.
+3. **Command-line options.** The flags documented on each command page.
 
 ## The exit-code contract
 
-Every command follows the same [exit-code contract](/cli/exit-codes/) so scripts and CI can
-branch on the result without parsing output.
+Every command follows the same [exit-code contract](/cli/exit-codes/) so scripts and CI can branch on the result without parsing output.
