@@ -1,10 +1,49 @@
-/* NSchema brand theme — accent derived from the logo mark (#6b8fff on #3a3d4a). */
+/* ───────────────────────────────────────────────────────────────────────────
+   NSchema brand theme
+   Accent + palette derived from the logo mark: braces & schema rows in
+   #6b8fff on a near-black blue-gray #15171c. Layered on top of Starlight's
+   defaults — everything here is cosmetic and safe to remove.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Typography ───────────────────────────────────────────────────────────── */
+/* Space Grotesk for display/headings (geometric, technical), JetBrains Mono
+   for code. Body text stays on the system stack for legibility. Both fonts are
+   self-hosted via @fontsource (loaded ahead of this file in astro.config.mjs). */
+
+:root {
+  --__brand-display: "Space Grotesk Variable", var(--sl-font, ui-sans-serif),
+    system-ui, sans-serif;
+  --sl-font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo,
+    Consolas, monospace;
+}
+
+/* Page + content headings, the site title, and the splash hero headline. */
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6),
+.content-panel h1,
+.site-title,
+.hero h1,
+.hero .copy > h1 {
+  font-family: var(--__brand-display);
+  font-weight: 600;
+  letter-spacing: -0.018em;
+}
+
+/* ── Brand-tinted surfaces ────────────────────────────────────────────────── */
+/* Nudge the neutral grays toward the logo's cool blue-gray so backgrounds,
+   borders, and the sidebar read as "NSchema dark" rather than stock gray. */
 
 :root {
   /* Dark theme (default) — accents read against a dark background. */
   --sl-color-accent-low: #1b2447;
   --sl-color-accent: #4a6fe8;
   --sl-color-accent-high: #c2cfff;
+
+  /* Cool, slightly-blue dark surfaces echoing the logo's #15171c. */
+  --sl-color-bg: #14161d;
+  --sl-color-bg-nav: #171922e6;
+  --sl-color-bg-sidebar: #171922;
+  --sl-color-bg-inline-code: #232735;
+  --sl-color-hairline-shade: #ffffff10;
 }
 
 :root[data-theme="light"] {
@@ -12,9 +51,139 @@
   --sl-color-accent-low: #dbe2ff;
   --sl-color-accent: #2f55d4;
   --sl-color-accent-high: #182a63;
+
+  --sl-color-bg-sidebar: #f5f7ff;
+  --sl-color-bg-inline-code: #eef1fb;
 }
 
-/* Slightly tighten the hero on the landing page. */
+/* Frosted, translucent top nav that lets the hero glow show through. */
+.header {
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--sl-color-hairline-shade);
+}
+
+/* Site title: lift it onto the display font with a hint of the brand gradient. */
+.site-title {
+  background: linear-gradient(
+    100deg,
+    var(--sl-color-white) 30%,
+    var(--sl-color-accent-high)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Splash hero: soft accent glow ────────────────────────────────────────── */
+/* A radial brand-blue bloom behind the landing hero so the home page doesn't
+   open on a flat background. Scoped to the splash template only. */
+
+.page:has(.hero) {
+  position: relative;
+  isolation: isolate;
+}
+
+.page:has(.hero)::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 60vh;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      60% 70% at 28% 0%,
+      color-mix(in oklab, var(--sl-color-accent) 26%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 55% at 90% 8%,
+      color-mix(in oklab, var(--sl-color-accent-high) 14%, transparent),
+      transparent 72%
+    );
+}
+
+/* Tighten the hero copy column. */
 .hero > .copy {
   max-width: 40rem;
+}
+
+/* Hero logo: gentle float + a matching glow so the mark anchors the page. */
+.hero img {
+  filter: drop-shadow(
+    0 0 2.5rem color-mix(in oklab, var(--sl-color-accent) 45%, transparent)
+  );
+}
+
+/* ── Cards: lift + accent edge ────────────────────────────────────────────── */
+/* Starlight cards are flat by default. Give them a left accent rule and a
+   subtle hover lift so the home-page grids feel deliberate. */
+
+.card {
+  border: 1px solid var(--sl-color-gray-5);
+  border-left: 3px solid var(--sl-color-accent);
+  border-radius: 0.6rem;
+  background: color-mix(in oklab, var(--sl-color-gray-6) 60%, transparent);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: var(--sl-color-accent);
+  box-shadow: 0 0.6rem 1.6rem -0.6rem
+    color-mix(in oklab, var(--sl-color-accent) 50%, transparent);
+}
+
+.card .icon {
+  color: var(--sl-color-accent-high);
+}
+
+/* Link cards (the "Start here" grid) get the same hover treatment. */
+.sl-link-card {
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.sl-link-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--sl-color-accent);
+  box-shadow: 0 0.6rem 1.6rem -0.6rem
+    color-mix(in oklab, var(--sl-color-accent) 50%, transparent);
+}
+
+/* ── Code frames ──────────────────────────────────────────────────────────── */
+/* Brand the Expressive Code chrome: accent the title-bar tab and round the
+   frame so code blocks feel part of the same design language as the cards. */
+
+.expressive-code .frame {
+  border-radius: 0.6rem;
+  overflow: hidden;
+}
+
+.expressive-code .frame .header {
+  /* override the global frosted .header above for the code title bar */
+  backdrop-filter: none;
+  border-bottom: 1px solid var(--sl-color-hairline-shade);
+}
+
+.expressive-code .frame.is-terminal .header::before,
+.expressive-code .frame:not(.is-terminal) .header .title::after {
+  border-color: var(--sl-color-accent);
+}
+
+/* Inline code: a touch of brand tint and a hairline border. */
+.sl-markdown-content code:not(:where(.expressive-code *)) {
+  border: 1px solid var(--sl-color-hairline-shade);
+}
+
+/* Section headings in long content get a short accent underline on hover-target
+   anchors, reinforcing the brand color as you scan a page. */
+.sl-markdown-content h2 {
+  padding-bottom: 0.2em;
+  border-bottom: 1px solid var(--sl-color-hairline-shade);
 }

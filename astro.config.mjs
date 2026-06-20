@@ -18,7 +18,13 @@ export default defineConfig({
         dark: "./assets/nschema-mark.svg"
       },
       favicon: "/favicon.svg",
-      customCss: ["./src/styles/theme.css"],
+      customCss: [
+        // Self-hosted brand fonts — load before the theme so it can reference
+        // them. Space Grotesk for headings/brand, JetBrains Mono for code.
+        "@fontsource-variable/space-grotesk",
+        "@fontsource-variable/jetbrains-mono",
+        "./src/styles/theme.css",
+      ],
       // The DDL grammar pages use ```ebnf fences; Shiki has no EBNF grammar, so
       // render them as plain monospace rather than emitting a warning per block.
       expressiveCode: {
