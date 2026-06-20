@@ -50,17 +50,17 @@ export default defineConfig({
         { label: "Backends", items: [{ autogenerate: { directory: "backends" } }] },
         { label: "Library (Core)", items: [{ autogenerate: { directory: "library" } }] },
         { label: "Reference", items: [{ autogenerate: { directory: "reference" } }] },
-        // {
-        //   // Generated from each package repo's GitHub releases by
-        //   // starlight-changelogs; bases must match src/content.config.ts.
-        //   label: "Changelog",
-        //   items: makeChangelogsSidebarLinks([
-        //     { type: "all", base: "changelog/cli", label: "CLI" },
-        //     { type: "all", base: "changelog/core", label: "Core" },
-        //     { type: "all", base: "changelog/postgres", label: "PostgreSQL" },
-        //     { type: "all", base: "changelog/aws", label: "AWS" },
-        //   ]),
-        // },
+        {
+          // Generated from each package repo's GitHub releases by
+          // starlight-changelogs; bases must match src/content.config.ts.
+          label: "Changelog",
+          items: makeChangelogsSidebarLinks([
+            { type: "all", base: "changelog/cli", label: "CLI" },
+            { type: "all", base: "changelog/core", label: "Core" },
+            { type: "all", base: "changelog/postgres", label: "PostgreSQL" },
+            { type: "all", base: "changelog/aws", label: "AWS" },
+          ]),
+        },
       ],
     }),
   ],
