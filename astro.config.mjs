@@ -28,7 +28,7 @@ export default defineConfig({
       // The DDL grammar pages use ```ebnf fences; Shiki has no EBNF grammar, so
       // render them as plain monospace rather than emitting a warning per block.
       expressiveCode: {
-        shiki: { langAlias: { ebnf: "ebnf" } },
+        shiki: { langAlias: { ebnf: "txt" } },
       },
       social: [
         {
@@ -45,11 +45,11 @@ export default defineConfig({
         { label: "Start Here", items: [{ autogenerate: { directory: "start" } }] },
         { label: "Guides", items: [{ autogenerate: { directory: "guides" } }] },
         // { label: "CLI Reference", items: [{ autogenerate: { directory: "cli" } }] },
-        // { label: "DDL Language", items: [{ autogenerate: { directory: "ddl" } }] },
-        // { label: "Providers", items: [{ autogenerate: { directory: "providers" } }] },
-        // { label: "Backends", items: [{ autogenerate: { directory: "backends" } }] },
+        { label: "DDL Language", items: [{ autogenerate: { directory: "ddl" } }] },
+        { label: "Providers", items: [{ autogenerate: { directory: "providers" } }] },
+        { label: "Backends", items: [{ autogenerate: { directory: "backends" } }] },
         // { label: "Library (Core)", items: [{ autogenerate: { directory: "library" } }] },
-        // { label: "Reference", items: [{ autogenerate: { directory: "reference" } }] },
+        { label: "Reference", items: [{ autogenerate: { directory: "reference" } }] },
         // {
         //   // Generated from each package repo's GitHub releases by
         //   // starlight-changelogs; bases must match src/content.config.ts.
