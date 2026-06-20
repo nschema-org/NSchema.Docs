@@ -1,12 +1,16 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import starlightChangelogs, {
+  makeChangelogsSidebarLinks,
+} from "starlight-changelogs";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://nschema.dev",
   integrations: [
     starlight({
+      plugins: [starlightChangelogs()],
       title: "NSchema",
       description: "A declarative database schema migration tool. Describe the schema you want; NSchema computes and applies the migration to get there.",
       logo: {
@@ -100,6 +104,17 @@ export default defineConfig({
         {
           label: "Reference",
           items: [{ label: "Roadmap", slug: "reference/roadmap" }],
+        },
+        {
+          // Generated from each package repo's GitHub releases by
+          // starlight-changelogs; bases must match src/content.config.ts.
+          label: "Changelog",
+          items: makeChangelogsSidebarLinks([
+            { type: "all", base: "changelog/cli", label: "CLI" },
+            { type: "all", base: "changelog/core", label: "Core" },
+            { type: "all", base: "changelog/postgres", label: "PostgreSQL" },
+            { type: "all", base: "changelog/aws", label: "AWS" },
+          ]),
         },
       ],
     }),
