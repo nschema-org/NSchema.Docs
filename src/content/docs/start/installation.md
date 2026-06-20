@@ -10,7 +10,7 @@ NSchema is deployed as a **[.NET tool](https://learn.microsoft.com/en-us/dotnet/
 ## Prerequisites
 
 - **.NET SDK 10.0 or later.** The tool targets `net10.0`. Check with `dotnet --version`; install from [dotnet.microsoft.com](https://dotnet.microsoft.com/download) if needed.
-- **A database.** This tool is for managing database schemas after all. See [Providers](../providers/providers.md) for supported databases.
+- **A database.** This tool is for managing database schemas after all. See [Providers](../providers/overview.md) for supported databases.
 
 ## Install
 

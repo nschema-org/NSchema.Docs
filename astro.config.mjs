@@ -59,7 +59,7 @@ export default defineConfig({
         {
           label: "CLI Reference",
           items: [
-            { label: "Overview", slug: "cli" },
+            { label: "Overview", slug: "cli/overview" },
             {
               label: "Commands",
               items: [{ autogenerate: { directory: "cli/commands" } }],
@@ -80,14 +80,14 @@ export default defineConfig({
         {
           label: "Providers",
           items: [
-            { label: "Overview", slug: "providers" },
+            { label: "Overview", slug: "providers/overview" },
             { label: "PostgreSQL", slug: "providers/postgres" },
           ],
         },
         {
           label: "Backends",
           items: [
-            { label: "Overview", slug: "backends" },
+            { label: "Overview", slug: "backends/overview" },
             { label: "Local file", slug: "backends/file" },
             { label: "Amazon S3", slug: "backends/s3" },
           ],
