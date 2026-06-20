@@ -1,17 +1,14 @@
 ---
 title: Embedding the engine
-draft: true
 description: Use the NSchema.Core engine directly from a .NET application, instead of the CLI.
 ---
 
-The `nschema` CLI is a thin front-end over **NSchema.Core**, the engine that does the real
-work. Most people should use the CLI. Embed the library directly only when you need to build
-your own harness — to drive migrations from inside an application, wire in custom policies, or
-integrate with your own configuration and logging.
+The `nschema` CLI is a thin front-end over the **NSchema.Core** NuGet package, which contains the engine that does the 
+real work. Most people should use the CLI. Embed the library directly only when you need to build your own harness, 
+to drive migrations from inside an application, wire in custom policies, or integrate with your own configuration and logging.
 
 :::tip
-If you just want to run migrations, the [CLI](/cli/) is almost certainly what you want. This
-section is for building on the engine itself.
+This is an _advanced_ use case. If you just want to run migrations, the [CLI](/cli/) is almost certainly what you want. This section is for building on the engine itself.
 :::
 
 ## Install
@@ -25,8 +22,7 @@ dotnet add package NSchema.Postgres   # or another provider
 
 ## Declare a schema
 
-Declare your desired schema in `.sql` files using [NSchema DDL](/ddl/defining-schemas/) —
-declarative `CREATE` statements describing the *desired* shape:
+Declare your desired schema in `.sql` files using [NSchema DDL](/ddl/defining-schemas/):
 
 ```sql
 CREATE SCHEMA app;
@@ -43,12 +39,13 @@ CREATE TABLE app.users
 
 ## Wire up and run
 
-The builder will be familiar to anyone who's used ASP.NET — it's a `HostApplicationBuilder`
-under the hood, so you get configuration, logging, and DI for free:
+The builder will be familiar to anyone who's used ASP.NET. It's a `HostApplicationBuilder` under the hood, so you get 
+configuration, logging, and DI for free:
 
 ```csharp
 using NSchema;
 using NSchema.Diff.Policies;
+using NSchema.Operations.Apply;
 using NSchema.Postgres;
 
 var builder = NSchemaApplication.CreateBuilder(args);
@@ -59,12 +56,11 @@ builder
     .WithDestructiveActionPolicy(DestructiveActionPolicy.Warn);
 
 var app = builder.Build();
-await app.Apply();
+await app.Apply(new ApplyArguments());
 ```
 
-On startup, NSchema introspects the database, compares it with your desired schema, and
-applies the resulting plan. The built application is **single-use**: it runs one operation and
-exits.
+On startup, NSchema introspects the database, compares it with your desired schema, and applies the resulting plan. 
+The built application is _single use_: it runs one operation and exits.
 
 ## Operations
 
@@ -72,15 +68,13 @@ Run an operation by calling the matching method on the built application. The co
 
 - **`Plan()`** (default) computes the plan and renders it without touching the database.
 - **`Apply()`** computes the plan and applies it.
-- **`Refresh()`** captures the current live schema to the state store without planning or
-  applying.
+- **`Refresh()`** captures the current live schema to the state store without planning or applying.
 
 See [Configuration (C#)](/library/configuration/#operations) for the full list.
 
 ## Saved plans
 
-You can save a plan to a file and apply it later, unchanged — so what was reviewed is exactly
-what runs:
+You can save a plan to a file and apply it later, unchanged — so what was reviewed is exactly what runs:
 
 ```csharp
 await app.Plan(new PlanArguments { OutFile = "migration.nplan" });
@@ -90,9 +84,6 @@ await app.Apply(new ApplyArguments { PlanFile = "migration.nplan" });
 
 ## Where to go next
 
-- **[Concepts & pipeline](/library/concepts/)** — the domain model and how a run flows
-  through the engine.
-- **[Configuration (C#)](/library/configuration/)** — building, running, operations,
-  policies, scoping, state, dialects, and output.
-- **[Extension points](/library/extension-points/)** — every interface you can swap or
-  extend.
+- **[Concepts & pipeline](/library/concepts/)** — the domain model and how a run flows through the engine.
+- **[Configuration (C#)](/library/configuration/)** — building, running, operations, policies, scoping, state, dialects, and output.
+- **[Extension points](/library/extension-points/)** — every interface you can swap or extend.
