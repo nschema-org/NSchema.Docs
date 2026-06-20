@@ -52,7 +52,7 @@ The saved plan fixes its own scope, desired schema, and destructive-action polic
 
 ## Previewing changes in CI without a database
 
-If you've configured a [backend store](/guides/state/), the `plan` command will run **offline** against the last recorded 
+If you've configured a [state store](/guides/state/), the `plan` command will run **offline** against the last recorded 
 snapshot without needing a database connection. Combine that with `--detailed-exitcode` to gate CI on whether a change 
 would occur:
 
