@@ -1,5 +1,6 @@
 ---
 title: Running in CI
+draft: true
 description: Patterns for running NSchema in continuous integration — non-interactive applies, exit-code gating, and offline planning.
 ---
 

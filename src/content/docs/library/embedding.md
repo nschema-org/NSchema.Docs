@@ -1,5 +1,6 @@
 ---
 title: Embedding the engine
+draft: true
 description: Use the NSchema.Core engine directly from a .NET application, instead of the CLI.
 ---
 

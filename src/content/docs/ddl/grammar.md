@@ -1,5 +1,6 @@
 ---
 title: NSchema DDL grammar
+draft: true
 description: The complete reference for the NSchema DDL — every statement, type, and reserved configuration block.
 ---
 

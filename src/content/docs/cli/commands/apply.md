@@ -1,5 +1,6 @@
 ---
 title: nschema apply
+draft: true
 description: Compute the plan and apply it to the target database.
 sidebar:
   label: apply

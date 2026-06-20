@@ -1,21 +1,23 @@
 ---
 title: What is NSchema?
-description: NSchema is a declarative database schema migration tool — you describe the schema you want, and it computes and applies the migration to get there.
+description: NSchema is a declarative database schema migration tool. Describe the schema you want; NSchema computes and applies the migration to get there.
 sidebar:
   order: 1
 ---
 
-NSchema is a **declarative database schema migration tool**. You describe the schema you
-want — in a familiar, SQL-flavoured DDL — and NSchema compares it against the live database,
-computes the difference, and applies the changes needed to get there. Think of it as
-*Terraform for your database schema*.
+NSchema is a CLI tool for declaratively managing database schemas. Instead of writing your migrations by hand with 
+`ALTER` and `DROP` statements, you express your desired schema using plain `CREATE` statements, and NSchema will 
+work out the migration steps.
+
+The starting design goal was "Terraform for databases", so it's built to work in CI/CD environments, 
+and supports a very familiar command shape: `plan`, `apply`, `destroy`, etc.
 
 ## Declarative, not imperative
 
-Most migration tools are imperative: you hand-write an ordered sequence of `ALTER` steps,
-one file per change, and the tool replays them. NSchema works the other way around. You
-maintain a single, declarative description of the schema's **desired state** — the final
-shape you want — and the planner derives the steps to reach it:
+Most migration tools are imperative: you hand-write an ordered sequence of `ALTER` steps, one file per change, 
+and the tool replays them, usually either requiring the scripts to be idempotent, or keeping a history of which 
+scripts have already been run. NSchema works the other way around. You maintain a single, declarative description 
+of the desired schema, and NSchema's planner derives the steps to reach it:
 
 ```sql
 CREATE SCHEMA app;
@@ -27,55 +29,52 @@ CREATE TABLE app.widgets (
 );
 ```
 
-There is no `ALTER`. You add a column to the table above, run `nschema plan`, and NSchema
-works out that it needs to add exactly that column. This is the same model Terraform uses
-for infrastructure: describe the goal, let the tool find the path.
+In the example above, if you were to add a `price` column to the `app.widgets` table and run `nschema plan`, 
+the planner would see the database already contains an `app.widgets` table, finds the missing `price` column and 
+generates an `ALTER TABLE` statement to append it.
+
+This is the same model tools like Terraform use for infrastructure: describe the goal, let the tool find the path. 
+One key difference though, is that databases are inherently _stateful_. Most accidentally destroyed infrastructure 
+can be recreated, but data lost through a dropped table can only be recovered from backups. (When did you last test those again?)
+NSchema has guardrails and escape hatches for protecting against data loss, but you still need to take care when making destructive changes.
 
 ## How it works
 
-A run flows through a simple pipeline:
+Each `apply` run flows through a simple pipeline:
 
-1. **Read the desired schema** — every `*.sql` file under your project directory.
-2. **Read the current schema** — from the live database, or from a persisted state snapshot
-   for offline planning.
-3. **Diff** the two to produce a structured migration plan.
-4. **Validate** the plan against policies (for example, the built-in guard against
-   destructive changes).
-5. **Render** the plan for review — and, on `apply`, execute it.
+1. **Read the desired schema.** The SQL files in your project directory are composed into a single view of your goal schema.
+2. **Validate the desired schema.** Checks are done to make sure the schema is valid: primary keys, referential integrity, etc.  
+3. **Read the current schema.** The current schema is introspected from the target database's metadata tables.
+4. **Diff the schemas.** The schemas are compared and output as a hierarchical diff.
+5. **Validate the diff.** Checks the plan against configured policies (for example, the built-in guard against destructive changes).
+6. **Linearize the diff.** The complex diff is reduced to a dependency-ordered list of actions (create table, add index, etc.).
+7. **Generate SQL.** The action list is handed off to a database-specific provider to generate the required SQL.
+8. **Apply.** Run the SQL against the target database if given approval.
 
-Because the plan is computed and rendered before anything is executed, you always see the
-exact changes first. You can even [save a plan to a file](/cli/commands/plan/) and apply
-that precise file later, so what was reviewed is what runs.
+Because the plan is computed and rendered before anything is executed, you always see a visual diff of the changes 
+and the exact SQL that will be executed first. You can even [save a plan to a file](/cli/commands/plan/) and apply
+that precise file later, so you can keep an audit of the executed SQL, and guarantee that the reviewed plan is what runs.
 
 ## What it manages
 
-NSchema models the structures of a relational database: schemas, tables, columns, primary
-and foreign keys, unique/check/exclusion constraints, indexes, views (including
-materialized), enums, domains, composite types, sequences, functions and procedures,
-triggers, extensions, and grants. For anything that can't be expressed declaratively —
-backfills, custom grants, `CREATE INDEX CONCURRENTLY` — there are
-[deployment scripts](/guides/deployment-scripts/): raw SQL that runs before or after the
-migration.
+NSchema covers most major structures supported by relational databases, including: schemas, tables, columns, primary and 
+foreign keys, constraints, indexes, views, functions, procedures, triggers, sequences, extensions, grants, enums, 
+domains and composite types. For anything more niche, NSchema also supports arbitrary [pre-deployment and post-deployment scripts](/guides/deployment-scripts).
+
+It's important to note that while your NSchema scripts might _look_ like SQL, it's actually a provider-neutral DSL meant
+to feel familiar to SQL authors. That's how it supports features like deployment scripts and provider configuration. It
+also means that unsupported objects fail the parsing check before they ever get near a database, meaning you can't accidentally
+write SQL for an object that isn't supported.
 
 ## CLI or library
 
-There are two ways to use NSchema:
+There are two ways to use NSchema. The first, and most strongly recommended, is via the CLI. NSchema is a .NET tool that
+works very similar to Terraform: dump a bunch of SQL files with `CREATE` DDL in a folder and run `nschema apply`. This 
+is what most people want, and what the bulk of these docs cover. Start with [Installation](/start/installation/) and the
+[Quickstart Guide](/start/quickstart/).
 
-- **The `nschema` CLI** — a global .NET tool that resolves configuration from your project
-  and runs one operation. This is what most people want, and what the bulk of these docs
-  cover. Start with [Installation](/start/installation/) and the
-  [Quickstart](/start/quickstart/).
-- **The `NSchema.Core` library** — the engine the CLI is built on, embeddable directly in
-  a .NET application when you need to build your own harness. See
-  [Embedding the engine](/library/embedding/).
+The second way is to consume the `NSchema.Core` library directly, allowing you to build your own harness for managing migrations.
+As much as possible, the CLI is kept as a thin wrapper around the Core, so embedding is kept simple and the behavior remains consistent. 
+This Core package also exposes extension points for features like custom validation policies.
 
-## Where things stand
-
-NSchema currently targets **PostgreSQL**, with state stored in a **local file** or **Amazon
-S3**. Other providers (SQLite, SQL Server) and backends (Azure Blob Storage) are on the
-[roadmap](/reference/roadmap/).
-
-:::caution[Pre-release]
-NSchema is still very new. It's not production-ready yet — follow along and experiment, but
-don't point it at a database you can't afford to lose.
-:::
+See [Embedding the engine](/library/embedding/).

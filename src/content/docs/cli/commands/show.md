@@ -1,5 +1,6 @@
 ---
 title: nschema show
+draft: true
 description: Print the schema recorded in the state store as human-readable text.
 sidebar:
   label: show

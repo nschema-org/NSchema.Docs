@@ -1,5 +1,6 @@
 ---
 title: Backends
+draft: true
 description: NSchema's optional state backend — what it's for, the backends available, and how it's configured.
 ---
 
@@ -17,10 +18,10 @@ want one.
 
 ## Available backends
 
-| Backend | Page |
-| ------- | ---- |
+| Backend    | Page                          |
+|------------|-------------------------------|
 | Local file | [Local file](/backends/file/) |
-| Amazon S3 | [Amazon S3](/backends/s3/) |
+| Amazon S3  | [Amazon S3](/backends/s3/)    |
 
 ## On the roadmap
 

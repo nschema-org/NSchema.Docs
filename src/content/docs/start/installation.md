@@ -5,22 +5,23 @@ sidebar:
   order: 2
 ---
 
-NSchema ships as a **.NET global tool** named `nschema`.
+NSchema is deployed as a **[.NET tool](https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools)** named `nschema`.
 
 ## Prerequisites
 
-- **.NET SDK 10.0 or later.** The tool targets `net10.0`. Check with `dotnet --version`;
-  install from [dotnet.microsoft.com](https://dotnet.microsoft.com/download) if needed.
-- **A PostgreSQL database** to manage (for the commands that touch one). Planning can also
-  run offline against a [state store](/guides/state/), with no database connection.
+- **.NET SDK 10.0 or later.** The tool targets `net10.0`. Check with `dotnet --version`; install from [dotnet.microsoft.com](https://dotnet.microsoft.com/download) if needed.
+- **A database.** This tool is for managing database schemas after all. See [Providers](../providers/overview.md) for supported databases.
 
 ## Install
+
+These instructions assume you want to install `nschema` globally just for the sake of simplicity. 
+If you just want to install it locally, you can do that too. 
 
 ```sh
 dotnet tool install --global nschema
 ```
 
-This installs the `nschema` command onto your `PATH`. Verify it:
+This installs the `nschema` command onto your `PATH`. You can verify it using:
 
 ```sh
 nschema --version
@@ -40,10 +41,8 @@ dotnet tool uninstall --global nschema
 
 ## Shell completion
 
-NSchema can emit a completion script for your shell — see the
-[`completion` command](/cli/commands/completion/).
+NSchema can emit a completion script for your shell. See the [`completion` command](/cli/commands/completion/) for more details.
 
 ## Next steps
 
-With the tool installed, head to the [Quickstart](/start/quickstart/) to scaffold a project
-and apply your first schema.
+With the tool installed, head to the [Quickstart](/start/quickstart/) to scaffold a project and apply your first schema.

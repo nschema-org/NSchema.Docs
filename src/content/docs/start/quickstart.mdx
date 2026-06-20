@@ -1,0 +1,107 @@
+---
+title: Quickstart Guide
+description: How to get up and running with NSchema
+sidebar:
+  order: 3
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+This guide will walk you from through setting up NSchema in an empty directory and applying a basic Schema to a live
+PostgreSQL database. It assumes you've [installed `nschema`](/start/installation/) and have a connection string to a
+database.
+
+<Steps>
+
+1. **Scaffold the project.**
+
+   ```sh
+   nschema init
+   ```
+
+   This writes three files:
+
+   - `config.sql`. The default `PROVIDER` / `BACKEND` configuration (which database to connect to, and where state lives).
+   - `config.env.prod.sql`. The `PROVIDER` / `BACKEND` configuration to use when running with `--environment production`.
+   - `schemas/example.sql` — a sample desired-schema file.
+
+   Edit the sample to describe the schema you want, using [NSchema DDL](/ddl/defining-schemas/):
+
+   ```sql
+   -- schemas/example.sql
+   CREATE SCHEMA app;
+
+   CREATE TABLE app.widgets (
+     id   bigint NOT NULL,
+     name text,
+     CONSTRAINT widgets_pkey PRIMARY KEY (id)
+   );
+   ```
+
+2. **Point at your database.**
+
+   ```sql
+   -- NSchema project configuration. These blocks tell NSchema which database to
+   -- connect to and where to keep state. Config blocks may live in any .sql file.
+
+   PROVIDER postgres (
+     -- Prefer the NSCHEMA_POSTGRES_CONNECTION_STRING environment variable, which
+     -- overrides the value below.
+     connection_string = ''
+     -- Credentials may be supplied separately from the connection string (e.g. from
+     -- a secret store) via NSCHEMA_POSTGRES_USERNAME / NSCHEMA_POSTGRES_PASSWORD.
+     -- They override any user/password embedded in connection_string.
+   );
+
+   BACKEND file (
+     path = './nschema.state.json'
+   );
+   ```
+
+   The configuration in your `config.sql` files is the default, so you could enter `connection_string` directly, but
+   connection strings need to remain secret, so the safer approach is to set the connection string by environment
+   variable instead:
+
+   ```sh
+   export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
+   ```
+
+   See [Configuration blocks](/cli/configuration/) for setting the provider and backend, and [Environment variables](/cli/environment-variables/)
+   for the full list of overrides.
+
+3. **Check the schema files are well-formed** (optional, but a fast pre-flight):
+
+   ```sh
+   nschema validate
+   ```
+
+   `validate` checks for syntax errors, and also any structural errors like invalid foreign keys or tables without columns.
+
+4. **Preview the migration.**
+
+   ```sh
+   nschema plan
+   ```
+
+   `plan` computes the changes and prints them. If you have a backend configured, the comparison will be done against the
+   last state snapshot without touching the database.
+
+5. **Apply it.**
+
+   ```sh
+   nschema apply
+   ```
+
+   `apply` shows the same plan, then prompts for confirmation before making any changes.
+   Answer `yes` to proceed and apply the changes.
+
+</Steps>
+
+Congrats! You just deployed your first database using NSchema.
+
+## What next?
+
+- **Already have a database?** You can use the [`import`](/cli/commands/import/) command bootstrap your NSchema project from an existing database. See [Adopting an existing database](/guides/adopting-a-database/).
+- **Learn the schema language.** [Defining schemas](/ddl/defining-schemas/) is a practical introduction; the [grammar reference](/ddl/grammar/) is the complete spec.
+- **Understand the workflow.** [The plan / apply workflow](/guides/workflow/) covers saved plans, scoping, and the core developer loop.
+- **Automate it.** [Running in CI](/guides/ci/) covers `--auto-approve`, detailed exit codes, and offline planning.

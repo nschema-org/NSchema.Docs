@@ -1,5 +1,6 @@
 ---
 title: Configuration (C#)
+draft: true
 description: How to build, run, and configure an NSchema application from .NET code.
 ---
 

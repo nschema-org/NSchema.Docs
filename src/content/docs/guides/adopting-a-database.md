@@ -1,5 +1,6 @@
 ---
 title: Adopting an existing database
+draft: true
 description: Bring an existing PostgreSQL database under NSchema management with import.
 ---
 

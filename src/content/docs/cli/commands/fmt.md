@@ -1,5 +1,6 @@
 ---
 title: nschema fmt
+draft: true
 description: Reformat your .sql DDL files to a canonical layout — the analogue of terraform fmt.
 sidebar:
   label: fmt
