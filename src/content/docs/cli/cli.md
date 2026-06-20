@@ -1,5 +1,6 @@
 ---
 title: CLI Reference
+draft: true
 description: Every nschema command, the global flags they share, and how configuration is resolved.
 ---
 
