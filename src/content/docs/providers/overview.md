@@ -14,10 +14,11 @@ for offline planning. This section covers the live-database providers; see [Back
 
 ## Available backends
 
-| Provider | Page                                      |
-|----------|-------------------------------------------|
-| Postgres | [Postgres provider](/providers/postgres/) |
-| SQLite   | [SQLite provider](/providers/sqlite/)     |
+| Provider   | Page                                          |
+|------------|-----------------------------------------------|
+| Postgres   | [Postgres provider](/providers/postgres/)     |
+| SQL Server | [SQL Server provider](/providers/sqlserver/)  |
+| SQLite     | [SQLite provider](/providers/sqlite/)         |
 
 ## How a provider relates to the DDL
 
