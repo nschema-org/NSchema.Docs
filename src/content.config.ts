@@ -34,6 +34,7 @@ export const collections = {
       ghPackage("NSchema", "changelog/cli", "CLI"),
       ghPackage("NSchema.Core", "changelog/core", "Core"),
       ghPackage("NSchema.Postgres", "changelog/postgres", "PostgreSQL"),
+      ghPackage("NSchema.SQLite", "changelog/sqlite", "SQLite"),
       ghPackage("NSchema.Aws", "changelog/aws", "AWS"),
     ]),
   }),

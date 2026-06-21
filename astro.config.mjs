@@ -58,6 +58,7 @@ export default defineConfig({
             { type: "all", base: "changelog/cli", label: "CLI" },
             { type: "all", base: "changelog/core", label: "Core" },
             { type: "all", base: "changelog/postgres", label: "PostgreSQL" },
+            { type: "all", base: "changelog/sqlite", label: "SQLite" },
             { type: "all", base: "changelog/aws", label: "AWS" },
           ]),
         },

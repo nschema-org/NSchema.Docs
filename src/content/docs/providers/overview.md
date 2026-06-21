@@ -17,6 +17,7 @@ for offline planning. This section covers the live-database providers; see [Back
 | Provider | Page                                      |
 |----------|-------------------------------------------|
 | Postgres | [Postgres provider](/providers/postgres/) |
+| SQLite   | [SQLite provider](/providers/sqlite/)     |
 
 ## How a provider relates to the DDL
 
