@@ -12,16 +12,6 @@ will work out the migration steps.
 The starting design goal was "Terraform for databases", so it's built to work in CI/CD environments, 
 and supports a very familiar command shape: `plan`, `apply`, `destroy`, etc.
 
-## _Why_ is NSchema?
-
-There are plenty of database migration tools and techniques out there already, but in my experience, they never just work.
-Whether it's proprietary tooling, opaque binaries, or hand-written migrations, there's always one headache or another that
-makes them not fun to deal with. Compare that with how easy it is to get started managing infrastructure with [OpenTofu](https://opentofu.org/),
-and that's what we deserve for our databases.
-
-The goal of NSchema is to provide a production-grade schema management tool, with the bells and whistles expected from
-modern software, while offering a slick developer experience with the lowest-possible barrier to entry.
-
 ## Declarative, not imperative
 
 Most migration tools are imperative: you hand-write an ordered sequence of `ALTER` steps, one file per change, 
