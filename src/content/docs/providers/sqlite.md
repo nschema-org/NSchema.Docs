@@ -54,13 +54,16 @@ are out of scope.
 SQLite has a deliberately small surface, so this provider only allows what SQLite supports:
 
 - **Supported:** tables, columns (including `DEFAULT` and stored generated columns), primary keys, foreign keys, unique
-  constraints, check constraints, indexes, and views.
+  constraints, check constraints, indexes, views, and triggers.
 - **Native `ALTER TABLE` only.** Creating, dropping and renaming tables and columns, and creating or dropping
   indexes and views, are applied directly. Operations SQLite cannot do in place: changing a column's type, nullability,
   default or generated expression, or adding/dropping a constraint on an *existing* table would require a full
   table rebuild and raises a clear `NotSupportedException`.
+- **Triggers** carry an inline body, written as `CREATE TRIGGER … ON main.t AS $$ BEGIN … END $$`, (see the [DDL grammar](/ddl/grammar/#triggers)) 
+  and fire `BEFORE` or `AFTER` a single event. SQLite's limits throw `NotSupportedException`: one event per trigger (no 
+- `INSERT OR UPDATE`), no `TRUNCATE`, and no `INSTEAD OF`.
 - **Not supported (SQLite has no equivalent):** schemas other than `main`, sequences, enums, domains, composite types,
-  stored functions/procedures, grants, materialized views, and triggers. These raise `NotSupportedException`.
+  stored functions/procedures, grants, and materialized views. These raise `NotSupportedException`.
 - **Comments are not persisted.** SQLite has no `COMMENT ON`, so documentation comments are ignored when generating SQL.
   A desired schema that carries comments will show those comment changes as perpetually pending.
 
