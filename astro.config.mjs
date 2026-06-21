@@ -49,7 +49,7 @@ export default defineConfig({
         { label: "Providers", items: [{ autogenerate: { directory: "providers" } }] },
         { label: "Backends", items: [{ autogenerate: { directory: "backends" } }] },
         { label: "Library (Core)", items: [{ autogenerate: { directory: "library" } }] },
-        { label: "Reference", items: [{ autogenerate: { directory: "reference" } }] },
+        { label: "Project", items: [{ autogenerate: { directory: "project" } }] },
         {
           // Generated from each package repo's GitHub releases by
           // starlight-changelogs; bases must match src/content.config.ts.
