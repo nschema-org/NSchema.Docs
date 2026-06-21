@@ -12,7 +12,7 @@ opposed to inline configuration.
 The provider is configured separately from the optional [backend](/backends/), which persists a snapshot of the schema 
 for offline planning. This section covers the live-database providers; see [Backends](/backends/) for the state backends.
 
-## Available backends
+## Available providers
 
 | Provider   | Page                                          |
 |------------|-----------------------------------------------|

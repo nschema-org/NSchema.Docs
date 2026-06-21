@@ -9,7 +9,8 @@ Declare a sqlserver provider using a `PROVIDER sqlserver` [config block](/cli/co
 
 ```sql
 PROVIDER sqlserver (
-  connection_string = ''
+  connection_string = '',
+  command_timeout = 30
 );
 ```
 
@@ -20,9 +21,12 @@ place with `CREATE OR ALTER`, which requires this baseline.
 
 ## Attributes
 
-| Attribute           | Type   | Description                                                                                      |
-|---------------------|--------|--------------------------------------------------------------------------------------------------|
-| `connection_string` | string | The connection string used to reach the database. Best supplied via the environment (see below). |
+| Attribute           | Type    | Description                                                                                          |
+|---------------------|---------|------------------------------------------------------------------------------------------------------|
+| `connection_string` | string  | The connection string used to reach the database. Best supplied via the environment (see below).     |
+| `username`          | string  | The username, supplied separately from the connection string. Overrides any user embedded in it.     |
+| `password`          | string  | The password, supplied separately from the connection string. Overrides any password embedded in it. |
+| `command_timeout`   | integer | The command timeout, in seconds.                                                                     |
 
 ## The connection string
 
@@ -34,6 +38,21 @@ export NSCHEMA_SQLSERVER_CONNECTION_STRING="Server=localhost;Database=app;User I
 ```
 
 `NSCHEMA_SQLSERVER_CONNECTION_STRING` **takes precedence** over a `connection_string` set in the block.
+
+## Credentials supplied separately
+
+When a secret store (e.g. AWS Secrets Manager) injects the database username and password out of band, keep only the
+non-secret host/database in the connection string and supply the credentials on their own:
+
+```sh
+export NSCHEMA_SQLSERVER_CONNECTION_STRING="Server=db.internal;Database=app;TrustServerCertificate=True"
+export NSCHEMA_SQLSERVER_USERNAME="$DB_USER"
+export NSCHEMA_SQLSERVER_PASSWORD="$DB_PASSWORD"
+```
+
+These (also settable as `username` / `password` in the block) override any user/password embedded in the connection
+string. The base connection string is applied first, then the discrete overrides are layered on top. See
+[Environment variables](/cli/environment-variables/#separate-credentials).
 
 ## Identifiers and dialect
 
