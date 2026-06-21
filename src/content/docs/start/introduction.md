@@ -5,12 +5,22 @@ sidebar:
   order: 1
 ---
 
-NSchema is a CLI tool for declaratively managing database schemas. Instead of writing your migrations by hand with 
-`ALTER` and `DROP` statements, you express your desired schema using plain `CREATE` statements, and NSchema will 
-work out the migration steps.
+NSchema is a free, open-source CLI tool for declaratively managing database schemas. Instead of writing your migrations 
+by hand with `ALTER` and `DROP` statements, you express your desired schema using plain `CREATE` statements, and NSchema
+will work out the migration steps.
 
 The starting design goal was "Terraform for databases", so it's built to work in CI/CD environments, 
 and supports a very familiar command shape: `plan`, `apply`, `destroy`, etc.
+
+## _Why_ is NSchema?
+
+There are plenty of database migration tools and techniques out there already, but in my experience, they never just work.
+Whether it's proprietary tooling, opaque binaries, or hand-written migrations, there's always one headache or another that
+makes them not fun to deal with. Compare that with how easy it is to get started managing infrastructure with [OpenTofu](https://opentofu.org/),
+and that's what we deserve for our databases.
+
+The goal of NSchema is to provide a production-grade schema management tool, with the bells and whistles expected from
+modern software, while offering a slick developer experience with the lowest-possible barrier to entry.
 
 ## Declarative, not imperative
 
@@ -35,8 +45,9 @@ generates an `ALTER TABLE` statement to append it.
 
 This is the same model tools like Terraform use for infrastructure: describe the goal, let the tool find the path. 
 One key difference though, is that databases are inherently _stateful_. Most accidentally destroyed infrastructure 
-can be recreated, but data lost through a dropped table can only be recovered from backups. (When did you last test those again?)
-NSchema has guardrails and escape hatches for protecting against data loss, but you still need to take care when making destructive changes.
+can be recreated, but data lost through a dropped table can only be recovered from backups. (When did you last test those
+again?) NSchema has guardrails and escape hatches for protecting against data loss, but you still need to take care when 
+making destructive changes.
 
 ## How it works
 
