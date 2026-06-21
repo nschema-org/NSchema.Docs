@@ -28,24 +28,13 @@ There is no test suite; `npm run check` plus a successful `npm run build` are th
   `{ label, items: [{ autogenerate: { directory } }] }` (the v0.39+ form; the bare
   `{ label, autogenerate }` shorthand was removed). Group *labels* live in the config; item order and
   labels come from each page's frontmatter (`sidebar.order`, then filename; `sidebar.label` or `title`).
-  Adding a page needs no config change — just create the file. This is deliberate: `draft: true` pages
-  are excluded from production, and autogenerate simply omits them, whereas a hand-listed `slug` to a
-  draft/missing page is a hard build error. The "Changelog" group stays manual (plugin helper).
+  Adding a page needs no config change — just create the file. This is deliberate: autogenerate simply
+  omits a page that isn't there, whereas a hand-listed `slug` to a missing page is a hard build error.
+  The "Changelog" group stays manual (plugin helper).
 - **Internal links are absolute with a trailing slash** — `/cli/commands/plan/`, not relative or
   extensioned. Match this exactly or links break in the built site.
 - A section's overview page is named after the section (e.g. `cli/cli.md`, `providers/providers.md`,
   `backends/backends.md`) and mapped to the bare section slug in the sidebar.
-
-## The `draft:` convention (important)
-
-This repo is mid-"humanize" effort (branch `chore/humanize`). Every page authored by Claude carries
-`draft: true` in its frontmatter until a human has rewritten it in their own words. Drafts are
-excluded from production builds. Only fully human-written pages omit the flag (currently
-`index.mdx` and `cli/cli.md`).
-
-When you create or substantially generate page content, **add `draft: true`**. Do not silently
-remove `draft: true` from a page you only lightly touched — clearing it is the human author's signal
-that the prose has been humanized.
 
 ## Changelogs (per-package, from GitHub releases)
 

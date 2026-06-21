@@ -12,11 +12,13 @@ opposed to inline configuration.
 The provider is configured separately from the optional [backend](/backends/), which persists a snapshot of the schema 
 for offline planning. This section covers the live-database providers; see [Backends](/backends/) for the state backends.
 
-## Available backends
+## Available providers
 
-| Provider | Page                                      |
-|----------|-------------------------------------------|
-| Postgres | [Postgres provider](/providers/postgres/) |
+| Provider   | Page                                          |
+|------------|-----------------------------------------------|
+| Postgres   | [Postgres provider](/providers/postgres/)     |
+| SQL Server | [SQL Server provider](/providers/sqlserver/)  |
+| SQLite     | [SQLite provider](/providers/sqlite/)         |
 
 ## How a provider relates to the DDL
 

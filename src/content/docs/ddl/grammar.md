@@ -426,12 +426,17 @@ A definition-only change replaces in place, like a view body change.
 ```ebnf
 create-trigger = "CREATE" , "TRIGGER" , ident , timing , events , "ON" , qualified-name ,
                  [ "FOR" , "EACH" , ( "ROW" | "STATEMENT" ) ] , [ "WHEN" , "(" , expr , ")" ] ,
-                 "EXECUTE" , ( "FUNCTION" | "PROCEDURE" ) , func-name , "(" , [ arg-text ] , ")" ;
+                 trigger-action ;
+trigger-action = "EXECUTE" , ( "FUNCTION" | "PROCEDURE" ) , func-name , "(" , [ arg-text ] , ")"
+               | "AS" , dollar-body ;
 timing         = "BEFORE" | "AFTER" | "INSTEAD" , "OF" ;
 events         = event , { "OR" , event } ;
 event          = "INSERT" | "DELETE" | "TRUNCATE" | "UPDATE" , [ "OF" , "(" , ident , { "," , ident } , ")" ] ;
 func-name      = ident , [ "." , ident ] ;
 ```
+
+A trigger's action is written in one of two forms. The first executes a function (like PostgreSQL), where the trigger's 
+logic lives in a separate function it calls:
 
 ```sql
 CREATE TRIGGER users_audit
@@ -442,13 +447,33 @@ CREATE TRIGGER users_audit
   EXECUTE FUNCTION app.log_change();
 ```
 
+The second runs an inline body (like SQL Server), where the trigger carries its statements directly:
+
+```sql
+CREATE TRIGGER users_guard
+  INSTEAD OF DELETE
+  ON app.users
+  AS $$
+    BEGIN
+      INSERT INTO app.audit (msg) VALUES ('blocked');
+      RETURN;
+    END
+  $$;
+```
+
+The body uses the same dollar-quoted, opaque-SQL device as a function or deployment-script: `$$ … $$`, passed verbatim 
+with the delimiters stripped, so it may contain its own `;` and is not dialect-translated. The two forms are mutually 
+exclusive, and which one a [provider](/providers/) accepts depends on the specific database. PostgreSQL uses 
+`EXECUTE FUNCTION`, SQL Server uses an inline body.
+
 A trigger is table-scoped but written as a standalone statement that names its table via `ON`, attached to that table 
-when the document is built. The function it executes must exist; the planner creates a trigger after both its table and 
-the function it calls, and drops it before either. `FOR EACH` defaults to `STATEMENT`. The `WHEN` condition and the
-function `arg-text` are captured opaque.
+when the document is built. For the function form, the function it executes must exist: the planner creates the trigger 
+after both its table and the function it calls, and drops it before either. `FOR EACH` defaults to `STATEMENT`. The 
+`WHEN` condition and the function `arg-text` are captured opaque.
 
 Triggers are table members (named uniquely per table), so, like indexes and constraints, they are not renameable and have 
-no separate `DROP TRIGGER`. A trigger absent from a declared table's set is dropped, and a structural change is planned as a drop + recreate.
+no separate `DROP TRIGGER`. A trigger absent from a declared table's set is dropped, and a structural change is planned 
+as a drop + recreate.
 
 ## Construct → model mapping
 
