@@ -20,7 +20,7 @@ A live database (a `PROVIDER postgres` block) **and** a state store to compare a
 
 ## Options
 
-- **`--scope <name>`** — limit the check to specific namespaces. May be repeated.
+- **`-s`, `--scope <name>`** — limit the check to specific namespaces. May be repeated.
 - **`--detailed-exitcode`** — return a [detailed exit code](/cli/exit-codes/): `0` when there is no drift, `2` when the live database 
 - has drifted (errors stay `1`), so a monitoring job can gate on it. Without it, `drift` exits `0` and you read the diff it prints.
 

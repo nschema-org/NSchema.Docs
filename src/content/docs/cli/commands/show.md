@@ -19,4 +19,4 @@ A state store (a `BACKEND file` or `BACKEND s3` block).
 
 ## Options
 
-- **`--scope <name>`** — limit the output to specific namespaces. May be repeated.
+- **`-s`, `--scope <name>`** — limit the output to specific namespaces. May be repeated.

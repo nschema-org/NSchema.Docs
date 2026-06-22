@@ -22,7 +22,7 @@ Edit those to point at your database and describe the schema you want, then
 
 ## Options
 
-- **`--force`** — initialize even if the directory is not empty. Without it, `init` refuses to run in a non-empty 
+- **`-f`, `--force`** — initialize even if the directory is not empty. Without it, `init` refuses to run in a non-empty 
   directory so it can't clobber existing files.
 
 ## Needs

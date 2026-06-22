@@ -26,4 +26,4 @@ A state store (a `BACKEND file` or `BACKEND s3` block); the lock lives with it. 
 
 ## Options
 
-- **`--force`** — skip the confirmation prompt.
+- **`-f`, `--force`** — skip the confirmation prompt.
