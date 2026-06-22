@@ -66,8 +66,8 @@ The **current** schema has two possible sources, selected automatically per oper
 
 By default, a run's scope is the full set of schemas declared in your desired DDL. You can narrow it per run with the 
 `Schemas` argument on the operation (e.g. `app.Plan(new PlanArguments { Schemas = ["app"] })`). The live `ISchemaProvider` 
-is then asked only for those schemas — its `GetSchema(...)` takes the names to read and returns everything it describes 
-when none are given.
+is then asked only for those schemas. `GetSchema(...)` takes the names to read and returns everything it describes when 
+none are given.
 
 ## Schema policies
 

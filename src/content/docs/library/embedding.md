@@ -74,7 +74,7 @@ See [Configuration (C#)](/library/configuration/#operations) for the full list.
 
 ## Saved plans
 
-You can save a plan to a file and apply it later, unchanged — so what was reviewed is exactly what runs:
+You can save a plan to a file and apply it later, unchanged, so what was reviewed is exactly what runs:
 
 ```csharp
 await app.Plan(new PlanArguments { OutFile = "migration.nplan" });

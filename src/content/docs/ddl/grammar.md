@@ -27,7 +27,7 @@ These were settled deliberately; the rationale matters for anyone extending the 
    with no authoring benefit for a generated/canonical format.
 4. **Constraint names are always required.** Every constraint is written `CONSTRAINT <name>…`. The name is the comparer's 
    match key (its diff identity); anonymous constraints can't diff stably, so they are not allowed.
-5. **Grants are statements**, not table-body items — they're cross-cutting (one role across many objects), which matches `GRANT` in real SQL.
+5. **Grants are statements**, not table-body items. They're cross-cutting (one role across many objects), which matches `GRANT` in real SQL.
 
 ## Lexical
 
@@ -36,7 +36,7 @@ These were settled deliberately; the rationale matters for anyone extending the 
 line-comment   = "--" , { any-char - newline } ;
 block-comment  = "/*" , { any-char } , "*/" ;
 
-(* captured — doc-comments, attached to the following declaration (see Comments) *)
+(* captured: doc-comments, attached to the following declaration (see Comments) *)
 doc-line       = "---" , { any-char - newline } ;
 doc-block      = "/**" , { any-char } , "*/" ;
 
@@ -410,16 +410,16 @@ $$;
 ```
 
 Functions and procedures both capture opaquely: `arg-text` is the verbatim text inside the parentheses, and `definition-text` 
-is everything after the closing parenthesis up to the top-level `;` — **dollar-quote aware**, so a `;` inside `$$ … $$` 
-does not end the statement. A procedure is identical except its definition has no `RETURNS` clause.
+is everything after the closing parenthesis up to the top-level `;` (dollar-quote aware), so a `;` inside `$$ … $$`does 
+not end the statement. A procedure is identical except its definition has no `RETURNS` clause.
 
 Two rules carry over from the database:
 
 1. **No overloading.** One routine per name.
 2. **Functions and procedures share one namespace.** Within a schema.
 
-The argument list is part of the routine's identity: changing it plans a **drop + recreate**.
-A definition-only change replaces in place, like a view body change.
+The argument list is part of the routine's identity: changing it plans a **drop + recreate**. A definition-only change 
+replaces in-place, like a view body change.
 
 ### Triggers
 
