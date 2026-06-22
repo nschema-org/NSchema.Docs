@@ -24,9 +24,9 @@ BACKEND file (
 
 ## When to use it
 
-A file backend is ideal when a single machine or person owns the state — local development, or a setup where the state 
-file is committed to the repository. For a team or CI where many runners need one shared source of truth, prefer 
-the [Amazon S3 backend](/backends/s3/).
+A file backend is ideal when a single machine or person owns the state, like during local development, or a setup where
+the state file is committed to the repository. For a team or CI where many runners need one shared source of truth, consider
+using something like the [Amazon S3 backend](/backends/s3/) instead.
 
 ## Locking
 

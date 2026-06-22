@@ -56,7 +56,7 @@ A `---` doc-comment (or a `/** … */` block) immediately before a declaration b
 emitting a `COMMENT ON …` in the migration. Ordinary `--` comments are notes for the reader and are never persisted:
 
 ```sql
--- internal: revisit index strategy             (stripped — just a note)
+-- internal: revisit index strategy             (stripped; it's just a note)
 --- All registered users.                       (becomes the table's catalog comment)
 CREATE TABLE app.users
 (

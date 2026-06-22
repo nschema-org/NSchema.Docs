@@ -53,10 +53,10 @@ happen in separate steps (for example, plan in a pull request, apply after appro
 Write a plan to a file with `PlanArguments.OutFile`, then apply it with `ApplyArguments.PlanFile`:
 
 ```csharp
-// Step 1 — compute and save the plan (requires a registered SQL generator):
+// Step 1: compute and save the plan (requires a registered SQL generator):
 await app.Plan(new PlanArguments { OutFile = "migration.nplan" });
 
-// Step 2 — later, apply exactly that plan without recomputing:
+// Step 2: later, apply exactly that plan without recomputing:
 await app.Apply(new ApplyArguments { PlanFile = "migration.nplan" });
 ```
 
@@ -83,7 +83,7 @@ with no database connection.
 
 NSchema supports an optional backend state store that persists a snapshot of the schema. After a successful apply, NSchema 
 captures the resulting schema to the store, so a later plan can be generated against that snapshot. You can also capture 
-the current schema without applying by running a [`Refresh`](#operations) operation — handy for recording drift that happened 
+the current schema without applying by running a [`Refresh`](#operations) operation; handy for recording drift that happened 
 between applies.
 
 Register a state store from a provider package like `NSchema.Aws`, or use the built-in `UseFileStateStore(path)` for a file-backed store:

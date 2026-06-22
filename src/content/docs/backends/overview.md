@@ -24,10 +24,8 @@ See [Offline planning & state](/guides/state/) for when you want one.
 
 ## Locking
 
-NSchema locks the backend during write operations ([`apply`](/cli/commands/apply/),
-[`destroy`](/cli/commands/destroy/), [`refresh`](/cli/commands/refresh/)) so concurrent runs
-can't corrupt the recorded state. If a run is interrupted and leaves a stale lock behind, clear
-it with [`force-unlock`](/cli/commands/force-unlock/) — once you're sure no operation is still
-running.
+NSchema locks the backend during write operations ([`apply`](/cli/commands/apply/), [`destroy`](/cli/commands/destroy/), [`refresh`](/cli/commands/refresh/)) 
+so concurrent runs can't corrupt the recorded state. If a run is interrupted and leaves a stale lock behind, clear it 
+with [`force-unlock`](/cli/commands/force-unlock/) once you're sure no operation is still running.
 
 This applies to every backend; the lock lives alongside the state it protects.
