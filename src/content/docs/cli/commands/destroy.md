@@ -26,7 +26,7 @@ When a state store is configured it is refreshed after the teardown.
 
 ## Options
 
-- **`--scope <name>`** — limit the teardown to specific namespaces. May be repeated.
-- **`--auto-approve`** — skip the confirmation prompt. Required for non-interactive runs.
+- **`-s`, `--scope <name>`** — limit the teardown to specific namespaces. May be repeated.
+- **`-y`, `--auto-approve`** — skip the confirmation prompt. Required for non-interactive runs.
 
 Like a declined [`apply`](/cli/commands/apply/), a declined `destroy` makes no changes and exits `1`.

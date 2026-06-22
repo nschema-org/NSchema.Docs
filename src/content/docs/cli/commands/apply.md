@@ -27,8 +27,8 @@ the step rather than silently doing nothing and reporting success. Always pass `
 
 `apply` accepts every [`plan`](/cli/commands/plan/#options) option, plus:
 
-- **`--auto-approve`** — skip the confirmation prompt and apply immediately. Required for non-interactive runs (CI, ECS tasks).
-- **`--plan-file <path>`** — replay a plan saved by [`plan --out`](/cli/commands/plan/), executing exactly that plan instead of computing 
+- **`-y`, `--auto-approve`** — skip the confirmation prompt and apply immediately. Required for non-interactive runs (CI, ECS tasks).
+- **`-p`, `--plan-file <path>`** — replay a plan saved by [`plan --out`](/cli/commands/plan/), executing exactly that plan instead of computing 
   a fresh one (Terraform's `apply <planfile>`). The saved plan already fixes its scope, desired schema, and destructive-action 
   policy, so those inputs are ignored. A live database to write to is still required, and you're still prompted for 
   confirmation unless `--auto-approve` is given.

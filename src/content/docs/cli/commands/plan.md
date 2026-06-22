@@ -23,11 +23,11 @@ See [Configuration blocks](/cli/configuration/).
 
 ## Options
 
-- **`--scope <name>`** — limit the migration to specific database schemas (namespaces). May be repeated.
+- **`-s`, `--scope <name>`** — limit the migration to specific database schemas (namespaces). May be repeated.
 - **`--destructive-actions <error|warn|allow>`** — policy for destructive changes. Defaults to `error`. *(NSCHEMA 
   `destructive_action`, env `NSCHEMA_DESTRUCTIVE_ACTION_POLICY`)* See [Destructive-action safety](/guides/destructive-actions/).
 - **`--destroy`** — preview the SQL that [`destroy`](/cli/commands/destroy/) would run to tear the managed schema down.
-- **`--out <path>`** — write the computed plan to a file so it can be replayed later by [`apply --plan-file`](/cli/commands/apply/). 
+- **`-o`, `--out <path>`** — write the computed plan to a file so it can be replayed later by [`apply --plan-file`](/cli/commands/apply/). 
   Works with `--destroy` too, saving the teardown plan.
 - **`--detailed-exitcode`** — return a [detailed exit code](/cli/exit-codes/): `0` when there are no changes, `2` when the plan has 
   changes (errors stay `1`), so CI can gate on "does this change the schema?" without parsing output. Without it, `plan` exits `0` even when there are changes.

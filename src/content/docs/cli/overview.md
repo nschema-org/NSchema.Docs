@@ -27,12 +27,12 @@ every command in detail; the pages below cover the cross-cutting pieces they all
 
 Every command accepts these:
 
-- **`--directory <dir>`** Sets the current working directory for `nschema`.
-- **`--environment <name>`** Sets the target environment. Layers the matching `*.env.<name>.sql` overlay files over the base configuration. *(env `NSCHEMA_ENVIRONMENT`)* See [Environments](/cli/configuration/#environments).
+- **`-C`, `--directory <dir>`** Sets the current working directory for `nschema`.
+- **`-e`, `--environment <name>`** Sets the target environment. Layers the matching `*.env.<name>.sql` overlay files over the base configuration. *(env `NSCHEMA_ENVIRONMENT`)* See [Environments](/cli/configuration/#environments).
 - **`--no-color`** Disables colored output. *(env `NO_COLOR`)*
 - **`--json`** Emits machine-readable NDJSON output instead of formatted text.
-- **`--verbose`** / **`--quiet`** Raises or lowers output verbosity.
-- **`--help`** Shows contextual help for the command.
+- **`-v`, `--verbose`** / **`-q`, `--quiet`** Raises or lowers output verbosity.
+- **`-h`, `--help`** Shows contextual help for the command.
 
 ## Where configuration comes from
 

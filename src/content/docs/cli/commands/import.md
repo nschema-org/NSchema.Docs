@@ -20,9 +20,9 @@ A live database (a `PROVIDER postgres` block).
 
 ## Options
 
-- **`--out-dir <path>`** — directory to write the imported SQL files into. Defaults to the current directory.
-- **`--scope <name>`** — limit the import to specific database schemas (namespaces). May be repeated.
-- **`--force`** — overwrite existing `.sql` files in the output directory. Without it,`import` refuses to run against a 
+- **`-o`, `--out-dir <path>`** — directory to write the imported SQL files into. Defaults to the current directory.
+- **`-s`, `--scope <name>`** — limit the import to specific database schemas (namespaces). May be repeated.
+- **`-f`, `--force`** — overwrite existing `.sql` files in the output directory. Without it,`import` refuses to run against a 
   directory that already contains `.sql` files, so a re-import can't silently clobber hand-edited schema (the same guard
   [`init`](/cli/commands/init/) applies to a non-empty directory).
 
