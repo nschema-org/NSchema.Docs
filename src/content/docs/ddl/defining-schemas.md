@@ -13,7 +13,7 @@ is the complete specification, and the [type reference](/ddl/types/) lists suppo
 --- The application schema.
 CREATE PARTIAL SCHEMA app;
 
---- All regis tered users.
+--- All registered users.
 CREATE TABLE app.users
 (
     id bigint NOT NULL IDENTITY,
@@ -38,10 +38,10 @@ A few things to note, each covered in full by the [grammar reference](/ddl/gramm
   object's catalog comment (`COMMENT ON …`). See [Comments](/ddl/grammar/#comments).
 - **Renames** use `RENAMED FROM <old_name>` on a schema, table, or column, so the comparer matches the existing object 
   instead of dropping and recreating it.
-- **Partial schemas** (`CREATE PARTIAL SCHEMA …`) leave undeclared tables alone rather than dropping them. This is useful 
-- for shared schemas or while migrating to NSchema. A `DROP TABLE app.x;` statement still records an explicit drop.
+  **Partial schemas** (`CREATE PARTIAL SCHEMA …`) leave undeclared tables alone rather than dropping them. This is useful 
+  for shared schemas or while migrating to NSchema. A `DROP TABLE app.x;` statement still records an explicit drop.
 - **Other objects**. Other types like views (`CREATE VIEW`), enums (`CREATE ENUM`), domains, composite types, sequences, 
-- functions/procedures, triggers, and extensions each have their own statements. See the [grammar reference](/ddl/grammar/).
+  functions/procedures, triggers, and extensions each have their own statements. See the [grammar reference](/ddl/grammar/).
 
 ## Where the files live
 
