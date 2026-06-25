@@ -20,7 +20,9 @@ every command in detail; the pages below cover the cross-cutting pieces they all
 | [`destroy`](/cli/commands/destroy/)           | Drop all managed schema objects from the database.        |
 | [`show`](/cli/commands/show/)                 | Print the schema recorded in the state store.             |
 | [`drift`](/cli/commands/drift/)               | Report how the live database differs from recorded state. |
+| [`doctor`](/cli/commands/doctor/)             | Check the database and state store are reachable.         |
 | [`force-unlock`](/cli/commands/force-unlock/) | Forcibly release a stale state-store lock.                |
+| [`lock-status`](/cli/commands/lock-status/)   | Show whether the state store is locked, and by whom.      |
 | [`completion`](/cli/commands/completion/)     | Output a shell tab-completion script.                     |
 
 ## Global flags
