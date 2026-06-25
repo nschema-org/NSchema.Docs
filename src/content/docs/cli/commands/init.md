@@ -12,13 +12,6 @@ Scaffold a simple project in the current directory, to get a new project going. 
 nschema init
 ```
 
-By default this scaffolds a PostgreSQL provider with a local-file state backend. Choose a different combination with
-`--provider` and `--backend`:
-
-```sh
-nschema init --provider sqlite --backend s3
-```
-
 This writes:
 
 - `config.sql` — the project's provider/state configuration, as `PROVIDER` / `BACKEND` [config blocks](/cli/configuration/).
