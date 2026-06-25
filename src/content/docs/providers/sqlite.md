@@ -46,8 +46,8 @@ CREATE TABLE main.widgets (
 );
 ```
 
-`main` always exists, so it is never planned as a create. Schemas other than `main` (and `temp` / `ATTACH`ed databases)
-are out of scope.
+`main` always exists, so the provider never creates or drops it: a [`destroy`](/cli/commands/destroy/) removes the
+tables and leaves `main` in place. Schemas other than `main` (and `temp` / `ATTACH`ed databases) are out of scope.
 
 ## What's supported
 
