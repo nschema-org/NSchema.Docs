@@ -16,8 +16,24 @@ nschema lock acquire --ttl 2h
 ```
 
 :::note[Needs]
-A state store (a `BACKEND file` or `BACKEND s3` block); the lock lives with it. The live database is never contacted.
+A state store (a `BACKEND` block); the lock lives with it.
 :::
+
+It prints the new lock's id and the exact command to release it.
+
+## Scripting
+
+Pass `--json`, to print details of the acquired lock in JSON format.
+
+```sh
+LOCK_ID=$(nschema lock acquire --json | jq -r .lockId)
+# ... run your out-of-band checks ...
+nschema lock release "$LOCK_ID" --auto-approve
+```
+
+```json
+{ "locked": true, "lockId": "ba5edd4334d74f1a89d6f143f506fe7f", "operation": "manual", "who": "ci@runner", "since": "2026-06-27T20:30:59+00:00" }
+```
 
 ## Options
 
@@ -25,3 +41,5 @@ A state store (a `BACKEND file` or `BACKEND s3` block); the lock lives with it. 
   so others know why the state is held.
 - **`--ttl <duration>`** — record an optional expiry on the lock (for example `90s`, `30m`, `2h`, `1d`). [`lock status`](/cli/commands/lock-status/) 
   surfaces it, but it is **never auto-enforced**: the lock stays held until you release it.
+- **`--json`** — print the held lock as a structured object on stdout (instead of formatted text), so a script can read
+  the `lockId` to release it later.

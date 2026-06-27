@@ -16,11 +16,14 @@ nschema lock status
 A state store (a `BACKEND` block); the lock lives with it.
 :::
 
-When locked, it prints the holder and the id, and the exact command to release it:
+When locked, it prints the lock's details and the exact command to release it:
 
 ```text
-⚠ The state is locked by alice@ci (operation 'apply', since 2026-06-25 10:00:00Z).
+⚠ The state is locked.
   Lock ID: 9f8e7d6c
+  Held by: alice@ci
+  Operation: apply
+  Since: 2026-06-25 10:00:00Z
   Release it, once you're sure no operation is still running, with: nschema lock release 9f8e7d6c
 ```
 
