@@ -3,7 +3,7 @@ title: nschema show
 description: Print the schema recorded in the state store as human-readable text.
 sidebar:
   label: show
-  order: 9
+  order: 10
 ---
 
 Print the schema recorded in the state store as human-readable text. The live database is never contacted. This is a 

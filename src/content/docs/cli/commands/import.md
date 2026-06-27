@@ -3,7 +3,7 @@ title: nschema import
 description: Read the live database schema and write it out as desired-schema source files.
 sidebar:
   label: import
-  order: 7
+  order: 8
 ---
 
 Read the live database schema and write it out as desired-schema source files. Use this to adopt an existing database 
@@ -24,6 +24,6 @@ A live database (a `PROVIDER postgres` block).
 - **`-s`, `--scope <name>`** — limit the import to specific database schemas (namespaces). May be repeated.
 - **`-f`, `--force`** — overwrite existing `.sql` files in the output directory. Without it,`import` refuses to run against a 
   directory that already contains `.sql` files, so a re-import can't silently clobber hand-edited schema (the same guard
-  [`init`](/cli/commands/init/) applies to a non-empty directory).
+  [`scaffold`](/cli/commands/scaffold/) applies to a non-empty directory).
 
 See [Adopting an existing database](/guides/adopting-a-database/) for the full workflow.

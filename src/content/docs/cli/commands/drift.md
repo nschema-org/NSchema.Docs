@@ -3,7 +3,7 @@ title: nschema drift
 description: Check whether the live database has drifted from the recorded state.
 sidebar:
   label: drift
-  order: 10
+  order: 11
 ---
 
 Check whether the live database has drifted from the recorded state, reporting the difference as a diff that answers 

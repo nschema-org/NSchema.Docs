@@ -3,7 +3,7 @@ title: nschema doctor
 description: Check that the configured database and state store are reachable and healthy.
 sidebar:
   label: doctor
-  order: 11
+  order: 12
 ---
 
 Run read-only health checks against the infrastructure your project declares, and report the outcome of each. It's a quick

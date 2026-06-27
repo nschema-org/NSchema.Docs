@@ -3,7 +3,7 @@ title: nschema destroy
 description: Drop all managed schema objects from the target database.
 sidebar:
   label: destroy
-  order: 8
+  order: 9
 ---
 
 Drop all managed schema objects from the target database. Prompts for confirmation before making changes unless `--auto-approve` is given.

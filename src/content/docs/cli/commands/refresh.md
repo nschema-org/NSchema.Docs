@@ -3,7 +3,7 @@ title: nschema refresh
 description: Read the live schema and write it to the state store.
 sidebar:
   label: refresh
-  order: 6
+  order: 7
 ---
 
 Read the live schema and write it to the state store. Use this to seed or repair [state](/guides/state/).

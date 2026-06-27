@@ -3,7 +3,7 @@ title: nschema apply
 description: Compute the plan and apply it to the target database.
 sidebar:
   label: apply
-  order: 5
+  order: 6
 ---
 
 Compute the plan and apply it to the target database. Prompts for confirmation before making changes unless `--auto-approve` is given.

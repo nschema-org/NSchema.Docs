@@ -3,7 +3,7 @@ title: nschema lock-status
 description: Show whether the state store is currently locked, and by whom.
 sidebar:
   label: lock-status
-  order: 13
+  order: 14
 ---
 
 Show whether the state store is currently locked. It reads the lock, if there is one, and surfaces information like who

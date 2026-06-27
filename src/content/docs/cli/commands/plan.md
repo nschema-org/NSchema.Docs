@@ -3,7 +3,7 @@ title: nschema plan
 description: Compute and show the migration plan, without changing anything.
 sidebar:
   label: plan
-  order: 4
+  order: 5
 ---
 
 Compute and show the migration plan, without changing anything.

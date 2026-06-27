@@ -3,7 +3,7 @@ title: nschema force-unlock
 description: Forcibly release a stale lock on the state store.
 sidebar:
   label: force-unlock
-  order: 12
+  order: 13
 ---
 
 Forcibly release a stale lock on the state store.
