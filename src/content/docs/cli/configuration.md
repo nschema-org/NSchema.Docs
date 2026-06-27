@@ -6,7 +6,7 @@ description: Declare the database provider and state backend in SQL-shaped confi
 Project configuration lives in your `.sql` files alongside the schema, in SQL-statement-shaped blocks. They describe the
 provider database to connect to and the backend store that holds your schema snapshot.
 
-`nschema init` puts these in a dedicated `config.sql`, but they can live in any `.sql` file.
+[`nschema scaffold`](/cli/commands/scaffold/) puts these in a dedicated `config.sql`, but they can live in any `.sql` file.
 
 ## The two blocks
 
