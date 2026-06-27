@@ -3,16 +3,17 @@ title: Configuration blocks
 description: Declare the database provider and state backend in SQL-shaped config blocks, alongside your schema.
 ---
 
-Project configuration lives in your `.sql` files alongside the schema, in SQL-statement-shaped blocks. They describe the 
-provider database connection, the backend store that holds your schema snapshot, and the project-level policy.
+Project configuration lives in your `.sql` files alongside the schema, in SQL-statement-shaped blocks. They describe the
+provider database to connect to and the backend store that holds your schema snapshot.
 
 `nschema init` puts these in a dedicated `config.sql`, but they can live in any `.sql` file.
 
-## The three blocks
+## The two blocks
 
 ```sql
--- which database to connect to (the connection string is best supplied via the environment)
+-- which database to connect to. The provider is a plugin, so pin its version (the connection string itself is best supplied via the environment).
 PROVIDER postgres (
+  version = '4.0.0',
   connection_string = '',
   command_timeout = 30
 );
@@ -21,25 +22,34 @@ PROVIDER postgres (
 BACKEND file (
   path = './nschema.state.json'
 );
-
--- optional project settings
-NSCHEMA (
-  destructive_action = 'error'
-);
 ```
 
 | Block              | Purpose                                              |
 |--------------------|------------------------------------------------------|
 | `PROVIDER <label>` | The live database. See the [Providers](/providers/). |
 | `BACKEND <label>`  | The state backend. See [Backends](/backends/).       |
-| `NSCHEMA`          | Project-level settings (no label).                   |
 
-The `BACKEND` block may instead select S3:
+## Plugins and versions
+
+Every `PROVIDER` or `BACKEND` block (other than the built-in `file` backend) names a [plugin](/providers/) and pins its package 
+`version`. A first-party label (`postgres`, `sqlite`, `sqlserver`, `s3`) resolves to its NuGet package automatically; a 
+`source` attribute points at any other package:
+
+```sql
+PROVIDER oracle (
+  source  = 'Acme.NSchema.Oracle',
+  version = '1.2.0',
+  connection_string = ''
+);
+```
+
+`nschema` restores the pinned plugin on first use. The `BACKEND` block may instead select S3 (also versioned):
 
 ```sql
 BACKEND s3 (
-  bucket = 'my-bucket',
-  key = 'env/state.json'
+  version = '4.0.0',
+  bucket  = 'my-bucket',
+  key     = 'env/state.json'
 );
 ```
 
