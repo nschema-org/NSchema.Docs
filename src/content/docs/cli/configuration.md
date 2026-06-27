@@ -53,6 +53,9 @@ BACKEND s3 (
 );
 ```
 
+To see which plugins a project pins and whether they are restored, use [`plugin list`](/cli/commands/plugin-list/); the
+shared on-disk cache is inspected and pruned with the [`plugin cache`](/cli/commands/plugin-cache/) commands.
+
 ## Precedence
 
 Settings resolve from three layers, in increasing order of precedence:

@@ -25,6 +25,7 @@ every command in detail; the pages below cover the cross-cutting pieces they all
 | [`drift`](/cli/commands/drift/)               | Report how the live database differs from recorded state.  |
 | [`doctor`](/cli/commands/doctor/)             | Check the database and state store are reachable.          |
 | [`lock`](/cli/commands/lock/)                 | Inspect, hold, or release the state-store lock.            |
+| [`plugin`](/cli/commands/plugin/)             | Inspect the project's plugins and manage the plugin cache. |
 | [`completion`](/cli/commands/completion/)     | Output a shell tab-completion script.                      |
 
 ## Global flags
