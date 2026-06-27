@@ -4,13 +4,25 @@ import starlight from "@astrojs/starlight";
 import starlightChangelogs, {
   makeChangelogsSidebarLinks,
 } from "starlight-changelogs";
+import starlightVersions from "starlight-versions";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://nschema.dev",
   integrations: [
     starlight({
-      plugins: [starlightChangelogs()],
+      plugins: [
+        starlightChangelogs(),
+        // Multi-version docs. The live `src/content/docs/` tree is the current
+        // (v4) docs; each archived version lives under `src/content/docs/<slug>/`
+        // with a sidebar snapshot in `src/content/versions/<slug>.json`. To cut a
+        // new version, add it here and start the dev server — the plugin archives
+        // the current docs into that slug. See CLAUDE.md "Versioned docs".
+        starlightVersions({
+          current: { label: "Latest (4.x)" },
+          versions: [{ slug: "v3", label: "v3.x" }],
+        }),
+      ],
       title: "NSchema",
       description: "A declarative database schema migration tool. Describe the schema you want; NSchema computes and applies the migration to get there.",
       logo: {

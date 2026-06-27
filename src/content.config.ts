@@ -2,6 +2,7 @@ import { defineCollection } from "astro:content";
 import { docsLoader } from "@astrojs/starlight/loaders";
 import { docsSchema } from "@astrojs/starlight/schema";
 import { changelogsLoader } from "starlight-changelogs/loader";
+import { docsVersionsLoader } from "starlight-versions/loader";
 
 // NSchema's production history begins at 3.0.0 — the 0.x/1.x/2.x releases were
 // the pre-CLI library era and are no longer meaningful. We don't delete those
@@ -29,6 +30,8 @@ const ghPackage = (repo: string, base: string, title: string) => ({
 
 export const collections = {
   docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
+  // Archived doc versions (see starlight-versions plugin in astro.config.mjs).
+  versions: defineCollection({ loader: docsVersionsLoader() }),
   changelogs: defineCollection({
     loader: changelogsLoader([
       ghPackage("NSchema", "changelog/cli", "CLI"),
