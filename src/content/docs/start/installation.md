@@ -54,7 +54,7 @@ nschema completion install bash
 ```
 
 Swap `bash` for `zsh`, `fish`, or `pwsh`. See the [`completion` command](/cli/commands/completion/)
-for manual installation and [`completion uninstall`](/cli/commands/completion/uninstall/) to remove it.
+for manual installation and [`completion uninstall`](/cli/commands/completion-uninstall/) to remove it.
 
 ## Next steps
 

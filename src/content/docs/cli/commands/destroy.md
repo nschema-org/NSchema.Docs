@@ -28,6 +28,6 @@ When a state store is configured it is refreshed after the teardown.
 - **`-s`, `--scope <name>`** — limit the teardown to specific namespaces. May be repeated.
 - **`-y`, `--auto-approve`** — skip the confirmation prompt. Required for non-interactive runs.
 - **`--no-lock`** — skip taking the state-store lock for this run. Use it only when you've coordinated access by 
-  other means (for example you already hold the lock via [`nschema lock acquire`](/cli/commands/lock/acquire/)).
+  other means (for example you already hold the lock via [`nschema lock acquire`](/cli/commands/lock-acquire/)).
 
 Like a declined [`apply`](/cli/commands/apply/), a declined `destroy` makes no changes and exits `1`.

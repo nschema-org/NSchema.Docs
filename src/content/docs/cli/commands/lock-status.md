@@ -24,7 +24,7 @@ When locked, it prints the holder and the id, and the exact command to release i
   Release it, once you're sure no operation is still running, with: nschema lock release 9f8e7d6c
 ```
 
-If the lock records a [`--ttl`](/cli/commands/lock/acquire/), the expiry is surfaced here too (it is informational only: 
+If the lock records a [`--ttl`](/cli/commands/lock-acquire/), the expiry is surfaced here too (it is informational only: 
 NSchema never auto-enforces it). For a broader health check (database + state store + lock together) see [`doctor`](/cli/commands/doctor/).
 
 ## Options

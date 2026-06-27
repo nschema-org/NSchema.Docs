@@ -17,7 +17,7 @@ nschema lock release             # release whatever lock is held
 A state store (a `BACKEND file` or `BACKEND s3` block); the lock lives with it. The live database is never contacted.
 :::
 
-The `lock-id` is shown by [`lock status`](/cli/commands/lock/status/) and in the error message of the operation that was
+The `lock-id` is shown by [`lock status`](/cli/commands/lock-status/) and in the error message of the operation that was
 blocked. When you pass it, `lock release` reads the held lock first and refuses if the id no longer matches. This guards
 against race conditions where the lock you read is released and a new one acquired, so you don't break the lock for a 
 legitimate operation. Omitting the id releases whatever lock is present (and also clears a lock whose contents are corrupt).
@@ -29,7 +29,7 @@ you're certain is stale.
 
 ## Arguments
 
-- **`lock-id`** *(optional)* — the id of the lock to release, copied from [`lock status`](/cli/commands/lock/status/) or
+- **`lock-id`** *(optional)* — the id of the lock to release, copied from [`lock status`](/cli/commands/lock-status/) or
   the blocked operation's error. The release is refused if it no longer matches the held lock. Omit to release whatever 
   lock is held.
 

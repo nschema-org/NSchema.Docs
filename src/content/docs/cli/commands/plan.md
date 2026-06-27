@@ -41,7 +41,7 @@ nschema plan --out tonight.nplan
 nschema apply --plan-file tonight.nplan
 ```
 
-To render a saved plan back to the terminal before applying it, see [`plan show`](/cli/commands/plan/show/). See
+To render a saved plan back to the terminal before applying it, see [`plan show`](/cli/commands/plan-show/). See
 [The plan / apply workflow](/guides/workflow/) for the full pattern.
 
 ## Previewing a teardown

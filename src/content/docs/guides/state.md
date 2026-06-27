@@ -53,7 +53,7 @@ This captures the **whole** live schema to the store. Run it again any time you 
 
 ## Inspecting state
 
-[`state show`](/cli/commands/state/show/) prints what the store currently holds, without touching the database:
+[`state show`](/cli/commands/state-show/) prints what the store currently holds, without touching the database:
 
 ```sh
 nschema state show
@@ -62,9 +62,9 @@ nschema state show
 ## Locking
 
 NSchema locks the store during writes (`apply`, `destroy`, `refresh`) so concurrent runs can't corrupt it. An interrupted 
-run can leave a stale lock; clear it with [`lock release`](/cli/commands/lock/release/) once you're certain nothing is 
-still running. You can check the lock without touching it with [`lock status`](/cli/commands/lock/status/), or hold 
-it deliberately for out-of-band coordination with [`lock acquire`](/cli/commands/lock/acquire/).
+run can leave a stale lock; clear it with [`lock release`](/cli/commands/lock-release/) once you're certain nothing is 
+still running. You can check the lock without touching it with [`lock status`](/cli/commands/lock-status/), or hold 
+it deliberately for out-of-band coordination with [`lock acquire`](/cli/commands/lock-acquire/).
 
 ## Detecting divergence
 

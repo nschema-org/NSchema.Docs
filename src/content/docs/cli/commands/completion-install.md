@@ -27,7 +27,7 @@ of the script, your completions always track the installed binary — there's no
 Re-running the command is safe: it replaces the existing block instead of duplicating it.
 
 Open a new shell (or re-source the startup file) to pick up completion. To remove the block again, use
-[`completion uninstall`](/cli/commands/completion/uninstall/).
+[`completion uninstall`](/cli/commands/completion-uninstall/).
 
 ## Arguments
 

@@ -23,4 +23,4 @@ before you start managing a database offline.
 ## Options
 
 - **`--no-lock`** — skip taking the state-store lock for this run. Use it only when you've coordinated access by 
-  other means (for example you already hold the lock via [`nschema lock acquire`](/cli/commands/lock/acquire/)).
+  other means (for example you already hold the lock via [`nschema lock acquire`](/cli/commands/lock-acquire/)).

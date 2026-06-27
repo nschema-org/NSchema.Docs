@@ -5,7 +5,7 @@ sidebar:
   order: 15.2
 ---
 
-Remove the managed completion block that [`completion install`](/cli/commands/completion/install/) added to the
+Remove the managed completion block that [`completion install`](/cli/commands/completion-install/) added to the
 shell's startup file (`~/.bashrc`, `~/.zshrc`, fish's `config.fish`, or the PowerShell `$PROFILE`).
 
 ```sh
