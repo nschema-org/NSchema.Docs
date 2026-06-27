@@ -16,14 +16,7 @@ without opting in via the `--destructive-actions` option. It has three settings:
 
 ## Setting it
 
-The destructive action policy can be set in any of the three [configuration layers](/cli/configuration/#precedence):
-
-```sql
--- in a config block (lowest precedence)
-NSCHEMA (
-  destructive_action = 'error'
-);
-```
+The destructive action policy is set by an environment variable or the command-line flag (the flag wins).
 
 ```sh
 # environment variable
