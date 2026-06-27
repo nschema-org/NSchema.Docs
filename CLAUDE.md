@@ -67,7 +67,13 @@ each archived version is a frozen on-disk snapshot:
   rewrites internal absolute links to `/<slug>/…` so cross-version navigation stays inside the version.
   Image/asset references are copied to `assets/<slug>/`. These files are **committed** — don't gitignore them.
 - `src/content/versions/<slug>.json` — a snapshot of that version's sidebar (autogenerate groups only).
-- Current version is labelled `v4`, the archived one `v3` (slug `3` → URLs under `/v3/…`).
+- Current version is labelled `Latest (4.x)`, the archived one `v3.x` (slug `v3` → URLs under `/v3/…`).
+
+> **Renaming a version slug is not just a folder rename.** The slug is baked into each archived page's
+> `slug:` frontmatter (`slug: v3/…`), every rewritten internal link (`/v3/…`), the `assets/<slug>/` path,
+> and the `src/content/versions/<slug>.json` filename. Change all of them together — the page route comes
+> from the `slug:` frontmatter, so a stale `slug: 3/…` renders the page at `/3/…` and every `/v3/…` link
+> 404s. Simplest path: pick the slug before first archiving so the plugin writes it everywhere for you.
 
 **Cutting a new version isn't a hand edit.** Add `{ slug, label }` to the `versions` array in
 `astro.config.mjs`, then start the dev server: the plugin archives whatever is *currently* in

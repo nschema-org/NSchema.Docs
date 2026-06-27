@@ -1,7 +1,7 @@
 ---
 title: NSchema DDL grammar
 description: The complete reference for the NSchema DDL.
-slug: 3/ddl/grammar
+slug: v3/ddl/grammar
 ---
 
 NSchema DDL stays as true to standard SQL as possible, for maximum familiarity and compatibility. It should read instantly

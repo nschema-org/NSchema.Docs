@@ -4,7 +4,7 @@ description: How NSchema guards against accidental data loss, and how to opt
   into destructive changes when you mean them.
 sidebar:
   order: 60
-slug: 3/guides/destructive-actions
+slug: v3/guides/destructive-actions
 ---
 
 By default, NSchema will error on destructive actions like dropping a table or column, so you can't cause data to be lost

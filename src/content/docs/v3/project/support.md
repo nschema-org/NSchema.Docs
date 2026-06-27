@@ -4,7 +4,7 @@ description: Where to ask questions, report bugs, request features, and disclose
   security issues.
 sidebar:
   order: 5
-slug: 3/project/support
+slug: v3/project/support
 ---
 
 NSchema is an open-source project. The best place to get help or report a problem is the relevant GitHub repository. See

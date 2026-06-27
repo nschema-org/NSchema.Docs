@@ -3,7 +3,7 @@ title: About NSchema
 description: Who builds NSchema, why it exists, and what to expect from the project.
 sidebar:
   order: 1
-slug: 3/project/about
+slug: v3/project/about
 ---
 
 NSchema is a free, open-source project built and maintained by me, [Tom Wolfe](https://github.com/trwolfe13). I'm just another software engineer

@@ -1,7 +1,7 @@
 ---
 title: Defining schemas
 description: A practical introduction to declaring schemas in NSchema DDL.
-slug: 3/ddl/defining-schemas
+slug: v3/ddl/defining-schemas
 ---
 
 The desired schema is declared using a dialect-neutral flavor of SQL with some extensions to support concepts like

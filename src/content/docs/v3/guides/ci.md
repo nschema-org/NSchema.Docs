@@ -3,7 +3,7 @@ title: Running in CI
 description: Patterns for running NSchema in a continuous integration environment.
 sidebar:
   order: 70
-slug: 3/guides/ci
+slug: v3/guides/ci
 ---
 
 NSchema is built to run unattended and be easy to automate. A few things facilitate this:

@@ -4,7 +4,7 @@ description: NSchema is a declarative database schema migration tool. Describe
   the schema you want; NSchema computes and applies the migration to get there.
 sidebar:
   order: 1
-slug: 3/start/introduction
+slug: v3/start/introduction
 ---
 
 NSchema is a free, open-source CLI tool for declaratively managing database schemas. Instead of writing your migrations

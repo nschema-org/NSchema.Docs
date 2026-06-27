@@ -2,7 +2,7 @@
 title: Configuration blocks
 description: Declare the database provider and state backend in SQL-shaped
   config blocks, alongside your schema.
-slug: 3/cli/configuration
+slug: v3/cli/configuration
 ---
 
 Project configuration lives in your `.sql` files alongside the schema, in SQL-statement-shaped blocks. They describe the

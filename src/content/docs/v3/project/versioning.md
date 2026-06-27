@@ -3,7 +3,7 @@ title: Versioning & compatibility
 description: How NSchema's packages are versioned and which versions work together.
 sidebar:
   order: 3
-slug: 3/project/versioning
+slug: v3/project/versioning
 ---
 
 NSchema ships as several independently versioned NuGet packages rather than one monolith. This page explains what the

@@ -3,7 +3,7 @@ title: Installation
 description: Install the nschema .NET global tool.
 sidebar:
   order: 2
-slug: 3/start/installation
+slug: v3/start/installation
 ---
 
 NSchema is deployed as a **[.NET tool](https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools)** named `nschema`.

@@ -4,7 +4,7 @@ description: Drop all managed schema objects from the target database.
 sidebar:
   label: destroy
   order: 8
-slug: 3/cli/commands/destroy
+slug: v3/cli/commands/destroy
 ---
 
 Drop all managed schema objects from the target database. Prompts for confirmation before making changes unless `--auto-approve` is given.

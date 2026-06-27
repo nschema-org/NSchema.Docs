@@ -4,7 +4,7 @@ description: Use nschema drift to find out whether the live database has
   diverged from the recorded state.
 sidebar:
   order: 40
-slug: 3/guides/drift
+slug: v3/guides/drift
 ---
 
 Drift is when the live database no longer matches NSchema's latest snapshot in the state store. This happens when people

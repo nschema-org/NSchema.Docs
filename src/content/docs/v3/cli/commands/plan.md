@@ -4,7 +4,7 @@ description: Compute and show the migration plan, without changing anything.
 sidebar:
   label: plan
   order: 4
-slug: 3/cli/commands/plan
+slug: v3/cli/commands/plan
 ---
 
 Compute and show the migration plan, without changing anything.

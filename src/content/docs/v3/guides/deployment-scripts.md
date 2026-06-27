@@ -3,7 +3,7 @@ title: Deployment scripts
 description: Run imperative SQL before or after a migration
 sidebar:
   order: 50
-slug: 3/guides/deployment-scripts
+slug: v3/guides/deployment-scripts
 ---
 
 Some database configuration can't be expressed declaratively, or isn't yet supported by the engine. For this, NSchema

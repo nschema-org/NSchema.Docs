@@ -4,7 +4,7 @@ description: Compute the plan and apply it to the target database.
 sidebar:
   label: apply
   order: 5
-slug: 3/cli/commands/apply
+slug: v3/cli/commands/apply
 ---
 
 Compute the plan and apply it to the target database. Prompts for confirmation before making changes unless `--auto-approve` is given.

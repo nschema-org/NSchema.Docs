@@ -3,7 +3,7 @@ title: SQL Server
 description: Connect NSchema to a Microsoft SQL Server database.
 sidebar:
   order: 25
-slug: 3/providers/sqlserver
+slug: v3/providers/sqlserver
 ---
 
 Declare a sqlserver provider using a `PROVIDER sqlserver` [config block](/v3/cli/configuration/):

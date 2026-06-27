@@ -3,7 +3,7 @@ title: Local file
 description: Persist NSchema state to a JSON file on the local filesystem.
 sidebar:
   order: 20
-slug: 3/backends/file
+slug: v3/backends/file
 ---
 
 The local file backend persists state to a JSON file on the local filesystem. It's the simplest option, good for a single

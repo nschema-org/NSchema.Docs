@@ -4,7 +4,7 @@ description: Print the schema recorded in the state store as human-readable text
 sidebar:
   label: show
   order: 9
-slug: 3/cli/commands/show
+slug: v3/cli/commands/show
 ---
 
 Print the schema recorded in the state store as human-readable text. The live database is never contacted. This is a

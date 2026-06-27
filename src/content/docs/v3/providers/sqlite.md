@@ -3,7 +3,7 @@ title: SQLite
 description: Connect NSchema to a SQLite database.
 sidebar:
   order: 30
-slug: 3/providers/sqlite
+slug: v3/providers/sqlite
 ---
 
 Declare a sqlite provider using a `PROVIDER sqlite` [config block](/v3/cli/configuration/):

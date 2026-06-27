@@ -2,7 +2,7 @@
 title: Concepts & pipeline
 description: The NSchema domain model, the pipeline a run flows through, and how
   the pieces fit together.
-slug: 3/library/concepts
+slug: v3/library/concepts
 ---
 
 This page goes over the core concepts in NSchema in more detail.

@@ -4,7 +4,7 @@ description: Scaffold a new NSchema project in the current directory.
 sidebar:
   label: init
   order: 1
-slug: 3/cli/commands/init
+slug: v3/cli/commands/init
 ---
 
 Scaffold a simple project in the current directory, to get a new project going. It connects to nothing.

@@ -4,7 +4,7 @@ description: Check that the configured database and state store are reachable an
 sidebar:
   label: doctor
   order: 11
-slug: 3/cli/commands/doctor
+slug: v3/cli/commands/doctor
 ---
 
 Run read-only health checks against the infrastructure your project declares, and report the outcome of each. It's a quick

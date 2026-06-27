@@ -1,7 +1,7 @@
 ---
 title: Exit codes
 description: The exit-code contract every nschema command follows.
-slug: 3/cli/exit-codes
+slug: v3/cli/exit-codes
 ---
 
 Every command follows the same contract, so scripts and CI can branch on the result without parsing output:

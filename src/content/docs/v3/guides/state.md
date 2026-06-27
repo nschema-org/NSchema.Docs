@@ -3,7 +3,7 @@ title: Offline planning & state
 description: How NSchema's optional state store enables planning without a database.
 sidebar:
   order: 30
-slug: 3/guides/state
+slug: v3/guides/state
 ---
 
 By default, NSchema will `plan` against the **live database**: it introspects the database schema and diffs it against the

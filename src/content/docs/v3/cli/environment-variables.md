@@ -1,7 +1,7 @@
 ---
 title: Environment variables
 description: Every environment variable the nschema CLI reads as a configuration override.
-slug: 3/cli/environment-variables
+slug: v3/cli/environment-variables
 ---
 
 The CLI offers a small list of environment variables as configuration overrides. Environment values sit above config

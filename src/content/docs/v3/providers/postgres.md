@@ -3,7 +3,7 @@ title: Postgres
 description: Connect NSchema to a PostgreSQL database.
 sidebar:
   order: 20
-slug: 3/providers/postgres
+slug: v3/providers/postgres
 ---
 
 Declare a postgres provider using a `PROVIDER postgres` [config block](/v3/cli/configuration/):

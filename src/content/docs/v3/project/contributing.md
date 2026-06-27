@@ -4,7 +4,7 @@ description: How NSchema is organised across repositories and how to contribute
   code, docs, or ideas.
 sidebar:
   order: 4
-slug: 3/project/contributing
+slug: v3/project/contributing
 ---
 
 Contributions are welcome, whether it's a bug report, documentation fix, new provider, or just an idea, I'll be happy to

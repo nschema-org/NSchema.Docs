@@ -4,7 +4,7 @@ description: Forcibly release a stale lock on the state store.
 sidebar:
   label: force-unlock
   order: 12
-slug: 3/cli/commands/force-unlock
+slug: v3/cli/commands/force-unlock
 ---
 
 Forcibly release a stale lock on the state store.

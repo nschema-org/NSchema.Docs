@@ -2,7 +2,7 @@
 title: Extension points
 description: Every interface in the NSchema pipeline you can swap or extend, and
   how to register it.
-slug: 3/library/extension-points
+slug: v3/library/extension-points
 ---
 
 Everything in the pipeline is registered through DI. You can replace defaults or add to the enumerable extension points.

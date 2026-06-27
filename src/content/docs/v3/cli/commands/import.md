@@ -4,7 +4,7 @@ description: Read the live database schema and write it out as desired-schema so
 sidebar:
   label: import
   order: 7
-slug: 3/cli/commands/import
+slug: v3/cli/commands/import
 ---
 
 Read the live database schema and write it out as desired-schema source files. Use this to adopt an existing database

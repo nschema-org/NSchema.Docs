@@ -3,7 +3,7 @@ title: Roadmap
 description: The direction NSchema is heading.
 sidebar:
   order: 2
-slug: 3/project/roadmap
+slug: v3/project/roadmap
 ---
 
 This page describes the direction of the project, my intent and ideas. This project is worked on in my spare time, and

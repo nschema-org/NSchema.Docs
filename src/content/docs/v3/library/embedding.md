@@ -2,7 +2,7 @@
 title: Embedding the engine
 description: Use the NSchema.Core engine directly from a .NET application,
   instead of the CLI.
-slug: 3/library/embedding
+slug: v3/library/embedding
 ---
 
 The `nschema` CLI is a thin front-end over the **NSchema.Core** NuGet package, which contains the engine that does the

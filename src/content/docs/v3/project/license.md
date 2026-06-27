@@ -3,7 +3,7 @@ title: License
 description: NSchema is free and open source under the MIT License.
 sidebar:
   order: 6
-slug: 3/project/license
+slug: v3/project/license
 ---
 
 NSchema is **free and open-source software**, released under the [MIT License](https://opensource.org/license/mit).

@@ -4,7 +4,7 @@ description: Read the live schema and write it to the state store.
 sidebar:
   label: refresh
   order: 6
-slug: 3/cli/commands/refresh
+slug: v3/cli/commands/refresh
 ---
 
 Read the live schema and write it to the state store. Use this to seed or repair [state](/v3/guides/state/).

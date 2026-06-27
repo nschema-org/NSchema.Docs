@@ -4,7 +4,7 @@ description: Reformat your .sql DDL files to a canonical layout.
 sidebar:
   label: fmt
   order: 3
-slug: 3/cli/commands/fmt
+slug: v3/cli/commands/fmt
 ---
 
 Reformats your `.sql` DDL files to a canonical layout.

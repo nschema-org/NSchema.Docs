@@ -1,7 +1,7 @@
 ---
 title: Configuration (C#)
 description: How to build, run, and configure an NSchema application from .NET code.
-slug: 3/library/configuration
+slug: v3/library/configuration
 ---
 
 How to build, run, and configure an NSchema application from code. New to NSchema? Start with the [Embedding the engine](/v3/library/embedding/)

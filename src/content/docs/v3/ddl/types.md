@@ -1,7 +1,7 @@
 ---
 title: Type reference
 description: The canonical, dialect-agnostic column types the NSchema DDL accepts.
-slug: 3/ddl/types
+slug: v3/ddl/types
 ---
 
 Column types in NSchema DDL are dialect-agnostic. You write the canonical type; the provider maps it to the target

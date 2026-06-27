@@ -4,7 +4,7 @@ description: Check that your desired-schema files are well-formed and internally
 sidebar:
   label: validate
   order: 2
-slug: 3/cli/commands/validate
+slug: v3/cli/commands/validate
 ---
 
 Check that your desired-schema files are well-formed and internally consistent, without contacting a database or state
