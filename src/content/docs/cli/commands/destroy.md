@@ -1,8 +1,7 @@
 ---
-title: nschema destroy
+title: destroy
 description: Drop all managed schema objects from the target database.
 sidebar:
-  label: destroy
   order: 9
 ---
 

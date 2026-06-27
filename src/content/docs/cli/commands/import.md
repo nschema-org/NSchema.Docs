@@ -1,8 +1,7 @@
 ---
-title: nschema import
+title: import
 description: Read the live database schema and write it out as desired-schema source files.
 sidebar:
-  label: import
   order: 8
 ---
 

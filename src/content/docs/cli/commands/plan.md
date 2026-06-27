@@ -1,8 +1,7 @@
 ---
-title: nschema plan
+title: plan
 description: Compute and show the migration plan, without changing anything.
 sidebar:
-  label: plan
   order: 5
 ---
 
@@ -42,7 +41,8 @@ nschema plan --out tonight.nplan
 nschema apply --plan-file tonight.nplan
 ```
 
-See [The plan / apply workflow](/guides/workflow/) for the full pattern.
+To render a saved plan back to the terminal before applying it, see [`plan show`](/cli/commands/plan/show/). See
+[The plan / apply workflow](/guides/workflow/) for the full pattern.
 
 ## Previewing a teardown
 

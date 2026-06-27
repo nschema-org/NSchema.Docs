@@ -1,8 +1,7 @@
 ---
-title: nschema refresh
+title: refresh
 description: Read the live schema and write it to the state store.
 sidebar:
-  label: refresh
   order: 7
 ---
 

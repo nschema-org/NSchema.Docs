@@ -1,8 +1,7 @@
 ---
-title: nschema apply
+title: apply
 description: Compute the plan and apply it to the target database.
 sidebar:
-  label: apply
   order: 6
 ---
 

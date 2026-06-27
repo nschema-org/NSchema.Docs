@@ -1,8 +1,7 @@
 ---
-title: nschema scaffold
+title: scaffold
 description: Scaffold a new NSchema project in the current directory.
 sidebar:
-  label: scaffold
   order: 1
 ---
 

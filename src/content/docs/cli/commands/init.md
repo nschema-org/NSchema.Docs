@@ -1,8 +1,7 @@
 ---
-title: nschema init
+title: init
 description: Restore the provider and backend plugins pinned in the project configuration.
 sidebar:
-  label: init
   order: 2
 ---
 

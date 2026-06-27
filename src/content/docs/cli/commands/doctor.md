@@ -1,8 +1,7 @@
 ---
-title: nschema doctor
+title: doctor
 description: Check that the configured database and state store are reachable and healthy.
 sidebar:
-  label: doctor
   order: 12
 ---
 
