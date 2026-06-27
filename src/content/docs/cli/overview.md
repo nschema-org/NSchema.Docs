@@ -21,6 +21,7 @@ every command in detail; the pages below cover the cross-cutting pieces they all
 | [`import`](/cli/commands/import/)             | Write the live schema out as desired-schema files.         |
 | [`destroy`](/cli/commands/destroy/)           | Drop all managed schema objects from the database.         |
 | [`state`](/cli/commands/state/)               | Inspect the schema recorded in the state store.            |
+| [`db`](/cli/commands/db/)                     | Inspect the live database schema directly.                 |
 | [`drift`](/cli/commands/drift/)               | Report how the live database differs from recorded state.  |
 | [`doctor`](/cli/commands/doctor/)             | Check the database and state store are reachable.          |
 | [`lock`](/cli/commands/lock/)                 | Inspect, hold, or release the state-store lock.            |
