@@ -8,11 +8,11 @@ blocks and below command-line flags in [precedence](/cli/configuration/#preceden
 
 | Variable                              | Overrides                        | Notes                                                                                                               |
 |---------------------------------------|----------------------------------|---------------------------------------------------------------------------------------------------------------------|
-| `NSCHEMA_POSTGRES_CONNECTION_STRING`  | The Postgres connection string   | Names the Postgres provider on its own, and overwrites a `connection_string` set in a `PROVIDER postgres` block.    |
+| `NSCHEMA_POSTGRES_CONNECTION_STRING`  | The Postgres connection string   | Overrides the `connection_string` set in the `PROVIDER postgres` block.                                             |
 | `NSCHEMA_POSTGRES_USERNAME`           | The Postgres username            | Layered onto the connection string, overriding any user embedded in it.                                             |
 | `NSCHEMA_POSTGRES_PASSWORD`           | The Postgres password            | Layered onto the connection string, overriding any password embedded in it.                                         |
-| `NSCHEMA_SQLITE_CONNECTION_STRING`    | The SQLite connection string     | Names the SQLite provider on its own, and overwrites a `connection_string` set in a `PROVIDER sqlite` block.        |
-| `NSCHEMA_SQLSERVER_CONNECTION_STRING` | The SQL Server connection string | Names the SQL Server provider on its own, and overwrites a `connection_string` set in a `PROVIDER sqlserver` block. |
+| `NSCHEMA_SQLITE_CONNECTION_STRING`    | The SQLite connection string     | Overrides the `connection_string` set in the `PROVIDER sqlite` block.                                               |
+| `NSCHEMA_SQLSERVER_CONNECTION_STRING` | The SQL Server connection string | Overrides the `connection_string` set in the `PROVIDER sqlserver` block.                                            |
 | `NSCHEMA_SQLSERVER_USERNAME`          | The SQL Server username          | Layered onto the connection string, overriding any user embedded in it.                                             |
 | `NSCHEMA_SQLSERVER_PASSWORD`          | The SQL Server password          | Layered onto the connection string, overriding any password embedded in it.                                         |
 | `NSCHEMA_DESTRUCTIVE_ACTION_POLICY`   | The destructive-action policy    | `error` (default), `warn`, or `allow`. Equivalent to `--destructive-actions`.                                       |

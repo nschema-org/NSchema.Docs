@@ -12,6 +12,10 @@ opposed to inline configuration.
 The provider is configured separately from the optional [backend](/backends/), which persists a snapshot of the schema 
 for offline planning. This section covers the live-database providers; see [Backends](/backends/) for the state backends.
 
+Each provider ships as a **plugin**; a NuGet package named and version-pinned in its `PROVIDER` block, which `nschema`
+restores on first use. The pages below cover the first-party providers; a block can also point at a third-party provider
+package with a `source` attribute (see [Configuration](/cli/configuration/#plugins-and-versions)).
+
 ## Available providers
 
 | Provider   | Page                                          |

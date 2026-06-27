@@ -25,6 +25,7 @@ For a team, or in a CI environment, you'll want somewhere more persistent, like 
 
 ```sql
 BACKEND s3 (
+  version = '4.0.0',
   bucket = 'my-bucket',
   key = 'env/state.json'
 );

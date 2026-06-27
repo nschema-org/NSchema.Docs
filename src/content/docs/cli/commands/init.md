@@ -15,6 +15,7 @@ nschema init
 This writes:
 
 - `config.sql` — the project's provider/state configuration, as `PROVIDER` / `BACKEND` [config blocks](/cli/configuration/).
+- `config.env.prod.sql` — a starter [environment overlay](/cli/configuration/#environments).
 - `schemas/example.sql` — a starter [desired-schema](/ddl/defining-schemas/) file.
 
 Edit those to point at your database and describe the schema you want, then

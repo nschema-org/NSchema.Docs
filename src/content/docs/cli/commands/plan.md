@@ -25,7 +25,7 @@ See [Configuration blocks](/cli/configuration/).
 
 - **`-s`, `--scope <name>`** — limit the migration to specific database schemas (namespaces). May be repeated.
 - **`--destructive-actions <error|warn|allow>`** — policy for destructive changes. Defaults to `error`. *(NSCHEMA 
-  `destructive_action`, env `NSCHEMA_DESTRUCTIVE_ACTION_POLICY`)* See [Destructive-action safety](/guides/destructive-actions/).
+  env `NSCHEMA_DESTRUCTIVE_ACTION_POLICY`)* See [Destructive-action safety](/guides/destructive-actions/).
 - **`--destroy`** — preview the SQL that [`destroy`](/cli/commands/destroy/) would run to tear the managed schema down.
 - **`-o`, `--out <path>`** — write the computed plan to a file so it can be replayed later by [`apply --plan-file`](/cli/commands/apply/). 
   Works with `--destroy` too, saving the teardown plan.
