@@ -27,6 +27,12 @@ This installs the `nschema` command onto your `PATH`. You can verify it using:
 nschema --version
 ```
 
+## Providers are plugins
+
+Database providers and remote state backends aren't bundled with the CLI: each ships as its own NuGet package. You name 
+and pin one in your project config (e.g. `PROVIDER postgres ( version = '4.0.0' )`) and `nschema` restores it on first use. 
+The local-file state backend is the one exception — it's built in.
+
 ## Update
 
 ```sh
