@@ -53,8 +53,11 @@ in `astro.config.mjs`. Bases must match between the two files (`changelog/cli`, 
   each provider. It's optional locally but should be set as a Netlify env var so CI builds get the
   5000/hr GitHub API rate limit instead of 60/hr.
 - **Dependency pin:** the `overrides` block in `package.json` forces `@ascorbic/loader-utils` (a
-  transitive dep of the plugin) onto the root `astro@6`. Without it, npm installs a second `astro@5`
-  that ships Zod 3, and the plugin's `z.url()` (Zod 4) crashes config load. Don't remove it.
+  transitive dep of the plugin) onto the root `astro` version. Without it, npm installs a second,
+  older `astro` that ships Zod 3, and the plugin's `z.url()` (Zod 4) crashes config load. Don't
+  remove it. Pin the astro version **explicitly** here (e.g. `"astro": "^7.0.3"`), matching the
+  root `astro` dependency — the `"$astro"` reference form fails to resolve on a clean install
+  (no lockfile) with npm 10.9, so keep the two in sync by hand when bumping astro.
 
 ## Versioned docs (per-CLI-version snapshots)
 
