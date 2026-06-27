@@ -20,3 +20,8 @@ It captures the **whole** schema and so takes no desired-schema or `--scope` opt
 
 Refresh is how you record drift that happened between applies, or initialize the state store with the current schema 
 before you start managing a database offline.
+
+## Options
+
+- **`--no-lock`** — skip taking the state-store lock for this run. Use it only when you've coordinated access by 
+  other means (for example you already hold the lock via [`nschema lock acquire`](/cli/commands/lock/acquire/)).

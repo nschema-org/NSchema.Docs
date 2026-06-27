@@ -19,11 +19,10 @@ every command in detail; the pages below cover the cross-cutting pieces they all
 | [`refresh`](/cli/commands/refresh/)           | Read the live schema and write it to the state store.      |
 | [`import`](/cli/commands/import/)             | Write the live schema out as desired-schema files.         |
 | [`destroy`](/cli/commands/destroy/)           | Drop all managed schema objects from the database.         |
-| [`show`](/cli/commands/show/)                 | Print the schema recorded in the state store.              |
+| [`state`](/cli/commands/state/)               | Inspect the schema recorded in the state store.            |
 | [`drift`](/cli/commands/drift/)               | Report how the live database differs from recorded state.  |
 | [`doctor`](/cli/commands/doctor/)             | Check the database and state store are reachable.          |
-| [`force-unlock`](/cli/commands/force-unlock/) | Forcibly release a stale state-store lock.                 |
-| [`lock-status`](/cli/commands/lock-status/)   | Show whether the state store is locked, and by whom.       |
+| [`lock`](/cli/commands/lock/)                 | Inspect, hold, or release the state-store lock.            |
 | [`completion`](/cli/commands/completion/)     | Output a shell tab-completion script.                      |
 
 ## Global flags
