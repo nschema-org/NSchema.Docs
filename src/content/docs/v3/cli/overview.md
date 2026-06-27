@@ -2,7 +2,7 @@
 title: CLI Reference
 description: Every nschema command, the global flags they share, and how
   configuration is resolved.
-slug: v3/cli/overview
+slug: v3/cli
 ---
 
 The `nschema` CLI resolves your project's configuration and runs one operation per invocation. This section documents

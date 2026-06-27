@@ -41,7 +41,7 @@ With a state store configured:
 
 ## Seeding and repairing state
 
-When you first add a state store, or after [out-of-band changes](/v3/guides/drift.md), seed it from the live database using the
+When you first add a state store, or after [out-of-band changes](/v3/guides/drift/), seed it from the live database using the
 [`refresh`](/v3/cli/commands/refresh/) command:
 
 ```sh

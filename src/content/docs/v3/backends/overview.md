@@ -3,7 +3,7 @@ title: Backends
 description: NSchema's optional state backend .
 sidebar:
   order: 10
-slug: v3/backends/overview
+slug: v3/backends
 ---
 
 A backend is the optional place NSchema persists a snapshot of the last applied schema. It's declared in a `BACKEND`

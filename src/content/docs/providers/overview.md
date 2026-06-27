@@ -1,6 +1,7 @@
 ---
 title: Providers
 description: The database providers NSchema supports, and how they're configured.
+slug: providers
 sidebar:
   order: 10
 ---

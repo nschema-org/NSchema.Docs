@@ -5,6 +5,7 @@ import starlightChangelogs, {
   makeChangelogsSidebarLinks,
 } from "starlight-changelogs";
 import starlightVersions from "starlight-versions";
+import starlightLinksValidator from "starlight-links-validator";
 
 // https://astro.build/config
 export default defineConfig({
@@ -12,6 +13,14 @@ export default defineConfig({
   integrations: [
     starlight({
       plugins: [
+        // Fails the build on broken internal links (e.g. a command page linking
+        // to a route that doesn't exist). Runs in CI via `npm run build`.
+        starlightLinksValidator({
+          // /changelog/* routes are generated at build time by starlight-changelogs,
+          // not content pages the validator can resolve. Everything else — including
+          // the archived v3 snapshot — is validated.
+          exclude: ["/changelog/**"],
+        }),
         starlightChangelogs(),
         // Multi-version docs. The live `src/content/docs/` tree is the current
         // (v4) docs; each archived version lives under `src/content/docs/<slug>/`

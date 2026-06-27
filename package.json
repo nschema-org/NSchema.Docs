@@ -24,5 +24,8 @@
     "@ascorbic/loader-utils": {
       "astro": "$astro"
     }
+  },
+  "devDependencies": {
+    "starlight-links-validator": "^0.24.0"
   }
 }

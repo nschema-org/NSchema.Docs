@@ -33,5 +33,5 @@ As I see it, the biggest gap is in backend and provider support, and that's wher
 
 ## Launched
 
-Shipped changes are recorded per package in the [Changelog](/v3/changelog/cli/). For day-to-day progress and discussion,
+Shipped changes are recorded per package in the [Changelog](/changelog/cli/). For day-to-day progress and discussion,
 watch the repositories listed on the [Contributing](/v3/project/contributing/) page.

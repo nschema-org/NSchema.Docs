@@ -26,8 +26,8 @@ so the project is reproducible from the moment it's created.
 ## Options
 
 - **`-f`, `--force`** — scaffold even if the directory is not empty. Without it, `scaffold` refuses to run in a non-empty directory so it can't clobber existing files.
-- **`--provider <postgres|sqlite|sqlserver>`** — the database [provider](/providers/overview/) to scaffold for. Defaults to `postgres`.
-- **`--backend <file|s3>`** — the state [backend](/backends/overview/) to scaffold for. Defaults to `file`.
+- **`--provider <postgres|sqlite|sqlserver>`** — the database [provider](/providers/) to scaffold for. Defaults to `postgres`.
+- **`--backend <file|s3>`** — the state [backend](/backends/) to scaffold for. Defaults to `file`.
 
 ## Needs
 

@@ -3,7 +3,7 @@ title: Providers
 description: The database providers NSchema supports, and how they're configured.
 sidebar:
   order: 10
-slug: v3/providers/overview
+slug: v3/providers
 ---
 
 A provider is the live database NSchema reads from and writes to. It's declared in a `PROVIDER` [config block](/v3/cli/configuration/) and

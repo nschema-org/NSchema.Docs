@@ -24,8 +24,8 @@ Edit those to point at your database and describe the schema you want, then
 ## Options
 
 * **`-f`, `--force`** — initialize even if the directory is not empty. Without it, `init` refuses to run in a non-empty directory so it can't clobber existing files.
-* **`--provider <postgres|sqlite|sqlserver>`** — the database [provider](/v3/providers/overview/) to scaffold for. Defaults to `postgres`.
-* **`--backend <file|s3>`** — the state [backend](/v3/backends/overview/) to scaffold for. Defaults to `file`.
+* **`--provider <postgres|sqlite|sqlserver>`** — the database [provider](/v3/providers/) to scaffold for. Defaults to `postgres`.
+* **`--backend <file|s3>`** — the state [backend](/v3/backends/) to scaffold for. Defaults to `file`.
 
 ## Needs
 

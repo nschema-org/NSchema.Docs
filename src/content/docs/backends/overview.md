@@ -1,6 +1,7 @@
 ---
 title: Backends
 description: NSchema's optional state backend .
+slug: backends
 sidebar:
   order: 10
 ---
