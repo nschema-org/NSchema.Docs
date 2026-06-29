@@ -13,7 +13,18 @@ you can adopt an existing database and manage it going forward.
 
 <Steps>
 
-1. **Point at the database.** Set the connection string (see [Configuration blocks](/cli/configuration/)):
+1. **Declare the provider.** Import reads from a live database, so it needs a `PROVIDER` block naming the provider and
+   pinning its plugin version. Create a single `.sql` file in your project directory with just that block — the schema
+   files themselves will come from the import:
+
+   ```sql
+   -- provider.sql
+   PROVIDER postgres (
+     version = '4.0.0'
+   );
+   ```
+
+   Supply the connection string out of band so it stays out of source control (see [Configuration blocks](/cli/configuration/)):
 
    ```sh
    export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
