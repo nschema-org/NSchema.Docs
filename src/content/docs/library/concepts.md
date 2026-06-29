@@ -25,8 +25,9 @@ interface you can swap or extend; these are covered in more detail below and in 
 
 ### Planning
 
-This section of the pipeline is where the migration plan is generated. It runs on every execution, even for an `Apply`, 
-so that stale plans aren't accidentally applied.
+This section of the pipeline is where the migration plan is generated, by the `Plan` operation. It never writes to the 
+database, so a plan can always be computed and previewed first; an `Apply` then executes a plan produced here (a fresh one 
+or a [saved](/library/configuration/#saved-plan-files) one).
 
 1. **Read the desired schema.** The SQL files in your project directory are composed into a single view of your goal schema.
 2. **Validate the desired schema.** Checks are done to make sure the schema is valid: primary keys, referential integrity, etc.
@@ -38,9 +39,9 @@ so that stale plans aren't accidentally applied.
 
 ### Applying
 
-This section runs only for an `Apply` operation. It takes the compiled plan and executes it against the database.
+This section runs for an `Apply` operation. It takes a compiled plan's SQL, handed to `ApplyArguments.Sql`, and executes it against the database.
 
-1. **Execute the migration.** Takes the compiled migration from the Planning phase, and executes it against the target.
+1. **Execute the migration.** Takes the SQL plan (from a `Plan` operation or a saved plan file) and executes it against the target.
 2. **State capture.** After a successful apply, the resulting schema is captured to the state store (if configured) so 
    that future plans can be generated against it.
 
@@ -60,12 +61,12 @@ The **current** schema has two possible sources, selected automatically per oper
 - **Online.** The live database, read through an `ISchemaProvider` registered via `UseCurrentSchema<T>()` or a provider package like `UseCurrentSchemaPostgres(...)`.
 - **Offline.** A persisted snapshot, available when an `ISchemaStateStore` is registered via `UseStateStore<T>()` / `UseFileStateStore(...)`.
 
-`Plan` operations prefer the offline snapshot when one is available (so planning works without a database connection); `Apply` always reads from the live database.
+Which source a `Plan` reads is chosen by its `PlanArguments.Target`: a preview (`Recorded`, the default) prefers the offline snapshot when one is available so planning works without a database connection, while planning for an apply (`Live`) always reads the live database.
 
 ### Schema scope
 
 By default, a run's scope is the full set of schemas declared in your desired DDL. You can narrow it per run with the 
-`Schemas` argument on the operation (e.g. `app.Plan(new PlanArguments { Schemas = ["app"] })`). The live `ISchemaProvider` 
+`Schemas` argument on the operation (e.g. `app.Operations.Plan(new PlanArguments { Schemas = ["app"] })`). The live `ISchemaProvider` 
 is then asked only for those schemas. `GetSchema(...)` takes the names to read and returns everything it describes when 
 none are given.
 
