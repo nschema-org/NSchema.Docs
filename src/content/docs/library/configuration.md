@@ -12,64 +12,68 @@ The builder should be familiar to any developer who's used ASP.NET. `NSchemaAppl
 builder that you can configure with your target schema, database provider, configuration, logging, metrics, or any other
 .NET packages that we've come to rely on. It uses a `HostApplicationBuilder` internally purely to compose those.
 
-Call `builder.Build()` to get an `NSchemaApplication`. It is not a long-running host; it's a single-use object that runs 
-one operation and exits. Run an operation by calling the matching method on it (`Plan()`, `Apply()`, etc.). The operation 
-`await`s directly, so exceptions surface to you at the call site, and the application can only be run once.
+Call `builder.Build()` to get an `NSchemaApplication`. It is not a long-running host, but it is reusable — run as many 
+operations through one instance as you like, then dispose it. Operations live on `app.Operations`; each is awaitable and 
+returns a `Result<T>`, so an *expected* failure (a policy violation, lock contention, a bad configuration) comes back as 
+`result.IsFailure` with diagnostics rather than throwing. (See [Errors and exceptions](#errors-and-exceptions).)
 
 ## Operations
 
-Each run performs one of the following operations, selected by the method you call on the built application:
+Each operation is a method on `app.Operations`, taking an arguments object (`PlanArguments`, `ApplyArguments`, …) and 
+returning a `Result<T>`:
 
-- **`Plan()`** computes and renders the plan, without touching the database. Can also write the plan to a file to apply 
-  later. (See [Saved plan files](#saved-plan-files).)
-- **`Apply()`** computes the plan and applies it to the database. After a successful apply, the resulting schema is captured 
-  to the [state store](#backend-state-store) if one is configured. Can also apply a previously [saved plan file](#saved-plan-files) instead of recomputing.
-- **`PlanDestroy()`** computes and renders the teardown plan (the plan to drop the managed schema)without applying it. 
-  Can also write it to a file. (See [Saved plan files](#saved-plan-files)).
-- **`Refresh()`** reads the current schema from the live database and writes it to the state store, without planning or 
-  applying anything. Requires a state store.
-- **`Import()`** reads the live database schema and writes it to the local filesystem as desired-schema source files. 
-  One `.sql` file is written per major object under `ImportArguments.OutputDirectory`. Useful for bootstrapping a project 
-  from an existing database.
-- **`Validate()`** loads the desired schema and validates it against the configured schema policies, without planning or applying.
-- **`Show()`** reads the recorded state from the state store and renders it. Requires a state store.
-- **`Drift()`** compares the recorded state against the live database and reports how the live database has drifted from it. Requires a state store.
-- **`Destroy()`** drops the managed schema objects from the database.
-- **`ForceUnlock()`** forcibly removes the state lock, for recovering from a stale lock.
+- **`Plan(PlanArguments)`** computes the plan — the structured diff, the migration plan, and the SQL — without writing to 
+  the database. `PlanArguments.Target` selects what it plans against: a preview of recorded state (`Recorded`, the default), 
+  the live database (`Live`, what an apply uses), or a teardown of the managed schema (`Teardown`). Set `OutFile` to also 
+  save the plan to a file. (See [Saved plan files](#saved-plan-files).)
+- **`Apply(ApplyArguments)`** executes a plan's SQL against the database, then captures the resulting schema to the 
+  [state store](#backend-state-store) if one is configured. The SQL comes from `ApplyArguments.Sql` — a `PlanResult.Sql`, 
+  or a [saved plan file](#saved-plan-files).
+- **`Refresh(RefreshArguments)`** reads the current schema from the live database and writes it to the state store, without 
+  planning or applying anything. Requires a state store.
+- **`Import(ImportArguments)`** reads the live database schema and writes it to the local filesystem as desired-schema source 
+  files. One `.sql` file is written per major object under `ImportArguments.OutputDirectory`. Useful for bootstrapping a 
+  project from an existing database.
+- **`Validate(ValidateArguments)`** loads the desired schema and validates it against the configured schema policies, without planning or applying.
+- **`Drift(DriftArguments)`** compares the recorded state against the live database and reports how the live database has drifted from it. Requires a state store.
+- **`Doctor(DoctorArguments)`** runs read-only health checks against the configured infrastructure (connectivity, the state store, the lock) and reports the outcome of each.
 
-Every operation takes an arguments object (`PlanArguments`, `ApplyArguments`, …); pass a fresh one when you have nothing to configure:
+A teardown is just a `Plan` with `Target = PlanTarget.Teardown`, applied like any other plan. Reading recorded state or a 
+saved plan for display is done through `app.CurrentSchema` / `app.PlanFile`, and inspecting or releasing the state lock 
+through `app.Locks` — not through an operation.
 
 ```csharp
 var app = builder.Build();
-await app.Apply(new ApplyArguments()); // Runs the apply.
+
+// Plan against the live database, then apply the resulting SQL.
+var plan = await app.Operations.Plan(new PlanArguments { Target = PlanTarget.Live });
+if (plan.IsSuccess)
+    await app.Operations.Apply(new ApplyArguments { Sql = plan.Value!.Sql! });
 ```
 
 ## Saved plan files
 
-By default `Apply` recomputes the plan when it runs. You can instead save the plan from one run and apply that exact 
-file later. This guarantees that what was reviewed is exactly what is applied, which is useful when planning and applying 
-happen in separate steps (for example, plan in a pull request, apply after approval in CI).
+An `Apply` executes whatever SQL you hand it, so you can save the plan from one run and apply that exact file later. This 
+guarantees that what was reviewed is exactly what is applied, which is useful when planning and applying happen in separate 
+steps (for example, plan in a pull request, apply after approval in CI).
 
-Write a plan to a file with `PlanArguments.OutFile`, then apply it with `ApplyArguments.PlanFile`:
+Save a plan as it is computed with `PlanArguments.OutFile`. Later, read it back with `app.PlanFile.Read(...)` and apply its SQL:
 
 ```csharp
 // Step 1: compute and save the plan (requires a registered SQL generator):
-await app.Plan(new PlanArguments { OutFile = "migration.nplan" });
+await app.Operations.Plan(new PlanArguments { Target = PlanTarget.Live, OutFile = "migration.nplan" });
 
-// Step 2: later, apply exactly that plan without recomputing:
-await app.Apply(new ApplyArguments { PlanFile = "migration.nplan" });
+// Step 2: later, read the saved plan and apply exactly its SQL, without recomputing:
+var envelope = await app.PlanFile.Read("migration.nplan", cancellationToken);
+await app.Operations.Apply(new ApplyArguments { Sql = envelope.Sql });
 ```
 
-The file records the structured diff, the migration plan, and the generated SQL. Applying from it reports the same 
-diff/plan/SQL view a normal run would, then executes the saved SQL. It does not re-read the database or re-plan. When 
-`PlanFile` is set, `ApplyArguments.Schemas` is ignored, since the saved plan already fixes its scope.
+The file records the structured diff, the migration plan, and the generated SQL (a `PlanFileEnvelope`). Applying from it 
+does not re-read the database or re-plan — it executes the saved SQL directly, and the envelope's `Diff`/`Plan` are there 
+if you want to present the same view a normal run would.
 
-A teardown plan works the same way: save it with `PlanDestroyArguments.OutFile`, then apply it through `Apply` (a saved teardown is just a saved plan):
-
-```csharp
-await app.PlanDestroy(new PlanDestroyArguments { OutFile = "teardown.nplan" });
-await app.Apply(new ApplyArguments { PlanFile = "teardown.nplan" });
-```
+A teardown plan works the same way: save it with `Target = PlanTarget.Teardown`, then read and apply it identically — a 
+saved teardown is just a saved plan.
 
 Saving a plan requires a registered SQL generator (to produce the SQL stored in the file). Plan files are written to the 
 local filesystem; they are not routed through the [state store](#backend-state-store).
@@ -92,8 +96,9 @@ Register a state store from a provider package like `NSchema.Aws`, or use the bu
 builder.UseFileStateStore("schema_state.json");
 ```
 
-When a state store is registered, `Plan` operations automatically use it as the current-state source (offline planning), 
-and `Apply` operations always read from the live database. No additional configuration is needed.
+When a state store is registered, a preview `Plan` (`Target = PlanTarget.Recorded`) uses the snapshot as its current-state 
+source (offline planning), while planning for an apply (`Target = PlanTarget.Live`) reads the live database. No additional 
+configuration is needed.
 
 ## Destructive action policy
 
@@ -118,7 +123,7 @@ var app = builder
     .UseCurrentSchemaPostgres(connectionString)
     .Build();
 
-await app.Plan(new PlanArguments { Schemas = ["app"] });   // only "app" is read, validated, and diffed
+await app.Operations.Plan(new PlanArguments { Schemas = ["app"] });   // only "app" is read, validated, and diffed
 ```
 
 Scope is a per-invocation argument (`PlanArguments` / `ApplyArguments` / `ValidateArguments` / `DestroyArguments`), not 
@@ -172,16 +177,19 @@ builder.WithTransactionMode(TransactionMode.Single); // entire migration in one 
 builder.WithTransactionMode(TransactionMode.None);   // all statements outside transactions
 ```
 
-## Output format
+## Output and progress
 
-Run output is produced by an `IOperationReporter`. The built-in default reporter writes human-readable output to the 
-terminal. Replace it with your own, for example to emit JSON for a CI pipeline, using `UseReporter`:
+An operation returns its structured output in the `Result<T>` you `await` — the diff, migration plan, and SQL on 
+`PlanResult`, the applied SQL on `ApplyResult`, and so on. Render or serialize that yourself (for example to emit JSON for 
+a CI pipeline); the engine writes nothing on its own, so there is no output reporter to replace.
+
+For the transient progress a long run emits, register an `IProgress<OperationProgress>` with `UseProgressReporter`:
 
 ```csharp
-builder.UseReporter<JsonReporter>();   // or UseReporter(new JsonReporter())
+builder.UseProgressReporter<MyProgressSink>();   // receives each OperationProgress as the run narrates
 ```
 
-Only one reporter is active; the last registration wins.
+The default progress reporter is a no-op. Only one is active; the last registration wins.
 
 ## SQL generation
 
@@ -218,24 +226,21 @@ the built-in destructive-action policy runs. Register your own to enforce additi
 builder.AddDiffPolicy<NoDropTablesPolicy>();   // your own IDiffPolicy implementation
 ```
 
-## Exception behavior
+## Errors and exceptions
 
-By default, NSchema will report any exceptions using `IOperationReporter` and then rethrow them. You can change this 
-behavior through `NSchemaApplicationOptions`, passed when you create the builder:
+Expected, recoverable failures — a policy violation, lock contention, an invalid configuration — are not exceptions. They 
+come back as a failed `Result<T>`, which carries the diagnostics explaining what went wrong:
 
 ```csharp
-// report and rethrow exceptions (default)
-var app = NSchemaApplication.CreateBuilder(new NSchemaApplicationOptions
+var result = await app.Operations.Apply(new ApplyArguments { Sql = plan.Value!.Sql! });
+if (result.IsFailure)
 {
-    ExceptionBehavior = ExceptionBehavior.ReportAndThrow,
-});
-
-// rethrow exceptions without reporting
-var app = NSchemaApplication.CreateBuilder(new NSchemaApplicationOptions
-{
-    ExceptionBehavior = ExceptionBehavior.Throw,
-});
+    foreach (var diagnostic in result.Diagnostics)
+        Console.Error.WriteLine(diagnostic.Message);
+    return 1;
+}
 ```
 
-Either way the exception propagates out of the operation call (e.g. `await app.Apply()`), so you can handle it and set 
-a process exit code in your entry point.
+A genuine exception (a dropped connection, a bug) still throws and propagates out of the operation call, so you can catch 
+it at your entry point and set a process exit code. Either way the engine prints nothing itself — presenting results and 
+exceptions is the caller's job.
