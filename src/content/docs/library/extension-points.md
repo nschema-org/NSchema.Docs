@@ -19,10 +19,10 @@ Everything in the pipeline is registered through DI. You can replace defaults or
 
 These extension points are less commonly used, but still available for advanced scenarios.
 
-| Interface            | Purpose                                                                                      | Registered via                                                                      |
-|----------------------|----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
-| `IDiffRenderer`      | Customize how the migration diff is rendered to text (e.g. JSON instead of Terraform-style). | `UseTerraformRenderer(...)` / `UseDiffRenderer<TRenderer>()`                        |
-| `ISqlPlanRenderer`   | Customize how the SQL preview is rendered to text (e.g. JSON for CI).                        | `UseSqlPlanRenderer<TRenderer>()`                                                   |
-| `ISchemaRenderer`    | Customize how a schema is rendered to text (used by `Show`/`Import`-style output).           | `UseSchemaRenderer<TRenderer>()`                                                    |
-| `IOperationReporter` | Customize run output (e.g. JSON instead of human-readable).                                  | `UseReporter<T>()` / `UseReporter(instance)` (replaces the default; last call wins) |
+| Interface                      | Purpose                                                                                                          | Registered via                                               |
+|--------------------------------|------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| `IDiffRenderer`                | Customize how the migration diff is rendered to text (e.g. JSON instead of Terraform-style).                     | `UseTerraformRenderer(...)` / `UseDiffRenderer<TRenderer>()` |
+| `ISqlPlanRenderer`             | Customize how the SQL preview is rendered to text (e.g. JSON for CI).                                            | `UseSqlPlanRenderer<TRenderer>()`                            |
+| `ISchemaRenderer`              | Customize how a schema is rendered to text (used by schema/state output).                                        | `UseSchemaRenderer<TRenderer>()`                             |
+| `IProgress<OperationProgress>` | Receive an operation's live progress narration while it runs (e.g. forward it to a logger or a structured sink). | `UseProgressReporter<T>()`                                   |
 
