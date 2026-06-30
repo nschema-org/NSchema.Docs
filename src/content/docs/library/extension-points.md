@@ -21,8 +21,4 @@ These extension points are less commonly used, but still available for advanced 
 
 | Interface                      | Purpose                                                                                                          | Registered via                                               |
 |--------------------------------|------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
-| `IDiffRenderer`                | Customize how the migration diff is rendered to text (e.g. JSON instead of Terraform-style).                     | `UseTerraformRenderer(...)` / `UseDiffRenderer<TRenderer>()` |
-| `ISqlPlanRenderer`             | Customize how the SQL preview is rendered to text (e.g. JSON for CI).                                            | `UseSqlPlanRenderer<TRenderer>()`                            |
-| `ISchemaRenderer`              | Customize how a schema is rendered to text (used by schema/state output).                                        | `UseSchemaRenderer<TRenderer>()`                             |
 | `IProgress<OperationProgress>` | Receive an operation's live progress narration while it runs (e.g. forward it to a logger or a structured sink). | `UseProgressReporter<T>()`                                   |
-

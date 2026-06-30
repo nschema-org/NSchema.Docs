@@ -98,5 +98,7 @@ can be previewed without a live connection:
   are still computed and reported, just without a SQL preview.
 - `ISqlExecutor` runs the `SqlPlan` against the database, applying the configured transaction mode. It is internal, and the only online step.
 
-The rendered preview is produced by `ISqlPlanRenderer` (default `DefaultSqlPlanRenderer`). Register a custom one with 
-`UseSqlPlanRenderer<T>()` to change the preview format, mirroring how `IDiffRenderer` controls the diff output.
+The SQL preview is rendered by the public `SqlPlanRenderer` utility — call `SqlPlanRenderer.Default.Render(sqlPlan)`, or
+construct your own. It's a plain helper a front-end invokes, not a registered service; the diff and schema have matching
+`DiffRenderer` and `SchemaRenderer` utilities. See [Extension points](/library/extension-points/#rendering-output-to-text)
+for why rendering sits outside the DI pipeline.
