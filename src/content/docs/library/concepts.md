@@ -98,7 +98,8 @@ can be previewed without a live connection:
   are still computed and reported, just without a SQL preview.
 - `ISqlExecutor` runs the `SqlPlan` against the database, applying the configured transaction mode. It is internal, and the only online step.
 
-The SQL preview is rendered by the public `SqlPlanRenderer` utility — call `SqlPlanRenderer.Default.Render(sqlPlan)`, or
-construct your own. It's a plain helper a front-end invokes, not a registered service; the diff and schema have matching
-`DiffRenderer` and `SchemaRenderer` utilities. See [Extension points](/library/extension-points/#rendering-output-to-text)
-for why rendering sits outside the DI pipeline.
+Rendering output to text sits outside the DI pipeline. For the diff, the public `DiffReader` utility — `DiffReader.Default.Read(diff)`,
+or construct your own — projects a `DatabaseDiff` into a renderer-neutral `DiffDocument`: an ordered list of lines, each tagged with its
+change kind (add/modify/remove), that a front-end folds into colour, Markdown, or plain text. Core deliberately ships **no** renderer for a
+`SqlPlan` or a `DatabaseSchema`; turning those models into text is left to the consumer (the `nschema` CLI carries its own). A consumer
+wanting a different format writes its own — there are no renderer interfaces or `Use*` registrations to satisfy.

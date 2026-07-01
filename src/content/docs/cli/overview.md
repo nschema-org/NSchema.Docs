@@ -36,9 +36,22 @@ Every command accepts these:
 - **`-e`, `--environment <name>`** Sets the target environment. Layers the matching `*.env.<name>.sql` overlay files over the base configuration. *(env `NSCHEMA_ENVIRONMENT`)* See [Environments](/cli/configuration/#environments).
 - **`--no-color`** Disables colored output. *(env `NO_COLOR`)*
 - **`--no-init`** Skips the implicit plugin restore and requires the pinned plugins to be cached already. See [`init`](/cli/commands/init/#skipping-the-implicit-restore).
-- **`--json`** Emits machine-readable NDJSON output instead of formatted text.
+- **`--format <text|json|markdown>`** Selects the output format. `text` (the default) is the formatted console output; `json` is machine-readable NDJSON; `markdown` renders the result for a PR comment or CI job summary. See [Output formats](#output-formats).
+- **`--json`** Shorthand for `--format json`. (Passing both `--json` and a conflicting `--format` is an error.)
 - **`-v`, `--verbose`** / **`-q`, `--quiet`** Raises or lowers output verbosity.
 - **`-h`, `--help`** Shows contextual help for the command.
+
+## Output formats
+
+`--format` chooses how a command's structured result (a plan diff, the SQL to run, a schema) is rendered:
+
+- **`text`** — colorized, human-readable console output. The default.
+- **`json`** — newline-delimited JSON (one event per line) for scripting. The results go to stdout; progress narration goes to stderr.
+- **`markdown`** — the plan diff (as a fenced ` ```diff ` block coloring adds, drops, and changes), the SQL (as a ` ```sql ` block), and any schema output, rendered as Markdown. Like `json`, results go to stdout and progress to stderr, so you can pipe a clean summary straight into CI:
+
+```bash
+nschema plan --format markdown >> "$GITHUB_STEP_SUMMARY"
+```
 
 ## Where configuration comes from
 
