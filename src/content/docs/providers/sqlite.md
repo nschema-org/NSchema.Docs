@@ -9,15 +9,21 @@ Declare a sqlite provider using a `PROVIDER sqlite` [config block](/cli/configur
 
 ```sql
 PROVIDER sqlite (
+  version = '4.0.0',
   connection_string = 'Data Source=app.db'
 );
 ```
 
+The `NSchema.Sqlite` plugin is restored automatically from the pinned `version` the first time you run a command — for
+CLI use you don't install it by hand. (To embed the engine as a library instead, see [Using the library](#using-the-library).)
+
 ## Attributes
 
-| Attribute           | Type   | Description                                                                  |
-|---------------------|--------|------------------------------------------------------------------------------|
-| `connection_string` | string | The connection string used to reach the database, e.g. `Data Source=app.db`. |
+| Attribute           | Type   | Description                                                                         |
+|---------------------|--------|-------------------------------------------------------------------------------------|
+| `version`           | string | **Required.** The version of the `NSchema.Sqlite` plugin package to restore.        |
+| `source`            | string | Optional. A NuGet package id to load the provider from instead of `NSchema.Sqlite`. |
+| `connection_string` | string | The connection string used to reach the database, e.g. `Data Source=app.db`.        |
 
 SQLite is file-based, so the connection string is its only setting.
 
@@ -69,11 +75,11 @@ SQLite has a deliberately small surface, so this provider only allows what SQLit
 
 ## Using the library
 
-When [embedding the engine](/library/embedding/) instead of the CLI, register SQLite with the `NSchema.SQLite` package:
+When [embedding the engine](/library/embedding/) instead of the CLI, register SQLite with the `NSchema.Sqlite` package:
 
 ```sh
 dotnet add package NSchema.Core
-dotnet add package NSchema.SQLite
+dotnet add package NSchema.Sqlite
 ```
 
 `UseSqliteSchema` wires up both the current-schema provider and the SQL generator. The two connection-aware overloads

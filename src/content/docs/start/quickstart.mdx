@@ -15,7 +15,7 @@ PostgreSQL database. It assumes you've [installed `nschema`](/start/installation
 1. **Scaffold the project.**
 
    ```sh
-   nschema init
+   nschema scaffold
    ```
 
    This writes three files:
@@ -44,6 +44,7 @@ PostgreSQL database. It assumes you've [installed `nschema`](/start/installation
    -- connect to and where to keep state. Config blocks may live in any .sql file.
 
    PROVIDER postgres (
+     version = '4.0.0',
      -- Prefer the NSCHEMA_POSTGRES_CONNECTION_STRING environment variable, which
      -- overrides the value below.
      connection_string = ''

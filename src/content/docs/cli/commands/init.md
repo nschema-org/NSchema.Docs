@@ -1,31 +1,39 @@
 ---
-title: nschema init
-description: Scaffold a new NSchema project in the current directory.
+title: init
+description: Restore the provider and backend plugins pinned in the project configuration.
 sidebar:
-  label: init
-  order: 1
+  order: 2
 ---
 
-Scaffold a simple project in the current directory, to get a new project going. It connects to nothing.
+Restore the provider and backend [plugins](/cli/configuration/#plugins-and-versions) pinned by your project, so a later command doesn't have to.
 
 ```sh
 nschema init
 ```
 
-This writes:
+Plugins are restored implicitly on first use, so `init` is optional, it just does the restore up front. Run it to:
 
-- `config.sql` — the project's provider/state configuration, as `PROVIDER` / `BACKEND` [config blocks](/cli/configuration/).
-- `schemas/example.sql` — a starter [desired-schema](/ddl/defining-schemas/) file.
+- Warm the cache before a timed step, so the first real command isn't slowed by a download.
+- Fail fast on a bad version pin or an unreachable feed, at a predictable point rather than mid-operation.
 
-Edit those to point at your database and describe the schema you want, then
-[`plan`](/cli/commands/plan/) and [`apply`](/cli/commands/apply/).
+To create a *new* project's files, use [`scaffold`](/cli/commands/scaffold/) instead — `init` only restores plugins for an existing project. 
+Pairs with the [`--no-init`](#skipping-the-implicit-restore) flag below.
 
-## Options
+## Skipping the implicit restore
 
-- **`-f`, `--force`** — initialize even if the directory is not empty. Without it, `init` refuses to run in a non-empty directory so it can't clobber existing files.
-- **`--provider <postgres|sqlite|sqlserver>`** — the database [provider](/providers/overview/) to scaffold for. Defaults to `postgres`.
-- **`--backend <file|s3>`** — the state [backend](/backends/overview/) to scaffold for. Defaults to `file`.
+Every operation accepts **`--no-init`** (analogous to `dotnet --no-restore`). It skips the implicit restore and requires
+the pinned plugins to already be cached, failing fast with guidance if one is missing. The pattern in CI is to restore
+once up front and require the cache thereafter:
+
+```sh
+nschema init                 # restore once
+nschema plan   --no-init     # require the cache, never fetch
+nschema apply  --no-init
+```
+
+The built-in `file` backend has no plugin, so it never needs restoring.
 
 ## Needs
 
-Nothing. `init` only writes files.
+The **.NET SDK and network access** to your NuGet feed (the restore shells out to `dotnet`). A project with only the
+built-in `file` backend and no provider has nothing to restore.

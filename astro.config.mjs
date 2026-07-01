@@ -4,13 +4,34 @@ import starlight from "@astrojs/starlight";
 import starlightChangelogs, {
   makeChangelogsSidebarLinks,
 } from "starlight-changelogs";
+import starlightVersions from "starlight-versions";
+import starlightLinksValidator from "starlight-links-validator";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://nschema.dev",
   integrations: [
     starlight({
-      plugins: [starlightChangelogs()],
+      plugins: [
+        // Fails the build on broken internal links (e.g. a command page linking
+        // to a route that doesn't exist). Runs in CI via `npm run build`.
+        starlightLinksValidator({
+          // /changelog/* routes are generated at build time by starlight-changelogs,
+          // not content pages the validator can resolve. Everything else — including
+          // the archived v3 snapshot — is validated.
+          exclude: ["/changelog/**"],
+        }),
+        starlightChangelogs(),
+        // Multi-version docs. The live `src/content/docs/` tree is the current
+        // (v4) docs; each archived version lives under `src/content/docs/<slug>/`
+        // with a sidebar snapshot in `src/content/versions/<slug>.json`. To cut a
+        // new version, add it here and start the dev server — the plugin archives
+        // the current docs into that slug. See CLAUDE.md "Versioned docs".
+        starlightVersions({
+          current: { label: "Latest (4.x)" },
+          versions: [{ slug: "v3", label: "v3.x" }],
+        }),
+      ],
       title: "NSchema",
       description: "A declarative database schema migration tool. Describe the schema you want; NSchema computes and applies the migration to get there.",
       logo: {
@@ -50,6 +71,7 @@ export default defineConfig({
         { label: "Backends", items: [{ autogenerate: { directory: "backends" } }] },
         { label: "Library (Core)", items: [{ autogenerate: { directory: "library" } }] },
         { label: "Project", items: [{ autogenerate: { directory: "project" } }] },
+        { label: "Upgrading", items: [{ autogenerate: { directory: "upgrade" } }] },
         {
           // Generated from each package repo's GitHub releases by
           // starlight-changelogs; bases must match src/content.config.ts.

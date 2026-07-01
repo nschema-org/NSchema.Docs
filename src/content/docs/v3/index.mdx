@@ -1,0 +1,63 @@
+---
+title: NSchema
+description: A declarative database schema migration tool. Describe the schema
+  you want; NSchema computes and applies the migration to get there.
+template: splash
+hero:
+  tagline: A declarative database schema migration tool. Describe the schema you
+    want; NSchema computes and applies the migration to get there.
+  image:
+    alt: The NSchema logo
+    file: ../../../../assets/v3/nschema-mark.svg
+  actions:
+    - text: Get started
+      link: /v3/start/introduction/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/nschema-org/NSchema
+      icon: github
+      variant: secondary
+slug: "v3"
+---
+
+import { Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+## Why NSchema?
+
+<CardGrid stagger>
+  <Card title="Declarative SQL, not migrations" icon="document">
+    Declare your schema using only familiar `CREATE`-based SQL statements.
+    NSchema will diff the desired schema against the database (or a snapshot), and compute the migration automatically.
+  </Card>
+
+  <Card title="Plan before you apply" icon="approve-check">
+    Every run previews the exact changes first, Terraform-style. See the schema and the exact SQL that will be executed before you apply.
+    Not ready to commit? Save the plan-file to disk, and `apply` it later.
+  </Card>
+
+  <Card title="Safe by default" icon="warning">
+    Destructive changes are blocked by default unless overridden, drift checking prevents unintended changes,
+    and offline state snapshots allow you to produce plans without needing direct access to the database.
+  </Card>
+
+  <Card title="Adopt any database" icon="seti:db">
+    Connect to an existing database using a supported NSchema provider. Run `nschema import` and output your current schema out as DDL, ready to check in and manage from there.
+  </Card>
+</CardGrid>
+
+## Start here
+
+<CardGrid>
+  <LinkCard title="What is NSchema?" href="/start/introduction/" description="The idea, the model, and who it's for." />
+
+  <LinkCard title="Installation" href="/start/installation/" description="Install the nschema global tool." />
+
+  <LinkCard title="Quickstart" href="/start/quickstart/" description="From empty directory to applied schema in five minutes." />
+
+  <LinkCard title="CLI reference" href="/cli/" description="Every command, flag, and exit code." />
+
+  <LinkCard title="DDL language" href="/ddl/defining-schemas/" description="How to declare schemas, with the full grammar." />
+
+  <LinkCard title="Embedding the library" href="/library/embedding/" description="Use the NSchema.Core engine directly from .NET." />
+</CardGrid>

@@ -10,7 +10,7 @@ NSchema is deployed as a **[.NET tool](https://learn.microsoft.com/en-us/dotnet/
 ## Prerequisites
 
 - **.NET SDK 10.0 or later.** The tool targets `net10.0`. Check with `dotnet --version`; install from [dotnet.microsoft.com](https://dotnet.microsoft.com/download) if needed.
-- **A database.** This tool is for managing database schemas after all. See [Providers](../providers/overview.md) for supported databases.
+- **A database.** This tool is for managing database schemas after all. See [Providers](/providers/) for supported databases.
 
 ## Install
 
@@ -26,6 +26,12 @@ This installs the `nschema` command onto your `PATH`. You can verify it using:
 ```sh
 nschema --version
 ```
+
+## Providers are plugins
+
+Database providers and remote state backends aren't bundled with the CLI: each ships as its own NuGet package. You name 
+and pin one in your project config (e.g. `PROVIDER postgres ( version = '4.0.0' )`) and `nschema` restores it on first use. 
+The local-file state backend is the one exception — it's built in.
 
 ## Update
 
@@ -44,11 +50,11 @@ dotnet tool uninstall --global nschema
 NSchema can emit a completion script for your shell, and install it for you in one step:
 
 ```sh
-nschema completion bash --install-autocomplete
+nschema completion install bash
 ```
 
 Swap `bash` for `zsh`, `fish`, or `pwsh`. See the [`completion` command](/cli/commands/completion/)
-for manual installation and the `--uninstall-autocomplete` flag.
+for manual installation and [`completion uninstall`](/cli/commands/completion-uninstall/) to remove it.
 
 ## Next steps
 

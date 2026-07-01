@@ -199,3 +199,13 @@
   padding-bottom: 0.2em;
   border-bottom: 1px solid var(--sl-color-hairline-shade);
 }
+
+/* ── Version picker ───────────────────────────────────────────────────────── */
+/* starlight-versions hard-codes its <select> to width: 6.5em, which clips
+   longer labels (e.g. "Latest (4.x)") behind its text-overflow: ellipsis. The
+   custom element is a global tag, so this outranks the plugin's scoped rule on
+   specificity — size the control to its content, keeping 6.5em as the floor. */
+starlight-version-select select {
+  width: auto;
+  min-width: 6.5em;
+}

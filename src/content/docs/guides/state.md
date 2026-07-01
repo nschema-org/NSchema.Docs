@@ -25,6 +25,7 @@ For a team, or in a CI environment, you'll want somewhere more persistent, like 
 
 ```sql
 BACKEND s3 (
+  version = '4.0.0',
   bucket = 'my-bucket',
   key = 'env/state.json'
 );
@@ -36,11 +37,11 @@ With a state store configured:
 
 - **`plan`** will run offline, against the recorded snapshot, with no database connection.
 - **`apply`** always reads the **live** database, and after a successful apply it refreshes the state snapshot.
-- **`refresh`**, **`drift`**, **`show`**, and **`force-unlock`** all operate against the store see their command pages.
+- **`refresh`**, **`drift`**, **`state show`**, and the **`lock`** subcommands all operate against the store see their command pages.
 
 ## Seeding and repairing state
 
-When you first add a state store, or after [out-of-band changes](/guides/drift.md), seed it from the live database using the 
+When you first add a state store, or after [out-of-band changes](/guides/drift/), seed it from the live database using the 
 [`refresh`](/cli/commands/refresh/) command:
 
 ```sh
@@ -52,17 +53,18 @@ This captures the **whole** live schema to the store. Run it again any time you 
 
 ## Inspecting state
 
-[`show`](/cli/commands/show/) prints what the store currently holds, without touching the database:
+[`state show`](/cli/commands/state-show/) prints what the store currently holds, without touching the database:
 
 ```sh
-nschema show
+nschema state show
 ```
 
 ## Locking
 
 NSchema locks the store during writes (`apply`, `destroy`, `refresh`) so concurrent runs can't corrupt it. An interrupted 
-run can leave a stale lock; clear it with [`force-unlock`](/cli/commands/force-unlock/) once you're certain nothing is 
-still running.
+run can leave a stale lock; clear it with [`lock release`](/cli/commands/lock-release/) once you're certain nothing is 
+still running. You can check the lock without touching it with [`lock status`](/cli/commands/lock-status/), or hold 
+it deliberately for out-of-band coordination with [`lock acquire`](/cli/commands/lock-acquire/).
 
 ## Detecting divergence
 

@@ -1,9 +1,8 @@
 ---
-title: nschema validate
+title: validate
 description: Check that your desired-schema files are well-formed and internally consistent.
 sidebar:
-  label: validate
-  order: 2
+  order: 3
 ---
 
 Check that your desired-schema files are well-formed and internally consistent, without contacting a database or state 

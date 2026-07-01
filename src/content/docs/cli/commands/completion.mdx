@@ -1,9 +1,8 @@
 ---
-title: nschema completion
+title: completion
 description: Output a shell tab-completion script for nschema.
 sidebar:
-  label: completion
-  order: 14
+  order: 15
 ---
 
 Output a shell tab-completion script for `nschema`.
@@ -16,28 +15,17 @@ Supported shells: `bash`, `zsh`, `fish`, `pwsh`.
 
 ## Installing automatically
 
-The quickest way to enable completion permanently is `--install-autocomplete`, which wires it into your shell's startup file for you:
+The quickest way to enable completion permanently is [`completion install`](/cli/commands/completion-install/),
+which wires it into your shell's startup file for you:
 
 ```sh
-nschema completion bash --install-autocomplete
+nschema completion install bash
 ```
 
-This inserts a small managed block into the shell's startup file that sources the completion script on each new session:
+Remove it again with [`completion uninstall`](/cli/commands/completion-uninstall/):
 
 ```sh
-# >>> nschema completion >>>
-source <(nschema completion bash)
-# <<< nschema completion <<<
-```
-
-Because the block _sources_ `nschema completion <shell>` rather than embedding a copy of the script, your completions
-always track the installed binary, there's nothing to refresh after an upgrade. Re-running the command is safe: it
-replaces the existing block instead of duplicating it.
-
-Open a new shell (or re-source the startup file) to pick up completion. To remove the block again:
-
-```sh
-nschema completion bash --uninstall-autocomplete
+nschema completion uninstall bash
 ```
 
 ## Installing manually
@@ -80,12 +68,6 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
   </TabItem>
 </Tabs>
 
-## Options
-
-- **`--install-autocomplete`** — instead of printing the script, install completion for the given shell by adding a managed
-  block to its startup file.
-- **`--uninstall-autocomplete`** — remove the managed block that `--install-autocomplete` added.
-
 ## What completes
 
 Completion covers commands, options, and their fixed value sets (for example the `--destructive-actions`
@@ -95,4 +77,4 @@ resolved against any `--directory` already on the line.
 
 ## Needs
 
-Nothing. it writes a completion script to stdout, or (with the install flags) edits your shell's startup file.
+Nothing. It writes a completion script to stdout.

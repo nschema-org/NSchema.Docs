@@ -1,9 +1,8 @@
 ---
-title: nschema plan
+title: plan
 description: Compute and show the migration plan, without changing anything.
 sidebar:
-  label: plan
-  order: 4
+  order: 5
 ---
 
 Compute and show the migration plan, without changing anything.
@@ -25,7 +24,7 @@ See [Configuration blocks](/cli/configuration/).
 
 - **`-s`, `--scope <name>`** — limit the migration to specific database schemas (namespaces). May be repeated.
 - **`--destructive-actions <error|warn|allow>`** — policy for destructive changes. Defaults to `error`. *(NSCHEMA 
-  `destructive_action`, env `NSCHEMA_DESTRUCTIVE_ACTION_POLICY`)* See [Destructive-action safety](/guides/destructive-actions/).
+  env `NSCHEMA_DESTRUCTIVE_ACTION_POLICY`)* See [Destructive-action safety](/guides/destructive-actions/).
 - **`--destroy`** — preview the SQL that [`destroy`](/cli/commands/destroy/) would run to tear the managed schema down.
 - **`-o`, `--out <path>`** — write the computed plan to a file so it can be replayed later by [`apply --plan-file`](/cli/commands/apply/). 
   Works with `--destroy` too, saving the teardown plan.
@@ -42,7 +41,8 @@ nschema plan --out tonight.nplan
 nschema apply --plan-file tonight.nplan
 ```
 
-See [The plan / apply workflow](/guides/workflow/) for the full pattern.
+To render a saved plan back to the terminal before applying it, see [`plan show`](/cli/commands/plan-show/). See
+[The plan / apply workflow](/guides/workflow/) for the full pattern.
 
 ## Previewing a teardown
 

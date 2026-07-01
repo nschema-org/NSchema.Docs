@@ -1,9 +1,8 @@
 ---
-title: nschema apply
+title: apply
 description: Compute the plan and apply it to the target database.
 sidebar:
-  label: apply
-  order: 5
+  order: 6
 ---
 
 Compute the plan and apply it to the target database. Prompts for confirmation before making changes unless `--auto-approve` is given.
@@ -32,6 +31,8 @@ the step rather than silently doing nothing and reporting success. Always pass `
   a fresh one (Terraform's `apply <planfile>`). The saved plan already fixes its scope, desired schema, and destructive-action 
   policy, so those inputs are ignored. A live database to write to is still required, and you're still prompted for 
   confirmation unless `--auto-approve` is given.
+- **`--no-lock`** — skip taking the state-store lock for this run. Use it only when you've coordinated access by other 
+  means (for example you already hold the lock via [`nschema lock acquire`](/cli/commands/lock-acquire/)).
 
 ## After a successful apply
 

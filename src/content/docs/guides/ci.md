@@ -35,6 +35,16 @@ export NSCHEMA_POSTGRES_PASSWORD="$DB_PASSWORD"
 
 See [Environment variables](/cli/environment-variables/).
 
+## Plugins are restored on first use
+
+Providers and backends are [plugins](/cli/configuration/#plugins-and-versions): `nschema` downloads the version pinned in
+your config the first time a command needs one. In CI that means:
+
+- The agent needs the .NET SDK and network access to your NuGet feed (the restore shells out to `dotnet`).
+- More control in provider versioning by pinning versions in your `PROVIDER` / `BACKEND` blocks.
+- To control *when* the fetch happens: fail fast on a bad pin, or warm the cache before timed steps. Run `nschema init`
+  up front, and pass `--no-init` to later commands to require the cache and skip any restore.
+
 ## Gate a pull request on changes
 
 The `plan` command always exits `0` by default unless there was an error. If you opt in with`--detailed-exitcode`, 

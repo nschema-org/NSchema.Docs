@@ -108,27 +108,23 @@ config-value   = string | [ "-" ] , integer | "true" | "false" | ident ;
 ```
 
 ```sql
-NSCHEMA (
-  dialect = 'postgres',
-  transaction_mode = 'single'
-);
-
 BACKEND file (
   path = 'state/app.nsstate'
 );
 
 PROVIDER postgres (
-  schema_search_path = 'app',
-  connection_timeout = 1000
+  version = '4.0.0',
+  connection_string = '',
+  command_timeout = 1000
 );
 ```
 
 Notes on the shape:
 
-- The block keyword (`NSCHEMA` / `BACKEND` / `PROVIDER`) and the optional label (`file`, `postgres`) are bare identifiers 
-  consistent with bare identifiers everywhere else in the DDL; double quotes are still unused. `NSCHEMA` has no label.
+- The block keyword (`BACKEND` / `PROVIDER`) and its label (`file`, `postgres`) are bare identifiers consistent with bare 
+  identifiers everywhere else in the DDL; double quotes are still unused.
 - String **values** are single-quoted (`'postgres'`), SQL-style. Values may also be integers (optionally negative), 
-  `true`/`false`, or a bare identifier (`transaction_mode = single`).
+  `true`/`false`, or a bare identifier.
 - Attributes are a flat comma-separated list. Group related settings with a dotted key (`pool.max = 10`), which is captured verbatim as a single key.
 
 The matching forward-compatibility rule for the parser: an unrecognized top-level block keyword is captured, not an error,

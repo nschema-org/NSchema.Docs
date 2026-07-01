@@ -1,9 +1,8 @@
 ---
-title: nschema fmt
+title: fmt
 description: Reformat your .sql DDL files to a canonical layout.
 sidebar:
-  label: fmt
-  order: 3
+  order: 4
 ---
 
 Reformats your `.sql` DDL files to a canonical layout.

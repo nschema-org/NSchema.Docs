@@ -9,10 +9,14 @@ Declare a sqlserver provider using a `PROVIDER sqlserver` [config block](/cli/co
 
 ```sql
 PROVIDER sqlserver (
+  version = '4.0.0',
   connection_string = '',
   command_timeout = 30
 );
 ```
+
+The `NSchema.SqlServer` plugin is restored automatically from the pinned `version` the first time you run a command — for
+CLI use you don't install it by hand. (To embed the engine as a library instead, see [Using the library](#using-the-library).)
 
 ## Requirements
 
@@ -23,6 +27,8 @@ place with `CREATE OR ALTER`, which requires this baseline.
 
 | Attribute           | Type    | Description                                                                                          |
 |---------------------|---------|------------------------------------------------------------------------------------------------------|
+| `version`           | string  | **Required.** The version of the `NSchema.SqlServer` plugin package to restore.                      |
+| `source`            | string  | Optional. A NuGet package id to load the provider from instead of `NSchema.SqlServer`.               |
 | `connection_string` | string  | The connection string used to reach the database. Best supplied via the environment (see below).     |
 | `username`          | string  | The username, supplied separately from the connection string. Overrides any user embedded in it.     |
 | `password`          | string  | The password, supplied separately from the connection string. Overrides any password embedded in it. |
