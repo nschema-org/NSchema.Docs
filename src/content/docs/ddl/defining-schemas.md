@@ -40,8 +40,10 @@ A few things to note, each covered in full by the [grammar reference](/ddl/gramm
   instead of dropping and recreating it.
   **Partial schemas** (`CREATE PARTIAL SCHEMA …`) leave undeclared tables alone rather than dropping them. This is useful 
   for shared schemas or while migrating to NSchema. A `DROP TABLE app.x;` statement still records an explicit drop.
-- **Other objects**. Other types like views (`CREATE VIEW`), enums (`CREATE ENUM`), domains, composite types, sequences, 
+- **Other objects.** Other types like views (`CREATE VIEW`), enums (`CREATE ENUM`), domains, composite types, sequences, 
   functions/procedures, triggers, and extensions each have their own statements. See the [grammar reference](/ddl/grammar/).
+- **Repeated structures.** The same table in several schemas, or the same columns on many tables, can be declared once
+  as a [template](/guides/templates/) (`TEMPLATE … BEGIN … END`) and instantiated with `APPLY TEMPLATE` or an `INCLUDE` table member.
 
 ## Where the files live
 
