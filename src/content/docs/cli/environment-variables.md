@@ -16,6 +16,7 @@ blocks and below command-line flags in [precedence](/cli/configuration/#preceden
 | `NSCHEMA_SQLSERVER_USERNAME`          | The SQL Server username          | Layered onto the connection string, overriding any user embedded in it.                                             |
 | `NSCHEMA_SQLSERVER_PASSWORD`          | The SQL Server password          | Layered onto the connection string, overriding any password embedded in it.                                         |
 | `NSCHEMA_DESTRUCTIVE_ACTION_POLICY`   | The destructive-action policy    | `error` (default), `warn`, or `allow`. Equivalent to `--destructive-actions`.                                       |
+| `NSCHEMA_DATA_HAZARD_POLICY`          | The data-hazard policy           | `error`, `warn` (default), `allow`, or `ignore`. Equivalent to `--data-hazards`.                                    |
 | `NSCHEMA_ENVIRONMENT`                 | The target environment           | Selects the `*.env.<name>.sql` [overlay files](/cli/configuration/#environments). Equivalent to `--environment`.    |
 | `NO_COLOR`                            | Colored output                   | The well-known [`NO_COLOR`](https://no-color.org) convention; any value disables color. Equivalent to `--no-color`. |
 

@@ -36,6 +36,12 @@ The option applies to both [`plan`](/cli/commands/plan/) and [`apply`](/cli/comm
 - When you _intend_ a destructive change, make it explicit: review the plan, then re-run that specific apply with `--destructive-actions allow` (or `warn`).
 - Prefer **renames over drop+recreate** where you can. Using `RENAMED FROM` tells the comparer to match the existing object instead of dropping it. See the [grammar reference](/ddl/grammar/).
 
+## Related: data hazards
+
+Destructive-action safety guards changes that succeed and lose data. Its counterpart, [data-hazard
+detection](/guides/data-hazards/), warns about changes that can fail on the data already in a table, like adding a
+`NOT NULL` column without a default.
+
 ## `destroy` is exempt
 
 [`nschema destroy`](/cli/commands/destroy/) is destructive by design and is **not** protected by this policy, although it does still require 
