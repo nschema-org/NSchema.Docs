@@ -471,6 +471,65 @@ Triggers are table members (named uniquely per table), so, like indexes and cons
 no separate `DROP TRIGGER`. A trigger absent from a declared table's set is dropped, and a structural change is planned 
 as a drop + recreate.
 
+## Templates
+
+Templates declare a reusable structure once and instantiate it in many places: a **schema template** holds whole
+objects, applied to schemas; a **table template** (`FOR TABLE`) holds table members, pulled into a table body by an
+`INCLUDE` member.
+
+```ebnf
+template        = "TEMPLATE" , ident , [ "FOR" , ( "SCHEMA" | "TABLE" ) ] , "BEGIN" , template-body , "END" , ";" ;
+template-body   = { statement }                        (* FOR SCHEMA: CREATE object statements and table GRANTs *)
+                | table-member , { "," , table-member } (* FOR TABLE: the table-body member grammar *) ;
+apply-template  = "APPLY" , "TEMPLATE" , ident , "IN" , "SCHEMA" , ident , { "," , ident } , ";" ;
+include-member  = "INCLUDE" , ident ;                  (* a table-body member naming a FOR TABLE template *)
+```
+
+```sql
+TEMPLATE outbox
+BEGIN
+  CREATE TABLE outbox (
+    id      uuid NOT NULL,
+    payload text NOT NULL,
+    CONSTRAINT pk_outbox PRIMARY KEY (id)
+  );
+  CREATE INDEX ix_outbox_id ON outbox (id);
+END;
+
+APPLY TEMPLATE outbox IN SCHEMA billing, ordering;
+
+TEMPLATE audit_columns FOR TABLE
+BEGIN
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+END;
+
+CREATE TABLE app.widgets (
+  id uuid NOT NULL,
+  INCLUDE audit_columns
+);
+```
+
+Notes on the shape:
+
+- The body is delimited by `BEGIN … END` — parsed like PostgreSQL's `BEGIN ATOMIC` function bodies, not an opaque
+  block — so errors surface at the definition, and `fmt` formats the contents.
+- `FOR SCHEMA` is the default and may be omitted.
+- Inside a body, **an unqualified name binds to the target schema; a qualified name escapes** to the schema it
+  names. Objects must be declared unqualified (each application creates its own copy); references may be either.
+  A column type or trigger function the template itself declares is qualified per instance at expansion.
+- A schema template body accepts `CREATE` object statements and table `GRANT`s — no schemas, extensions, views,
+  drops, deployment scripts, config blocks, or nested templates, and no `GRANT USAGE ON SCHEMA`.
+- An `INCLUDE` member's columns land at the position the include is written; its other members attach alongside the
+  table's own. A table template cannot include another template.
+- Definitions, applications, and includes are location- and order-independent across all DDL files; template names
+  are unique across the project, and instances are strictly identical.
+
+:::note
+Expansion happens when the desired schema is loaded — diff, plan, and import see only the concrete expanded
+objects. See [Templates](/guides/templates/) for the practical guide.
+:::
+
 ## Construct → model mapping
 
 | DDL construct                                                 | Model target                                                                         |
@@ -507,4 +566,5 @@ as a drop + recreate.
 | `CREATE EXTENSION e [VERSION 'v']`                            | `DatabaseSchema` + `Extension` (root-level)                                          |
 | `DROP EXTENSION e`                                            | `DroppedExtensions` (root-level; explicit drop only)                                 |
 | `CREATE TRIGGER t … ON s.tbl …`                               | `Trigger` on the named table (`Table.Triggers`)                                      |
+| `TEMPLATE n [FOR …] BEGIN … END` / `APPLY TEMPLATE` / `INCLUDE n` | expanded at load into concrete objects per target — no model construct survives  |
 | `---` / `/** */` before a declaration                         | that object's `Comment`                                                              |
