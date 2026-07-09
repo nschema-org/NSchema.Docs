@@ -169,6 +169,40 @@ Notes on the shape:
 Deployment scripts run on every apply, so they must be idempotent. See [Deployment scripts](/guides/deployment-scripts/).
 :::
 
+## Data migrations
+
+A `MIGRATION` block attaches raw SQL to a *structural change* rather than to a deployment phase: it runs only when the
+plan contains the matching change, and is inert (and reported as deletable) otherwise.
+
+```ebnf
+data-migration    = "MIGRATION" , [ string ] , "FOR" , migration-trigger , member-path ,
+                    [ "(" , [ script-option , { "," , script-option } ] , ")" ] ,
+                    "AS" , dollar-body , ";" ;
+migration-trigger = "ADD" , "COLUMN" | "ALTER" , "COLUMN" , "TYPE" | "ADD" , "CONSTRAINT" ;
+member-path       = ident , "." , ident , "." , ident ;    (* schema.table.column-or-constraint *)
+```
+
+```sql
+MIGRATION 'backfill emails' FOR ADD COLUMN app.users.email AS $$
+    UPDATE app.users SET email = username || '@legacy.example' WHERE email IS NULL;
+$$;
+```
+
+Notes on the shape:
+
+- The name is optional; messages and plan output fall back to the trigger and path (`ADD COLUMN app.users.email`).
+- The target is always a three-segment path — the third segment is a column name for the column triggers and a
+  constraint name for `ADD CONSTRAINT`.
+- Matching is structural (the trigger plus the path), never positional, and the block can live in any `.sql` file.
+  Declaring two blocks for the same trigger and path is an error.
+- The options clause and dollar-quoted body work exactly as for deployment scripts, including
+  `run_outside_transaction = true`.
+
+:::note
+For when each trigger fires, how a NOT NULL column add is decomposed around its backfill, and the block lifecycle,
+see [Data migrations](/guides/data-migrations/).
+:::
+
 ### Schemas
 
 ```ebnf

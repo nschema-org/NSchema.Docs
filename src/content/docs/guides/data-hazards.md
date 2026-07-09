@@ -46,6 +46,12 @@ nschema apply --data-hazards error
 
 The option applies to both [`plan`](/cli/commands/plan/) and [`apply`](/cli/commands/apply/).
 
+## Resolving a hazard with a migration block
+
+Declaring a matching [`MIGRATION` block](/guides/data-migrations/) silences the corresponding hazard: the block states
+how the data gets into shape (a backfill before `SET NOT NULL`, a de-duplication before a unique constraint), so there
+is nothing left to warn about. The plan output shows the block against its change instead.
+
 ## Teardowns are exempt
 
 Like every diff policy, data-hazard detection applies to forward migrations. A teardown ([`destroy`](/cli/commands/destroy/), 

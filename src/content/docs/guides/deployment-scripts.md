@@ -43,4 +43,8 @@ CREATE EXTENSION IF NOT EXISTS citext;
 ## When to use them
 
 Deployment scripts are intended as an escape hatch rather than a recommendation. Great power, great responsibility, etc.
-If there's something you need a deployment script for, consider logging a feature request for it instead. :thumbs_up:
+If there's something you need a deployment script for, consider logging a feature request for it instead.
+
+For transition SQL (backfills, and data fixes tied to a schema change) prefer a [`MIGRATION` block](/guides/data-migrations/).
+A deployment script runs on every apply and must be idempotent; a migration block runs only when its matching
+change is in the plan, then reports itself as safe to delete.
