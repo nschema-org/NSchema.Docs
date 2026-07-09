@@ -71,6 +71,40 @@ Delete the block whenever every environment you deploy to has the change. This r
 [deployment-script](/guides/deployment-scripts/) pattern for transition SQL: a deployment script runs on every apply and 
 must be written idempotently, while a migration block only runs alongside its change.
 
+## Migrations in templates
+
+A [schema template](/guides/templates/) can declare migrations alongside the objects they support, so a change to a templated table 
+doesn't need the block repeated for every schema it's applied to. 
+
+Because we treat provider-native SQL as opaque, NSchema can't automatically attach unqualified names to the correct schema.
+Instead, the `{schema}` token stands in for the target schema:
+
+```sql
+TEMPLATE outbox
+BEGIN
+    CREATE TABLE outbox_events (
+        id       uuid NOT NULL,
+        trace_id text NOT NULL,
+        CONSTRAINT pk_outbox_events PRIMARY KEY (id)
+    );
+
+    MIGRATION 'backfill trace ids' FOR ADD COLUMN outbox_events.trace_id AS $$
+        UPDATE {schema}.outbox_events SET trace_id = gen_random_uuid()::text WHERE trace_id IS NULL;
+    $$;
+END;
+
+APPLY TEMPLATE outbox IN SCHEMA sales, billing;
+```
+
+Applying the template instantiates one block per schema, and each behaves exactly like a hand-written one.A schema that 
+already has the change reports its instance as inert while a lagging schema's still fires, and a schema newly added to the
+`APPLY` list creates its table fresh (empty), so the migration correctly doesn't run there. 
+
+Delete the block from the template once every applied schema has the change.
+
+A migration in a template must target a table the template itself declares, and a template block colliding with a hand-written 
+one for the same change is rejected as a duplicate.
+
 ## Options
 
 `run_outside_transaction = true` works exactly as it does for deployment scripts, for statements the database forbids 

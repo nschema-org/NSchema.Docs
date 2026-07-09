@@ -191,8 +191,10 @@ $$;
 Notes on the shape:
 
 - The name is optional; messages and plan output fall back to the trigger and path (`ADD COLUMN app.users.email`).
-- The target is always a three-segment path — the third segment is a column name for the column triggers and a
-  constraint name for `ADD CONSTRAINT`.
+- The target is a three-segment path — the third segment is a column name for the column triggers and a
+  constraint name for `ADD CONSTRAINT`. Inside a [template](#templates) body the path is the unqualified
+  `table.member` instead, and the block instantiates per applied schema (see the
+  [guide](/guides/data-migrations/#migrations-in-templates)).
 - Matching is structural (the trigger plus the path), never positional, and the block can live in any `.sql` file.
   Declaring two blocks for the same trigger and path is an error.
 - The options clause and dollar-quoted body work exactly as for deployment scripts, including
@@ -513,7 +515,7 @@ objects, applied to schemas; a **table template** (`FOR TABLE`) holds table memb
 
 ```ebnf
 template        = "TEMPLATE" , ident , [ "FOR" , ( "SCHEMA" | "TABLE" ) ] , "BEGIN" , template-body , "END" , ";" ;
-template-body   = { statement }                        (* FOR SCHEMA: CREATE object statements and table GRANTs *)
+template-body   = { statement }                        (* FOR SCHEMA: CREATE statements, table GRANTs, MIGRATION blocks *)
                 | table-member , { "," , table-member } (* FOR TABLE: the table-body member grammar *) ;
 apply-template  = "APPLY" , "TEMPLATE" , ident , "IN" , "SCHEMA" , ident , { "," , ident } , ";" ;
 include-member  = "INCLUDE" , ident ;                  (* a table-body member naming a FOR TABLE template *)
@@ -552,7 +554,8 @@ Notes on the shape:
 - Inside a body, **an unqualified name binds to the target schema; a qualified name escapes** to the schema it
   names. Objects must be declared unqualified (each application creates its own copy); references may be either.
   A column type or trigger function the template itself declares is qualified per instance at expansion.
-- A schema template body accepts `CREATE` object statements and table `GRANT`s — no schemas, extensions, views,
+- A schema template body accepts `CREATE` object statements, table `GRANT`s, and [`MIGRATION` blocks](/guides/data-migrations/#migrations-in-templates)
+  (with an unqualified `table.member` path, instantiated per applied schema) — no schemas, extensions, views,
   drops, deployment scripts, config blocks, or nested templates, and no `GRANT USAGE ON SCHEMA`.
 - An `INCLUDE` member's columns land at the position the include is written; its other members attach alongside the
   table's own. A table template cannot include another template.
