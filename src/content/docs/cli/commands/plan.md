@@ -25,6 +25,8 @@ See [Configuration blocks](/cli/configuration/).
 - **`-s`, `--scope <name>`** — limit the migration to specific database schemas (namespaces). May be repeated.
 - **`--destructive-actions <error|warn|allow>`** — policy for destructive changes. Defaults to `error`. *(NSCHEMA 
   env `NSCHEMA_DESTRUCTIVE_ACTION_POLICY`)* See [Destructive-action safety](/guides/destructive-actions/).
+- **`--data-hazards <error|warn|allow|ignore>`** — policy for changes that can fail on the data already in a table. 
+  Defaults to `warn`. *(env `NSCHEMA_DATA_HAZARD_POLICY`)* See [Data hazards](/guides/data-hazards/).
 - **`--destroy`** — preview the SQL that [`destroy`](/cli/commands/destroy/) would run to tear the managed schema down.
 - **`-o`, `--out <path>`** — write the computed plan to a file so it can be replayed later by [`apply --plan-file`](/cli/commands/apply/). 
   Works with `--destroy` too, saving the teardown plan.
@@ -48,8 +50,8 @@ To render a saved plan back to the terminal before applying it, see [`plan show`
 
 With `--destroy` the command previews a teardown rather than a forward migration. It takes the same inputs as [`destroy`](/cli/commands/destroy/):
 a live database the teardown SQL is rendered against, and a managed-schema source (a configured state store, or a desired 
-schema to fall back on), but only shows the SQL. `--scope` and `--destructive-actions` don't apply to a teardown and are
-ignored.
+schema to fall back on), but only shows the SQL. `--scope`, `--destructive-actions`, and `--data-hazards` don't apply
+to a teardown and are ignored.
 
 ```sh
 nschema plan --destroy
