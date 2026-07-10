@@ -42,7 +42,17 @@ With a state store configured:
 ## Script executions
 
 The state also records which [`RUN ONCE` scripts](/guides/deployment-scripts/#run-conditions) have executed (by name,
-with a hash of the body that ran), which is how later plans know to skip them.
+with a hash of the body that ran), which is how later plans know to skip them. This ledger is the one part of the
+state that is **not** a rebuildable cache — a `refresh` carries it over rather than reconstructing it, because the
+database can't tell NSchema which scripts already ran.
+
+The [`script` command group](/cli/commands/script/) manages the ledger directly:
+
+```sh
+nschema script list                 # what has run, when, and with which body
+nschema script taint seed-users     # forget an execution — the script runs again on the next apply
+nschema script untaint seed-users   # record a pending script as executed, without running it
+```
 
 ## Seeding and repairing state
 
@@ -70,6 +80,49 @@ NSchema locks the store during writes (`apply`, `destroy`, `refresh`) so concurr
 run can leave a stale lock; clear it with [`lock release`](/cli/commands/lock-release/) once you're certain nothing is 
 still running. You can check the lock without touching it with [`lock status`](/cli/commands/lock-status/), or hold 
 it deliberately for out-of-band coordination with [`lock acquire`](/cli/commands/lock-acquire/).
+
+## State surgery
+
+When the recorded state is wrong in a way `refresh` can't fix, two loops cover everything:
+
+**Pull → edit → push** is the universal option. [`state pull`](/cli/commands/state-pull/) downloads the raw payload (even one too corrupt to parse), 
+you edit it as JSON, and [`state push`](/cli/commands/state-push/) validates it and writes it back byte-for-byte:
+
+```sh
+nschema state pull > state.json
+# …edit state.json…
+nschema state push state.json
+```
+
+This also serves as backup/restore, and as migration between backends: pull with one `BACKEND` configuration, push with 
+the other. When an edit touches the script ledger, [`script hash`](/cli/commands/script-hash/) computes the body hash a ledger entry must carry.
+
+**Refresh → untaint** rebuilds after state loss. The schema snapshot is just a cache of the live database, so
+[`refresh`](/cli/commands/refresh/) reconstructs it wholesale; the [script ledger](#script-executions) is then restored by [`untaint`](/cli/commands/script-untaint/)ing each script
+that had already executed:
+
+```sh
+nschema refresh
+nschema script untaint seed-users
+```
+
+Pushes, taints, and untaints run under the [state lock](/cli/commands/lock/), like every other state write.
+
+## State format and compatibility
+
+Pull and push make the state payload something you can hold in your hands, so its compatibility rules form part of our 
+semantic versioning contract:
+
+- The payload is JSON, carrying a format `version` number.
+- **Within a major version of NSchema, the format only changes additively.** Every 4.x release reads state written by
+  every other 4.x release. A payload written by a *newer minor* may carry fields an older release doesn't know.
+- **A payload from a newer major version is refused, never misread.** The format `version` number changes at most at
+  a major release, and a reader that encounters a newer one fails with an explicit error instead of guessing.
+- **Hand-edits are preserved.** A push validates that the payload parses, then stores your bytes verbatim. 
+- Check your work with [`state show`](/cli/commands/state-show/) or [`script list`](/cli/commands/script-list/).
+- **Corrupt state is never a dead end.** An unreadable payload fails planning loudly (it can't be trusted for
+  [run-once scripts](#script-executions)), but it can still be pulled for repair — and `refresh --force` replaces it
+  and rebuilds, the recovery path of last resort, with a warning that the script ledger was reset.
 
 ## Detecting divergence
 
