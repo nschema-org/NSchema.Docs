@@ -46,11 +46,11 @@ nschema apply --data-hazards error
 
 The option applies to both [`plan`](/cli/commands/plan/) and [`apply`](/cli/commands/apply/).
 
-## Resolving a hazard with a migration block
+## Resolving a hazard with a migration script
 
-Declaring a matching [`MIGRATION` block](/guides/data-migrations/) silences the corresponding hazard: the block states
+Declaring a matching [change-event `SCRIPT`](/guides/data-migrations/) silences the corresponding hazard: the script states
 how the data gets into shape (a backfill before `SET NOT NULL`, a de-duplication before a unique constraint), so there
-is nothing left to warn about. The plan output shows the block against its change instead.
+is nothing left to warn about. The plan output shows the script against its change instead.
 
 ## Teardowns are exempt
 

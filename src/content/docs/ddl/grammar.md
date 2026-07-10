@@ -85,7 +85,7 @@ CREATE TABLE app.users
 ## Document and statements
 
 ```ebnf
-document   = { [ doc-comment ] , ( statement | config-block | deployment-script ) } ;
+document   = { [ doc-comment ] , ( statement | config-block | script ) } ;
 statement  = ( create-schema | create-table | create-view | create-enum | create-domain | create-sequence
              | create-function | create-procedure | create-extension | create-trigger | create-index
              | drop-schema | drop-table | drop-view | drop-enum | drop-domain | drop-sequence
@@ -93,7 +93,7 @@ statement  = ( create-schema | create-table | create-view | create-enum | create
 ```
 
 A flat statement list; schema membership is by qualified name, like normal SQL. A document may also contain top-level 
-[configuration blocks](#configuration-blocks) and [deployment scripts](#deployment-scripts).
+[configuration blocks](#configuration-blocks) and [scripts](#scripts).
 
 ## Configuration blocks
 
@@ -135,73 +135,74 @@ This section describes the language shape of config blocks. For the attributes t
 [Providers](/providers/), and [Backends](/backends/).
 :::
 
-## Deployment scripts
+## Scripts
 
-Some migration steps are imperative and can't be expressed declaratively. Backfills, data fixes, etc. These can be 
-declared inline as deployment scripts that run as raw SQL around the computed migration: every `PRE DEPLOYMENT` body runs 
-before the migration's statements, every `POST DEPLOYMENT` body runs after.
+Some migration steps are imperative and can't be expressed declaratively. Backfills, data fixes, extensions, seeds.
+These are declared inline with the `SCRIPT` statement, which names *when* the script runs (its event) and *how often*
+(its run condition):
 
 ```ebnf
-deployment-script = ( "PRE" | "POST" ) , "DEPLOYMENT" , string ,
-                    [ "(" , [ script-option , { "," , script-option } ] , ")" ] ,
-                    "AS" , dollar-body , ";" ;
-script-option     = ident , "=" , config-value ;
-dollar-body       = "$$" , … , "$$" | "$" , tag , "$" , … , "$" , tag , "$" ;
+script         = "SCRIPT" , string , "RUN" , [ run-condition ] , "ON" , script-event ,
+                 [ "(" , [ script-option , { "," , script-option } ] , ")" ] ,
+                 "AS" , dollar-body , ";" ;
+run-condition  = "ALWAYS" | "ONCE" ;
+script-event   = "PRE" , "DEPLOYMENT" | "POST" , "DEPLOYMENT"
+               | "ADD" , "COLUMN" , member-path | "ALTER" , "COLUMN" , "TYPE" , member-path
+               | "ADD" , "CONSTRAINT" , member-path ;
+member-path    = ident , "." , ident , "." , ident ;    (* schema.table.column-or-constraint *)
+script-option  = ident , "=" , config-value ;
+dollar-body    = "$$" , … , "$$" | "$" , tag , "$" , … , "$" , tag , "$" ;
 ```
 
 ```sql
-POST DEPLOYMENT 'reindex' (run_outside_transaction = true) AS $$
+SCRIPT 'reindex' RUN ON POST DEPLOYMENT (run_outside_transaction = true) AS $$
     CREATE INDEX CONCURRENTLY idx_widgets_name ON app.widgets (name);
 $$;
-```
 
-Notes on the shape:
+SCRIPT 'seed currencies' RUN ONCE ON POST DEPLOYMENT AS $$
+    INSERT INTO app.currencies (code) VALUES ('GBP'), ('USD'), ('EUR');
+$$;
 
-- The name is a single-quoted string, used in plan output and logs.
-- An optional `( … )` clause carries script options. The only option today is `run_outside_transaction = true`, for 
-  statements the database forbids inside a transaction (e.g. `CREATE INDEX CONCURRENTLY`).
-- `AS` introduces the body, exactly as for a view (`CREATE VIEW … AS …`).
-- The body is a dollar-quoted block (`$$ … $$` or `$tag$ … $tag$`) using the same opaque-SQL device for function bodies. 
-- Dollar-quoting lets the body contain its own `;` and single quotes without escaping; the inner content is taken verbatim 
-- (delimiters stripped, surrounding whitespace trimmed) and is not dialect-translated.
-
-:::note
-Deployment scripts run on every apply, so they must be idempotent. See [Deployment scripts](/guides/deployment-scripts/).
-:::
-
-## Data migrations
-
-A `MIGRATION` block attaches raw SQL to a *structural change* rather than to a deployment phase: it runs only when the
-plan contains the matching change, and is inert (and reported as deletable) otherwise.
-
-```ebnf
-data-migration    = "MIGRATION" , [ string ] , "FOR" , migration-trigger , member-path ,
-                    [ "(" , [ script-option , { "," , script-option } ] , ")" ] ,
-                    "AS" , dollar-body , ";" ;
-migration-trigger = "ADD" , "COLUMN" | "ALTER" , "COLUMN" , "TYPE" | "ADD" , "CONSTRAINT" ;
-member-path       = ident , "." , ident , "." , ident ;    (* schema.table.column-or-constraint *)
-```
-
-```sql
-MIGRATION 'backfill emails' FOR ADD COLUMN app.users.email AS $$
+SCRIPT 'backfill emails' RUN ON ADD COLUMN app.users.email AS $$
     UPDATE app.users SET email = username || '@legacy.example' WHERE email IS NULL;
 $$;
 ```
 
 Notes on the shape:
 
-- The name is optional; messages and plan output fall back to the trigger and path (`ADD COLUMN app.users.email`).
-- The target is always a three-segment path — the third segment is a column name for the column triggers and a
-  constraint name for `ADD CONSTRAINT`.
-- Matching is structural (the trigger plus the path), never positional, and the block can live in any `.sql` file.
-  Declaring two blocks for the same trigger and path is an error.
-- The options clause and dollar-quoted body work exactly as for deployment scripts, including
-  `run_outside_transaction = true`.
+- The name is a single-quoted string, used in plan output, logs, and run-once tracking. Names are required and must be
+  unique across the project.
+- The **event** is when the script runs: `PRE DEPLOYMENT` / `POST DEPLOYMENT` are fixed bookends around the computed
+  migration, while the change events (`ADD COLUMN`, `ALTER COLUMN TYPE`, `ADD CONSTRAINT`) fire only when the plan
+  contains the matching structural change, splicing the SQL at the change (see [Data migrations](/guides/data-migrations/)).
+- The **run condition** is how often it runs when its event occurs: `ALWAYS` (the default — a bare `RUN ON …` means
+  this) or `ONCE` (recorded in the state backend on a successful apply and skipped thereafter; see
+  [Deployment scripts](/guides/deployment-scripts/#run-conditions)). `UNLESS EXISTS` is reserved for a future release.
+- A change-event target is a three-segment path — the third segment is a column name for the column events and a
+  constraint name for `ADD CONSTRAINT`. Inside a [template](#templates) body the path is the unqualified
+  `table.member` instead, and the script instantiates per applied schema (see the
+  [guide](/guides/data-migrations/#migrations-in-templates)).
+- Change-event matching is structural (the event plus the path), never positional, and the script can live in any
+  `.sql` file. Declaring two scripts for the same event and path is an error.
+- An optional `( … )` clause carries script options. The only option today is `run_outside_transaction = true`, for
+  statements the database forbids inside a transaction (e.g. `CREATE INDEX CONCURRENTLY`).
+- `AS` introduces the body, exactly as for a view (`CREATE VIEW … AS …`).
+- The body is a dollar-quoted block (`$$ … $$` or `$tag$ … $tag$`) using the same opaque-SQL device as function bodies.
+  Dollar-quoting lets the body contain its own `;` and single quotes without escaping; the inner content is taken
+  verbatim (delimiters stripped, surrounding whitespace trimmed) and is not dialect-translated.
 
-:::note
-For when each trigger fires, how a NOT NULL column add is decomposed around its backfill, and the block lifecycle,
-see [Data migrations](/guides/data-migrations/).
-:::
+### Legacy script forms
+
+Before NSchema 4.4, bookend scripts and data migrations had their own statements. Both forms still parse into the same
+model, surface a deprecation warning naming the `SCRIPT` replacement, and will be removed in NSchema 5.0:
+
+```ebnf
+deployment-script = ( "PRE" | "POST" ) , "DEPLOYMENT" , string , [ "(" , … , ")" ] , "AS" , dollar-body , ";" ;
+data-migration    = "MIGRATION" , [ string ] , "FOR" , script-event , member-path ,
+                    [ "(" , … , ")" ] , "AS" , dollar-body , ";" ;
+```
+
+The legacy `MIGRATION` name is optional (messages fall back to the event and path); the `SCRIPT` form requires one.
 
 ### Schemas
 
@@ -513,7 +514,7 @@ objects, applied to schemas; a **table template** (`FOR TABLE`) holds table memb
 
 ```ebnf
 template        = "TEMPLATE" , ident , [ "FOR" , ( "SCHEMA" | "TABLE" ) ] , "BEGIN" , template-body , "END" , ";" ;
-template-body   = { statement }                        (* FOR SCHEMA: CREATE object statements and table GRANTs *)
+template-body   = { statement }                        (* FOR SCHEMA: CREATE statements, table GRANTs, SCRIPT statements *)
                 | table-member , { "," , table-member } (* FOR TABLE: the table-body member grammar *) ;
 apply-template  = "APPLY" , "TEMPLATE" , ident , "IN" , "SCHEMA" , ident , { "," , ident } , ";" ;
 include-member  = "INCLUDE" , ident ;                  (* a table-body member naming a FOR TABLE template *)
@@ -552,7 +553,8 @@ Notes on the shape:
 - Inside a body, **an unqualified name binds to the target schema; a qualified name escapes** to the schema it
   names. Objects must be declared unqualified (each application creates its own copy); references may be either.
   A column type or trigger function the template itself declares is qualified per instance at expansion.
-- A schema template body accepts `CREATE` object statements and table `GRANT`s — no schemas, extensions, views,
+- A schema template body accepts `CREATE` object statements, table `GRANT`s, and [`SCRIPT` statements](/guides/data-migrations/#migrations-in-templates)
+  (with an unqualified `table.member` path, instantiated per applied schema) — no schemas, extensions, views,
   drops, deployment scripts, config blocks, or nested templates, and no `GRANT USAGE ON SCHEMA`.
 - An `INCLUDE` member's columns land at the position the include is written; its other members attach alongside the
   table's own. A table template cannot include another template.
