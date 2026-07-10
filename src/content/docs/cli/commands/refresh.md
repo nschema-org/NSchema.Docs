@@ -20,7 +20,12 @@ It captures the **whole** schema and so takes no desired-schema or `--scope` opt
 Refresh is how you record drift that happened between applies, or initialize the state store with the current schema 
 before you start managing a database offline.
 
+A refresh that finds an existing state payload it cannot read fails rather than overwriting it. The payload can still be 
+[pulled for repair](/guides/state/#state-surgery), or you can pass `--force` to replace it, which resets the[run-once script ledger](/guides/state/#script-executions). 
+Restore the ledger afterwards with [`script untaint`](/cli/commands/script-untaint/).
+
 ## Options
 
 - **`--no-lock`** — skip taking the state-store lock for this run. Use it only when you've coordinated access by 
   other means (for example you already hold the lock via [`nschema lock acquire`](/cli/commands/lock-acquire/)).
+- **`--force`** — replace an existing state payload that cannot be read, resetting the script ledger.
