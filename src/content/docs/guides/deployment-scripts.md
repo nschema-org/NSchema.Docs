@@ -69,13 +69,18 @@ Because the record lives in state, this works offline, and a plan against record
 touching the database. A few consequences to be aware of:
 
 - **Editing an executed script doesn't re-run it.** The plan warns that the body has changed, but still skips it. To run
-  the new body once, remove the script from the state, or rename it (a new name is a new identity).
+  the new body once, [`script taint`](/cli/commands/script-taint/) it, or rename it (a new name is a new identity).
 - **Recording requires a state backend.** With no backend configured there is nowhere to remember executions, and the
   plan warns that run-once scripts will run on every apply.
 - **A failed apply records nothing.** Whether the script ran before the failure is unknowable, so the next apply
   includes it again.
 
 Plan output marks run-once scripts in the pre/post-deployment sections (`(run once)`; `runCondition` in `--json`).
+
+The scripts are managed with the [`script` command group](/cli/commands/script/):
+[`script list`](/cli/commands/script-list/) shows what has run, [`script taint`](/cli/commands/script-taint/) forgets
+an execution so the script runs again, and [`script untaint`](/cli/commands/script-untaint/) records a pending script
+as executed without running it (e.g. after [rebuilding lost state](/guides/state/#state-surgery)).
 
 ## Scripts in templates
 
