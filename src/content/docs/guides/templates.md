@@ -75,7 +75,7 @@ in the database. A table template carrying an index works when included by one t
 schema including it would collide. The `validate` command will detect this, along with any other duplicate index name in a schema.
 :::
 
-## Data migrations in templates
+## Scripts in templates
 
-A schema template can also carry [`MIGRATION` blocks](/guides/data-migrations/#migrations-in-templates) for the tables it declares, instantiated per applied schema, 
-so a backfill travels with the template instead of being repeated for every schema.
+A schema template can also carry [`SCRIPT` statements](/guides/data-migrations/#migrations-in-templates) for the tables 
+it declares, so a backfill travels with the template instead of being repeated for every schema.

@@ -39,6 +39,11 @@ With a state store configured:
 - **`apply`** always reads the **live** database, and after a successful apply it refreshes the state snapshot.
 - **`refresh`**, **`drift`**, **`state show`**, and the **`lock`** subcommands all operate against the store see their command pages.
 
+## Script executions
+
+The state also records which [`RUN ONCE` scripts](/guides/deployment-scripts/#run-conditions) have executed (by name,
+with a hash of the body that ran), which is how later plans know to skip them.
+
 ## Seeding and repairing state
 
 When you first add a state store, or after [out-of-band changes](/guides/drift/), seed it from the live database using the 

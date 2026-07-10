@@ -5,9 +5,9 @@ sidebar:
   order: 55
 ---
 
-NSchema's core engine helps guide the transition of a database to a desired schema, but some transitions require a migration 
-script, whether it's a backfill, a data fix, or a de-duplication, that runs exactly once, when the change is applied. 
-A `MIGRATION` block can attach that SQL to the structural change itself:
+NSchema's core engine helps guide the transition of a database to a desired schema, but some transitions require a migration
+script, whether it's a backfill, a data fix, or a de-duplication, that runs exactly once, when the change is applied.
+A [`SCRIPT`](/guides/deployment-scripts/) declared `ON` a structural change attaches that SQL to the change itself:
 
 ```sql
 CREATE TABLE app.users (
@@ -16,35 +16,35 @@ CREATE TABLE app.users (
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
-MIGRATION 'backfill emails' FOR ADD COLUMN app.users.email AS $$
+SCRIPT 'backfill emails' RUN ON ADD COLUMN app.users.email AS $$
     UPDATE app.users SET email = username || '@legacy.example' WHERE email IS NULL;
 $$;
 ```
 
-If the plan adds `app.users.email`, the block's SQL is spliced into the migration. If it doesn't, because the column already 
-exists, or the change was applied last week, the block does nothing, and `plan` tells you it is safe to delete.
+If the plan adds `app.users.email`, the script's SQL is spliced into the migration. If it doesn't, because the column already
+exists, or the change was applied last week, the script does nothing, and `plan` tells you it is safe to delete.
 
-## Triggers
+## Change events
 
-| Trigger                                      | The block runs…                                     | Typical use                             |
-|----------------------------------------------|-----------------------------------------------------|-----------------------------------------|
-| `FOR ADD COLUMN schema.table.column`         | after the column is added (see decomposition below) | backfilling a new required column       |
-| `FOR ALTER COLUMN TYPE schema.table.column`  | before the column's type is changed                 | fixing values the new type can't hold   |
-| `FOR ADD CONSTRAINT schema.table.constraint` | before the constraint is added                      | de-duplicating rows before a unique key |
+| Event                                       | The script runs…                                    | Typical use                              |
+|---------------------------------------------|-----------------------------------------------------|------------------------------------------|
+| `ON ADD COLUMN schema.table.column`         | after the column is added (see decomposition below) | backfilling a new required column        |
+| `ON ALTER COLUMN TYPE schema.table.column`  | before the column's type is changed                 | fixing values the new type can't hold    |
+| `ON ADD CONSTRAINT schema.table.constraint` | before the constraint is added                      | de-duplicating rows before a unique key  |
 
-Triggers match changes to existing tables only. A brand-new table is empty, so a block targeting it has no data to move.
+Change events match changes to existing tables only. A brand-new table is empty, so a script targeting it has no data to move.
 
 ## NOT NULL adds are decomposed
 
-When adding a `NOT NULL` column with no default would fail against a populated table, with a matching`FOR ADD COLUMN` block, 
+When adding a `NOT NULL` column with no default would fail against a populated table, with a matching `ON ADD COLUMN` script,
 the planner decomposes the add into three steps:
 
 1. add the column _nullable_,
-2. run the block's SQL (the backfill),
+2. run the script's SQL (the backfill),
 3. `SET NOT NULL`.
 
-The plan preview shows all three statements. A nullable or defaulted column add isn't decomposed, the block's SQL
-simply runs after the add. (Declaring a `DEFAULT` is still often the whole fix, without any migration block; see
+The plan preview shows all three statements. A nullable or defaulted column add isn't decomposed, the script's SQL just 
+runs after the add. (Declaring a `DEFAULT` is still often a better option, without any migration script; see
 [Data hazards](/guides/data-hazards/).)
 
 :::note[SQLite]
@@ -54,30 +54,37 @@ procedure), so the decomposed form isn't available there.
 
 ## Hazard suppression
 
-A matching block also silences the corresponding [data-hazard](/guides/data-hazards/) diagnostic. The hazard warns
-that a change can fail on existing data, and the block is your declaration of how the data gets into shape.
+A matching script also silences the corresponding [data-hazard](/guides/data-hazards/) diagnostic. The hazard warns
+that a change can fail on existing data, and the script is your declaration of how the data gets into shape.
 
-## Lifecycle: blocks expire themselves
+## Lifecycle: change-event scripts expire themselves
 
-Because a block only fires when its change is in the plan, it naturally goes dead once the change has shipped
-everywhere. `plan` and `apply` report each unmatched block as an informational diagnostic:
+Because the script only fires when its change is in the plan, it naturally goes dead once the change has shipped
+everywhere. `plan` and `apply` report each unmatched script as an informational diagnostic:
 
 ```
 Migration 'backfill emails' (ADD COLUMN app.users.email) matches no change in this plan and will not run.
 If the change it supports has been applied everywhere, the block is safe to delete.
 ```
 
-Delete the block whenever every environment you deploy to has the change. This replaces the pre/post
-[deployment-script](/guides/deployment-scripts/) pattern for transition SQL: a deployment script runs on every apply and 
-must be written idempotently, while a migration block only runs alongside its change.
+Delete the script whenever every environment you deploy to has the change. This replaces the pre/post
+[deployment-script](/guides/deployment-scripts/) pattern for transition SQL: an always-run deployment script must be
+written idempotently, while a change-event script only runs alongside its change.
+
+### `RUN ONCE` on a change event
+
+The [`RUN ONCE`](/guides/deployment-scripts/#run-once-scripts-are-recorded) condition composes with change events too:
+`SCRIPT 'x' RUN ONCE ON ADD COLUMN …` runs at most once ever, even if the column is later dropped and re-added. It's
+rarely needed — change events already self-expire — but it is well-defined.
 
 ## Migrations in templates
 
-A [schema template](/guides/templates/) can declare migrations alongside the objects they support, so a change to a templated table 
-doesn't need the block repeated for every schema it's applied to. 
+A [schema template](/guides/templates/) can declare change-event scripts alongside the objects they support, so a change
+to a templated table doesn't need the script repeated for every schema it's applied to.
 
 Because we treat provider-native SQL as opaque, NSchema can't automatically attach unqualified names to the correct schema.
-Instead, the `{schema}` token stands in for the target schema:
+Instead, the `{schema}` token stands in for the target schema — in the name as well as the SQL, since instantiated
+script names must stay unique:
 
 ```sql
 TEMPLATE outbox
@@ -88,7 +95,7 @@ BEGIN
         CONSTRAINT pk_outbox_events PRIMARY KEY (id)
     );
 
-    MIGRATION 'backfill trace ids' FOR ADD COLUMN outbox_events.trace_id AS $$
+    SCRIPT 'backfill {schema} trace ids' RUN ON ADD COLUMN outbox_events.trace_id AS $$
         UPDATE {schema}.outbox_events SET trace_id = gen_random_uuid()::text WHERE trace_id IS NULL;
     $$;
 END;
@@ -96,23 +103,29 @@ END;
 APPLY TEMPLATE outbox IN SCHEMA sales, billing;
 ```
 
-Applying the template instantiates one block per schema, and each behaves exactly like a hand-written one.A schema that 
-already has the change reports its instance as inert while a lagging schema's still fires, and a schema newly added to the
-`APPLY` list creates its table fresh (empty), so the migration correctly doesn't run there. 
+Applying the template instantiates one script per schema. A schema that already has the change reports its instance as 
+inert while a lagging schema's still fires, and a schema newly added to the `APPLY` list creates its table fresh (empty),
+so the migration correctly doesn't run there.
 
-Delete the block from the template once every applied schema has the change.
+Delete the script from the template once every applied schema has the change.
 
-A migration in a template must target a table the template itself declares, and a template block colliding with a hand-written 
-one for the same change is rejected as a duplicate.
+A change-event script in a template must target a table the template itself declares, and a template script colliding
+with a hand-written one for the same change is rejected as a duplicate.
 
 ## Options
 
-`run_outside_transaction = true` works exactly as it does for deployment scripts, for statements the database forbids 
+`run_outside_transaction = true` works exactly as it does for deployment scripts, for statements the database forbids
 inside a transaction:
 
 ```sql
-MIGRATION FOR ADD CONSTRAINT app.users.users_email_uq (run_outside_transaction = true) AS $$
+SCRIPT 'dedupe emails' RUN ON ADD CONSTRAINT app.users.users_email_uq (run_outside_transaction = true) AS $$
     DELETE FROM app.users a USING app.users b
     WHERE a.id > b.id AND a.email = b.email;
 $$;
 ```
+
+## The legacy form
+
+Before NSchema 4.4, change-event scripts were declared as `MIGRATION ['name'] FOR <trigger> <path> AS $$…$$;` (with an
+optional name). The old form still parses, but plans surface a deprecation warning naming the `SCRIPT` replacement, and
+it will be removed in NSchema 5.0. Note the `SCRIPT` form requires a name.
