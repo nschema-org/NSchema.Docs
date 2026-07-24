@@ -16,7 +16,3 @@ one as run without running it.
 - **[`script hash`](/cli/commands/script-hash/)** — compute the body hash of the project's run-once declarations.
 - **[`script taint`](/cli/commands/script-taint/)** — remove a recorded execution, so the script runs again.
 - **[`script untaint`](/cli/commands/script-untaint/)** — record a script as executed without running it.
-
-:::note[Needs]
-A state store (a `BACKEND` block); the ledger lives in it. The live database is never contacted.
-:::

@@ -14,8 +14,8 @@ nschema doctor
 
 It checks:
 
-- **Database connectivity** — opens the `PROVIDER` connection and introspects the live schema.
-- **State store** — reads the `BACKEND` store and confirms the recorded snapshot still deserializes.
+- **Database connectivity** — opens the `DATABASE` connection and introspects the live schema.
+- **State store** — reads the `STATE` store and confirms the recorded snapshot still deserializes.
 - **State lock** — reads the lock, reporting whether it is free or who currently holds it.
 
 Sample output:
@@ -26,11 +26,6 @@ Running diagnostics...
 ✔ State lock: free.
 ✔ All checks passed.
 ```
-
-:::note[Needs]
-At least one of a live database (a `PROVIDER` block) or a state store (a `BACKEND file` / `BACKEND s3` block). A project
-that declares neither has nothing to check and is rejected.
-:::
 
 ## Exit code
 

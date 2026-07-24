@@ -5,18 +5,23 @@ sidebar:
   order: 25
 ---
 
-Declare a sqlserver provider using a `PROVIDER sqlserver` [config block](/cli/configuration/):
+Declare the plugin, then point a `DATABASE` [statement](/cli/configuration/) at it:
 
 ```sql
-PROVIDER sqlserver (
-  version = '4.0.0',
+PLUGIN sqlserver (
+  source  = 'NSchema.SqlServer',
+  version = '[5.0,6.0)'
+);
+
+DATABASE sqlserver (
   connection_string = '',
   command_timeout = 30
 );
 ```
 
-The `NSchema.SqlServer` plugin is restored automatically from the pinned `version` the first time you run a command — for
-CLI use you don't install it by hand. (To embed the engine as a library instead, see [Using the library](#using-the-library).)
+The label (`sqlserver` here) is yours to choose; the `DATABASE` statement selects the plugin by referencing it. The
+package is resolved and locked by [`init`](/cli/commands/init/) and restored on first use — for CLI use you don't install
+it by hand. (To embed the engine as a library instead, see [Using the library](#using-the-library).)
 
 ## Requirements
 
@@ -27,8 +32,6 @@ place with `CREATE OR ALTER`, which requires this baseline.
 
 | Attribute           | Type    | Description                                                                                          |
 |---------------------|---------|------------------------------------------------------------------------------------------------------|
-| `version`           | string  | **Required.** The version of the `NSchema.SqlServer` plugin package to restore.                      |
-| `source`            | string  | Optional. A NuGet package id to load the provider from instead of `NSchema.SqlServer`.               |
 | `connection_string` | string  | The connection string used to reach the database. Best supplied via the environment (see below).     |
 | `username`          | string  | The username, supplied separately from the connection string. Overrides any user embedded in it.     |
 | `password`          | string  | The password, supplied separately from the connection string. Overrides any password embedded in it. |
@@ -43,7 +46,7 @@ it, but I promise not to report you to the connection string police:
 export NSCHEMA_SQLSERVER_CONNECTION_STRING="Server=localhost;Database=app;User Id=sa;Password=hunter2;TrustServerCertificate=True"
 ```
 
-`NSCHEMA_SQLSERVER_CONNECTION_STRING` **takes precedence** over a `connection_string` set in the block.
+`NSCHEMA_SQLSERVER_CONNECTION_STRING` **takes precedence** over a `connection_string` set in the statement.
 
 ## Credentials supplied separately
 
@@ -56,13 +59,14 @@ export NSCHEMA_SQLSERVER_USERNAME="$DB_USER"
 export NSCHEMA_SQLSERVER_PASSWORD="$DB_PASSWORD"
 ```
 
-These (also settable as `username` / `password` in the block) override any user/password embedded in the connection
+These (also settable as `username` / `password` in the statement) override any user/password embedded in the connection
 string. The base connection string is applied first, then the discrete overrides are layered on top. See
 [Environment variables](/cli/environment-variables/#separate-credentials).
 
 ## Identifiers and dialect
 
-Identifiers are emitted bracket-quoted (`[schema].[name]`), so reserved words and unusual names are always safe.
+Identifiers are emitted bracket-quoted (`[schema].[name]`), so reserved words and unusual names are always safe. NSQL
+accepts brackets on input too, as an alternative spelling of a [quoted identifier](/nsql/grammar/#identifiers).
 
 ## What's supported
 
@@ -72,6 +76,9 @@ SQL Server is a full server database, so this provider covers most of NSchema's 
   foreign keys, unique constraints, check constraints, indexes (including `INCLUDE` columns and filtered indexes), views,
   sequences, scalar/table functions and stored procedures, table-level `GRANT`s, triggers, and documentation comments
   (stored as `MS_Description` extended properties).
+- **Not supported:** schema renames, materialized views, exclusion constraints, in-place identity/computed-column
+  changes, and `BEFORE` / row-level / `WHEN` / function-style triggers. Each is reported as an **error diagnostic on the
+  plan** — the plan still renders in full, so you can see everything else it would do.
 
 ## Using the library
 
@@ -83,15 +90,15 @@ dotnet add package NSchema.Core
 dotnet add package NSchema.SqlServer
 ```
 
-`UseSqlServerSchema` wires up both the current-schema provider and the SQL generator. The two connection-aware overloads
-also register the connection source the provider reads from and the data source the executor applies through:
+`UseSqlServer` wires up both the database introspector and the SQL dialect. The two connection-aware overloads also
+register the connection source the introspector reads from and the data source the executor applies through:
 
 ```csharp
 // 1. Connection string.
-builder.UseSqlServerSchema("Server=localhost;Database=app;User Id=sa;Password=…;TrustServerCertificate=True");
+builder.UseSqlServer("Server=localhost;Database=app;User Id=sa;Password=…;TrustServerCertificate=True");
 
 // 2. Configure the SqlConnectionStringBuilder directly.
-builder.UseSqlServerSchema(b =>
+builder.UseSqlServer(b =>
 {
     b.DataSource = "localhost";
     b.InitialCatalog = "app";
@@ -100,8 +107,8 @@ builder.UseSqlServerSchema(b =>
 });
 ```
 
-If you only need DDL generation and not introspection (for example, to render the migration SQL without connecting to a
-database), register just the generator with `UseSqlServerGenerator()`.
+If you only need SQL rendering and not introspection (for example, to render the migration SQL without connecting to a
+database), register just the dialect with `UseSqlServerDialect()`.
 
 ### SQL Server-specific types
 
@@ -113,5 +120,5 @@ database), register just the generator with `UseSqlServerGenerator()`.
 | `SqlType.Xml`        | `xml`           | XML documents and fragments.                           |
 | `SqlType.RowVersion` | `rowversion`    | Automatically maintained row-version stamp.            |
 
-In [DDL](/ddl/types/) you write these as ordinary type names (`money`, `xml`, `rowversion`); unrecognized names pass through as 
+In [NSQL](/nsql/types/) you write these as ordinary type names (`money`, `xml`, `rowversion`); unrecognized names pass through as 
 custom types.

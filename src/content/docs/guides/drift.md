@@ -11,7 +11,7 @@ command helps detect it.
 
 ## How it works
 
-`drift` compares the latest backend state snapshot against the **live database** and outputs the difference. The diff
+`drift` compares the recorded state snapshot against the **live database** and outputs the difference. The diff
 answers "what has been changed outside of NSchema?":
 
 - an out-of-band **addition** appears as an add;
@@ -20,10 +20,6 @@ answers "what has been changed outside of NSchema?":
 ```sh
 nschema drift
 ```
-
-:::note[Needs]
-A live database **and** a [state store](/guides/state/) to compare against. If you don't have one configured, see [Offline planning & state](/guides/state/).
-:::
 
 ## Gating a monitor on drift
 

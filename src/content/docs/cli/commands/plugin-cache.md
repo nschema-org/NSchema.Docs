@@ -6,7 +6,7 @@ sidebar:
 ---
 
 Group for managing the shared plugin cache at `~/.nschema/plugins`, where `nschema` stores the restored dependency
-closure of each provider/backend package, one folder per package version. The cache is shared by every project on the
+closure of each plugin package, one folder per package version. The cache is shared by every project on the
 machine, so it is managed here by package and version.
 
 `plugin cache` is a group. Run it with one of the subcommands below. On its own, `nschema plugin cache` just prints this

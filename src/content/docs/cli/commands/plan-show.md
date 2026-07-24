@@ -14,8 +14,4 @@ nschema plan --out tonight.nplan
 nschema plan show tonight.nplan
 ```
 
-:::note[Needs]
-Nothing — `plan show` reads the file directly and contacts neither the database nor the state store.
-:::
-
 See [The plan / apply workflow](/guides/workflow/) for the full plan-then-apply pattern.

@@ -187,7 +187,7 @@ in. It is generated, not hand-authored.
 
 :::tip
 This section describes the language shape. For the attributes each statement recognizes, see [Configuration](/cli/configuration/),
-[Providers](/providers/), and [Backends](/backends/).
+[Databases](/databases/), and [State](/state/).
 :::
 
 ## Directives
@@ -575,7 +575,7 @@ CREATE TRIGGER users_guard
 
 The body uses the same dollar-quoted, opaque-SQL device as a function or deployment-script: `$$ … $$`, passed verbatim 
 with the delimiters stripped, so it may contain its own `;` and is not dialect-translated. The two forms are mutually 
-exclusive, and which one a [provider](/providers/) accepts depends on the specific database. PostgreSQL uses 
+exclusive, and which one a [database](/databases/) accepts depends on the specific database. PostgreSQL uses 
 `EXECUTE FUNCTION`, SQL Server uses an inline body.
 
 A trigger is table-scoped but written as a standalone statement that names its table via `ON`, attached to that table 

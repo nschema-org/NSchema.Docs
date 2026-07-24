@@ -9,15 +9,11 @@ Print the schema recorded in the [state store](/guides/state/) as human-readable
 NSchema last recorded, useful for inspecting state or diffing it against [`import`](/cli/commands/import/) output.
 
 ```sh
-nschema state show               # read the configured BACKEND store
+nschema state show               # read the configured STATE store
 nschema state show ./state.json  # read a state file directly off disk
 ```
 
 Pass a path to read a state file straight from disk instead of the configured store.
-
-:::note[Needs]
-A state store (a `BACKEND` block) when no path is given. With a path, nothing — the file is read directly.
-:::
 
 ## Arguments
 
@@ -25,4 +21,4 @@ A state store (a `BACKEND` block) when no path is given. With a path, nothing �
 
 ## Options
 
-- **`-s`, `--scope <name>`** — limit the output to specific namespaces. May be repeated.
+- **`-s`, `--scope <address>`** — limit the output to a schema (`app`) or a single object (`app.orders`). May be repeated.

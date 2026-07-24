@@ -66,7 +66,7 @@
 /* Frosted, translucent top nav that lets the hero glow show through. */
 .header {
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--sl-color-hairline-shade);
+  /*border-bottom: 1px solid var(--sl-color-hairline-shade);*/
 }
 
 /* Site title: lift it onto the display font with a hint of the brand gradient. */

@@ -16,10 +16,6 @@ Use it when a run-once script needs to happen again: its effect was undone out-o
 want the new version to run. The next [`plan`](/cli/commands/plan/) will show the script as pending, and the next [`apply`](/cli/commands/apply/) 
 will execute and re-record it. The change runs under the [state lock](/cli/commands/lock/).
 
-:::note[Needs]
-A state store (a `BACKEND` block). The live database is never contacted.
-:::
-
 ## Arguments
 
 - **`name`** *(required)* — the script's declared name, as shown by [`script list`](/cli/commands/script-list/).

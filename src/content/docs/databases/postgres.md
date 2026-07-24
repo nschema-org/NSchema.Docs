@@ -5,25 +5,28 @@ sidebar:
   order: 20
 ---
 
-Declare a postgres provider using a `PROVIDER postgres` [config block](/cli/configuration/):
+Declare the plugin, then point a `DATABASE` [statement](/cli/configuration/) at it:
 
 ```sql
-PROVIDER postgres (
-  version = '4.0.0',
+PLUGIN postgres (
+  source  = 'NSchema.Postgres',
+  version = '[5.0,6.0)'
+);
+
+DATABASE postgres (
   connection_string = '',
   command_timeout = 30
 );
 ```
 
-The `NSchema.Postgres` plugin is restored automatically from the pinned `version` the first time you run a command — for
-CLI use you don't install it by hand. (To embed the engine as a library instead, see [Using the library](#using-the-library).)
+The label (`postgres` here) is yours to choose; the `DATABASE` statement selects the plugin by referencing it. The package
+is resolved and locked by [`init`](/cli/commands/init/) and restored on first use — for CLI use you don't install it by
+hand. (To embed the engine as a library instead, see [Using the library](#using-the-library).)
 
 ## Attributes
 
 | Attribute           | Type    | Description                                                                                          |
 |---------------------|---------|------------------------------------------------------------------------------------------------------|
-| `version`           | string  | **Required.** The version of the `NSchema.Postgres` plugin package to restore.                       |
-| `source`            | string  | Optional. A NuGet package id to load the provider from instead of the built-in `NSchema.Postgres`.   |
 | `connection_string` | string  | The connection string used to reach the database. Best supplied via the environment (see below).     |
 | `username`          | string  | The username, supplied separately from the connection string. Overrides any user embedded in it.     |
 | `password`          | string  | The password, supplied separately from the connection string. Overrides any password embedded in it. |
@@ -37,8 +40,8 @@ The connection string is a secret. Supply it through an environment variable rat
 export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
 ```
 
-`NSCHEMA_POSTGRES_CONNECTION_STRING` **takes precedence** over a `connection_string` set in the block. A `connection_string`
-in the block is fine for a local database, but keep real secrets in the environment.
+`NSCHEMA_POSTGRES_CONNECTION_STRING` **takes precedence** over a `connection_string` set in the statement. A
+`connection_string` in the statement is fine for a local database, but keep real secrets in the environment.
 
 ## Credentials supplied separately
 
@@ -54,10 +57,14 @@ export NSCHEMA_POSTGRES_PASSWORD="$DB_PASSWORD"
 These override any user/password embedded in the connection string. The base connection string is applied first, then the
 discrete overrides are layered on top. See [Environment variables](/cli/environment-variables/#separate-credentials).
 
-## Dialect
+## Dialect and equivalence
 
-The SQL dialect is determined by the provider, so there is nothing to configure. NSchema's canonical [DDL types](/ddl/types/) are
+The SQL dialect is determined by the provider, so there is nothing to configure. NSchema's canonical [types](/nsql/types/) are
 translated to PostgreSQL's spelling on output, and any opaque expressions in `DEFAULT` / `CHECK` / etc. are passed through verbatim.
+
+The provider also registers **equivalence rules** for comparison, so spellings the catalog and your project may
+legitimately disagree on (`bool` against `boolean`, a default the server has rewritten with a cast) compare equal in
+either direction and don't show up as drift.
 
 ## Using the library
 
@@ -68,24 +75,27 @@ dotnet add package NSchema.Core
 dotnet add package NSchema.Postgres
 ```
 
-`UseCurrentSchemaPostgres` has four overloads. The three connection-aware overloads register an `NpgsqlDataSource` for 
-you (via `AddNpgsqlDataSource`) and wire up both the current-schema provider and the SQL generator; the no-arg overload 
+`UsePostgres` has four overloads. The three connection-aware overloads register an `NpgsqlDataSource` for you (via
+`AddNpgsqlDataSource`) and wire up the introspector, the SQL dialect, and the equivalence rules; the no-arg overload
 assumes you've already registered an `NpgsqlDataSource`:
 
 ```csharp
 // 1. Connection string.
-builder.UseCurrentSchemaPostgres("Host=localhost;Database=app;Username=postgres;Password=postgres");
+builder.UsePostgres("Host=localhost;Database=app;Username=postgres;Password=postgres");
 
 // 2. Configure the NpgsqlDataSourceBuilder directly.
-builder.UseCurrentSchemaPostgres(b => b.EnableDynamicJson());
+builder.UsePostgres(b => b.EnableDynamicJson());
 
 // 3. As above, with access to the IServiceProvider.
-builder.UseCurrentSchemaPostgres((sp, b) => b.UseLoggerFactory(sp.GetRequiredService<ILoggerFactory>()));
+builder.UsePostgres((sp, b) => b.UseLoggerFactory(sp.GetRequiredService<ILoggerFactory>()));
 
 // 4. Bring your own data source (register it yourself first).
 builder.Services.AddNpgsqlDataSource(connectionString);
-builder.UseCurrentSchemaPostgres();
+builder.UsePostgres();
 ```
+
+To render SQL without ever connecting to a database, register just the dialect with `UsePostgresDialect()` (and, if you
+are comparing captured schemas, `UsePostgresEquivalence()`).
 
 ### Postgres-specific types
 
@@ -96,5 +106,5 @@ builder.UseCurrentSchemaPostgres();
 | `SqlType.Citext` | `citext`      | Case-insensitive text. Requires the `citext` extension. |
 | `SqlType.Jsonb`  | `jsonb`       | Binary JSON.                                            |
 
-In [DDL](/ddl/types/) you write these as ordinary type names (`citext`, `jsonb`); unrecognized names pass through as custom types. 
+In [NSQL](/nsql/types/) you write these as ordinary type names (`citext`, `jsonb`); unrecognized names pass through as custom types. 
 `citext` requires the extension to exist in the target database, NSchema does not create it for you.

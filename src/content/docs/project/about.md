@@ -5,11 +5,12 @@ sidebar:
   order: 1
 ---
 
-NSchema is a free, open-source project built and maintained by me, [Tom Wolfe](https://github.com/trwolfe13). I'm just another software engineer 
-who got nerd sniped trying to solve a problem one weekend and accidentally made a project out of it. While maintaining 
-this project isn't my job, I do use it both at work and in side projects, so I'm personally invested in its wellbeing.
+NSchema is a free, open-source project built and maintained by me, [Tom Wolfe](https://github.com/trwolfe13). I'm just 
+another software engineer who got nerd sniped trying to solve a problem one weekend and let it get way out of hand. 
+While maintaining this project isn't my full-time job, I do use it both at work and in side projects, so I'm personally 
+invested in its wellbeing.
 
-## _Why_ is NSchema?
+## Why?
 
 There are plenty of database migration tools and techniques out there already, but in my experience, they never just work.
 Whether it's proprietary tooling, opaque binaries, or hand-written migrations, there's always one headache or another that
@@ -26,8 +27,14 @@ and in side projects, so I have a personal commitment to it regardless, but I'm 
 It's been said before, but I have zero interest making money off this. Our industry runs on open source software, and I 
 just wanted to offer something cool that I built in the hope that it will help others as it's helped me. 
 
-See the [Roadmap](/project/roadmap/) for where things are headed and [Versioning & compatibility](/project/versioning/) for what the version numbers
-promise.
+See the [Roadmap](/project/roadmap/) for where things are headed and [Versioning & compatibility](/project/versioning/) 
+for how I approach things like breaking changes (spoiler alert: it's SemVer).
+
+## AI Disclosure
+ 
+This wasn't vibecoded, but I do use Claude (Opus, and more recently Fable), as both a pair programmer and workhorse. The 
+architecture and design calls here are all mine (for better or worse), and anything I didn't write personally, I've reviewed:
+AI tooling is never an excuse to disregard good engineering practice.
 
 ## License
 

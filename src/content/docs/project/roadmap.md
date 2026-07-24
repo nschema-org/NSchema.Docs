@@ -11,10 +11,10 @@ nothing here is a commitment to ship anything. If something here matters to you,
 
 ## Where things stand
 
-The core engine, the `nschema` CLI, and three database providers: PostgreSQL, SQL Server, and SQLite, are built, published,
-and usable today. The declarative workflow (`plan` / `apply` / `destroy`), saved plan files, drift detection, state 
-backends, and the embeddable `NSchema.Core` library are all in place, and there are no major functionality gaps when
-compared with analogous tools like Terraform.
+The NSchema CLI, NSchema.Core (the engine) and its plugins are all published, and usable today. The declarative workflow 
+commands (`plan` / `apply` / `destroy`), saved plan files, drift detection, state backends, and the embeddable 
+`NSchema.Core` library are all in place, and there are no major functionality gaps when compared with analogous tools 
+like Terraform.
 
 ## Active
 
@@ -22,7 +22,7 @@ In the meantime, though, NSchema is very fresh, and would benefit from some soli
 that it runs in real environments as well as it does across hundreds of integration tests. To that end, I'm currently 
 focusing on fixes and improvements, until I'm sure I've found all the sharp edges, and tightened any loose bolts.
 
-## Planned
+## Planned + V5
 
 As I see it, the biggest gap is in backend and provider support, and that's where the next feature push should be:
 

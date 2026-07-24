@@ -27,7 +27,7 @@ The name (a single-quoted string) appears in the plan output and must be unique 
 SQL that gets passed to the target database verbatim. NSchema can't validate its syntax, so be careful here.
 
 The `run_outside_transaction = true` option is for statements the database forbids inside a transaction
-(e.g. `CREATE INDEX CONCURRENTLY`). See the [grammar reference](/ddl/grammar/#scripts) for the full syntax.
+(e.g. `CREATE INDEX CONCURRENTLY`). See the [grammar reference](/nsql/grammar/#scripts) for the full syntax.
 
 ## Run conditions
 
@@ -59,23 +59,22 @@ $$;
 ```
 
 After an apply, NSchema records the script's execution (its name, and a hash of its body) in the
-[state backend](/guides/state/), so later plans can skip it:
+[state store](/guides/state/), so later plans can skip it:
 
 ```
 Run-once script 'seed currencies' has already run and is skipped.
 ```
 
 Because the record lives in state, this works offline, and a plan against recorded state knows what has run without
-touching the database. A few consequences to be aware of:
+touching the database. Some consequences to be aware of:
 
 - **Editing an executed script doesn't re-run it.** The plan warns that the body has changed, but still skips it. To run
   the new body once, [`script taint`](/cli/commands/script-taint/) it, or rename it (a new name is a new identity).
-- **Recording requires a state backend.** With no backend configured there is nowhere to remember executions, and the
-  plan warns that run-once scripts will run on every apply.
 - **A failed apply records nothing.** Whether the script ran before the failure is unknowable, so the next apply
   includes it again.
 
-Plan output marks run-once scripts in the pre/post-deployment sections (`(run once)`; `runCondition` in `--json`).
+Scripts appear in the plan where they run: a deployment script bookends the plan tree, and a change-event script
+sits on the change it attaches to. Run-once scripts are marked `(run once)` (`runCondition` in `--json`).
 
 The scripts are managed with the [`script` command group](/cli/commands/script/):
 [`script list`](/cli/commands/script-list/) shows what has run, [`script taint`](/cli/commands/script-taint/) forgets
@@ -111,9 +110,3 @@ If there's something you need a deployment script for, consider logging a featur
 For transition SQL (backfills, and data fixes tied to a schema change) prefer a
 [change-event script](/guides/data-migrations/) (`SCRIPT … RUN ON ADD COLUMN …`): it runs only when its matching
 change is in the plan, then reports itself as safe to delete.
-
-## The legacy form
-
-Before NSchema 4.4, deployment scripts were declared as `PRE DEPLOYMENT 'name' AS $$…$$;` /
-`POST DEPLOYMENT 'name' AS $$…$$;`. The old form still parses, but plans surface a deprecation warning naming the
-`SCRIPT` replacement, and it will be removed in NSchema 5.0.

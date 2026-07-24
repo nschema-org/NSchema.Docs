@@ -25,7 +25,3 @@ With `--json` the ledger is emitted as a single array, so a script can consume i
 ```sh
 nschema script list --json | jq '.[].name'
 ```
-
-:::note[Needs]
-A state store (a `BACKEND` block). The live database is never contacted.
-:::

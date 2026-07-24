@@ -12,10 +12,6 @@ holds it, the operation, when it was taken, and the id you need to release it.
 nschema lock status
 ```
 
-:::note[Needs]
-A state store (a `BACKEND` block); the lock lives with it.
-:::
-
 When locked, it prints the lock's details and the exact command to release it:
 
 ```text
