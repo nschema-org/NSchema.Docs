@@ -1,9 +1,9 @@
 ---
 title: Type reference
-description: The canonical, dialect-agnostic column types the NSchema DDL accepts.
+description: The canonical, dialect-agnostic column types NSQL accepts.
 ---
 
-Column types in NSchema DDL are dialect-agnostic. You write the canonical type; the provider maps it to the target 
+Column types in NSQL are dialect-agnostic. You write the canonical type; the provider maps it to the target 
 database's spelling on output. Anything NSchema doesn't recognize is passed through verbatim as a custom type, so 
 database-specific types still work.
 
@@ -59,4 +59,4 @@ CREATE TABLE app.orders (
 );
 ```
 
-See the [grammar reference](/ddl/grammar/#enums) for declaring these types.
+See the [grammar reference](/nsql/grammar/#enums) for declaring these types.

@@ -1,11 +1,11 @@
 ---
-title: NSchema DDL grammar
-description: The complete reference for the NSchema DDL.
+title: NSQL grammar
+description: The complete reference for NSQL, the NSchema project language.
 ---
 
-NSchema DDL stays as true to standard SQL as possible, for maximum familiarity and compatibility. It should read instantly
+NSQL stays as true to standard SQL as possible, for maximum familiarity and compatibility. It should read instantly
 to anyone who works with databases, but it is its own bounded language, **not** a SQL dialect. It describes *desired state*: 
-you write the final shape of the schema, never migration steps. Every construct maps 1:1 onto the `DatabaseSchema` domain
+you write the final shape of the schema, never migration steps. Every declaration maps 1:1 onto the `Database` domain
 model, so the parser is a thin front-end over that model. This means that unsupported models won't parse, so you'll never
 accidentally script an object that isn't covered.
 
@@ -28,6 +28,11 @@ These were settled deliberately; the rationale matters for anyone extending the 
 4. **Constraint names are always required.** Every constraint is written `CONSTRAINT <name>…`. The name is the comparer's 
    match key (its diff identity); anonymous constraints can't diff stably, so they are not allowed.
 5. **Grants are statements**, not table-body items. They're cross-cutting (one role across many objects), which matches `GRANT` in real SQL.
+6. **Declarations and directives are separate.** A *declaration* says what the schema is; a *directive* says how to get
+   there (a rename, a script). A `RENAMED FROM` clause hanging off a `CREATE` made the declaration about history rather
+   than about the desired shape. See [Directives](#directives).
+7. **Parsing is lossless.** The syntax tree keeps every character of the source, including comments and layout, which is
+   what lets [`fmt`](/cli/commands/fmt/) reformat a file without ever rewriting what it means.
 
 ## Lexical
 
@@ -40,11 +45,34 @@ block-comment  = "/*" , { any-char } , "*/" ;
 doc-line       = "---" , { any-char - newline } ;
 doc-block      = "/**" , { any-char } , "*/" ;
 
-ident          = ( letter | "_" ) , { letter | digit | "_" } ;
+bare-ident     = ( letter | "_" ) , { letter | digit | "_" } ;
+quoted-ident   = dquote , { any-char - dquote | dquote dquote } , dquote   (* "" escapes a double quote *)
+               | "[" , { any-char - "]" | "]]" } , "]" ;                   (* ]] escapes a bracket *)
+ident          = bare-ident | quoted-ident ;
 qualified-name = ident , "." , ident ;            (* schema.table, or schema.table for FK references *)
 string         = "'" , { any-char - "'" | "''" } , "'" ;   (* '' escapes a single quote *)
 integer        = digit , { digit } ;
 ```
+
+### Identifiers
+
+An identifier's identity is **its exact written text**, compared case-sensitively: `users` and `Users` are two different
+tables. Keywords stay case-insensitive — `create table` and `CREATE TABLE` are the same statement.
+
+Quoting lets a name carry characters a bare identifier can't, or collide with a keyword. Double quotes and square
+brackets are two spellings of the same thing, each doubling its own closing delimiter to escape it:
+
+```sql
+CREATE TABLE app."Order Details" ("weird ""col""" int);
+CREATE TABLE app.[Order Details] ([weird ]]col]]] int);   -- the same two names
+```
+
+**Quotes are syntax, not identity.** Casing is significant with or without them, and either spelling names the same
+object, so `"users"` and `users` are the same table while `"Users"` is not. Double quotes are the canonical form: the
+writer (and [`import`](/cli/commands/import/)) quotes only the names that need it, always with double quotes.
+
+The same rules apply wherever an identifier is read, including a [`--scope`](/cli/commands/plan/#scoping-to-an-object)
+address on the command line.
 
 ### Expressions
 
@@ -52,7 +80,7 @@ integer        = digit , { digit } ;
 
 ```ebnf
 paren-expr     = "(" , balanced-tokens , ")" ;     (* CHECK (…), WHERE (…): capture balanced parens *)
-default-expr   = token-run-until( top-level "," | top-level ")" | "COMMENT" | "RENAMED" ) ;
+default-expr   = token-run-until( top-level "," | top-level ")" | "GENERATED" ) ;
 ```
 
 An unparenthesized `DEFAULT` expression runs until a `,` or `)` at the enclosing list's paren depth, or a reserved 
@@ -85,60 +113,121 @@ CREATE TABLE app.users
 ## Document and statements
 
 ```ebnf
-document   = { [ doc-comment ] , ( statement | config-block | script ) } ;
-statement  = ( create-schema | create-table | create-view | create-enum | create-domain | create-sequence
-             | create-function | create-procedure | create-extension | create-trigger | create-index
-             | drop-schema | drop-table | drop-view | drop-enum | drop-domain | drop-sequence
-             | drop-function | drop-extension | grant ) , ";" ;
+document      = { [ doc-comment ] , ( declaration | directive | configuration ) } ;
+declaration   = ( create-schema | create-table | create-view | create-enum | create-domain | create-sequence
+                | create-function | create-procedure | create-extension | create-trigger | create-index
+                | grant | template | apply-template ) , ";" ;
+directive     = ( rename | script ) , ";" ;
+configuration = ( engine | plugin | database | state ) , ";" ;
 ```
 
-A flat statement list; schema membership is by qualified name, like normal SQL. A document may also contain top-level 
-[configuration blocks](#configuration-blocks) and [scripts](#scripts).
+A flat statement list; schema membership is by qualified name, like normal SQL.
 
-## Configuration blocks
+Three kinds of statement share the one grammar:
 
-Orchestration configuration (the state backend, the live-database provider, project settings) live in the DDL alongside 
-the schema. The blocks are SQL-statement shaped, keeping one consistent grammar in the file:
+- **Declarations** say what the schema *is*. Deleting a declaration is how you drop the object — there is no `DROP`
+  statement, because a declarative document describes the destination, not the journey.
+- **[Directives](#directives)** say how the difference is managed: a [rename](#renames) or a [script](#scripts).
+- **[Configuration](#configuration-statements)** says what the project runs against.
+
+Which kinds a given file may hold is a rule of the *file*, not of the grammar: configuration is read from your
+[configuration files](/cli/configuration/#where-configuration-files-live), and schema declarations from every file that
+isn't an environment overlay.
+
+## Configuration statements
+
+Orchestration configuration (the engine version, the plugins, the database, the state store) is written in the same
+statement-shaped grammar as everything else:
 
 ```ebnf
-config-block   = ident , [ ident ] , "(" , [ config-attr , { "," , config-attr } ] , ")" , ";" ;
-config-attr    = config-key , "=" , config-value ;
-config-key     = ident , { "." , ident } ;
-config-value   = string | [ "-" ] , integer | "true" | "false" | ident ;
+engine    = "ENGINE" , attribute-list ;
+plugin    = "PLUGIN" , ident , attribute-list ;
+database  = "DATABASE" , ident , attribute-list ;
+state     = "STATE" , ident , attribute-list ;
+
+attribute-list = "(" , [ attribute , { "," , attribute } ] , ")" ;
+attribute      = attr-key , "=" , attr-value ;
+attr-key       = ident , { "." , ident } ;
+attr-value     = string | [ "-" ] , integer | "true" | "false" | ident ;
 ```
 
 ```sql
-BACKEND file (
-  path = 'state/app.nsstate'
+ENGINE (
+  version = '[5.0,6.0)'
 );
 
-PROVIDER postgres (
-  version = '4.0.0',
+PLUGIN postgres (
+  source  = 'NSchema.Postgres',
+  version = '[5.0,6.0)'
+);
+
+DATABASE postgres (
   connection_string = '',
   command_timeout = 1000
+);
+
+STATE file (
+  path = 'state/app.nsstate'
 );
 ```
 
 Notes on the shape:
 
-- The block keyword (`BACKEND` / `PROVIDER`) and its label (`file`, `postgres`) are bare identifiers consistent with bare 
-  identifiers everywhere else in the DDL; double quotes are still unused.
+- **`PLUGIN` requires a label** — your local name for the plugin. `DATABASE` and `STATE` take one too, referencing a
+  declared `PLUGIN` (or the built-in `file` store). `ENGINE` takes none: there is only one engine.
+- Each of `ENGINE`, `DATABASE`, and `STATE` may appear **at most once** across the configuration; a second one is a
+  duplicate-statement error. `PLUGIN` may appear as often as the project has plugins.
 - String **values** are single-quoted (`'postgres'`), SQL-style. Values may also be integers (optionally negative), 
   `true`/`false`, or a bare identifier.
-- Attributes are a flat comma-separated list. Group related settings with a dotted key (`pool.max = 10`), which is captured verbatim as a single key.
+- Attributes are a flat comma-separated list. Group related settings with a dotted key (`pool.max = 10`), which binds to
+  a nested option on the plugin's settings.
 
-The matching forward-compatibility rule for the parser: an unrecognized top-level block keyword is captured, not an error,
-so a config type a front-end adds later (e.g. `WORKSPACE`) parses correctly.
+A fifth block keyword, `LOCK`, shares the shape and is what [`nschema.lock`](/cli/configuration/#the-lockfile) is written
+in. It is generated, not hand-authored.
 
 :::tip
-This section describes the language shape of config blocks. For the attributes the CLI recognizes, see [Configuration blocks](/cli/configuration/),
+This section describes the language shape. For the attributes each statement recognizes, see [Configuration](/cli/configuration/),
 [Providers](/providers/), and [Backends](/backends/).
 :::
 
-## Scripts
+## Directives
+
+A directive doesn't describe the schema; it describes how the difference to it is managed. There are two: renames, and
+[scripts](#scripts).
+
+### Renames
+
+Deleting one declaration and adding another reads as a drop and a create — which loses the data. A `RENAME` directive
+says it is the same object under a new name, so the existing object is carried across instead:
+
+```ebnf
+rename        = "RENAME" , rename-kind , rename-source , "TO" , ident ;
+rename-kind   = "SCHEMA" | "TABLE" | "COLUMN" | [ "MATERIALIZED" ] , "VIEW" | "ENUM" | "DOMAIN"
+              | "TYPE" | "SEQUENCE" | "FUNCTION" | "PROCEDURE" | "ROUTINE" ;
+rename-source = ident                               (* SCHEMA: a bare schema name *)
+              | qualified-name                      (* an object: schema.name *)
+              | ident , "." , ident , "." , ident   (* COLUMN: schema.table.column *) ;
+```
+
+```sql
+RENAME SCHEMA billing TO invoicing;
+RENAME TABLE app.users TO accounts;
+RENAME COLUMN app.accounts.email TO email_address;
+```
+
+The **source is fully qualified and the target is always a bare name**: a rename never moves an object between
+containers. `FUNCTION`, `PROCEDURE`, and `ROUTINE` all name a routine (they share one name space) and `VIEW` covers a
+materialized view; the concrete kind is resolved from the current state when the directive is planned.
+
+Write the directive alongside the *new* declaration, and delete it once the rename has been applied everywhere.
+
+A [template](#templates) body may carry object-level renames (everything except `RENAME SCHEMA`), so one edit renames the
+object in every schema the template is applied to.
+
+### Scripts
 
 Some migration steps are imperative and can't be expressed declaratively. Backfills, data fixes, extensions, seeds.
-These are declared inline with the `SCRIPT` statement, which names *when* the script runs (its event) and *how often*
+These are declared inline with the `SCRIPT` directive, which names *when* the script runs (its event) and *how often*
 (its run condition):
 
 ```ebnf
@@ -184,6 +273,8 @@ Notes on the shape:
   [guide](/guides/data-migrations/#migrations-in-templates)).
 - Change-event matching is structural (the event plus the path), never positional, and the script can live in any
   `.sql` file. Declaring two scripts for the same event and path is an error.
+- A matched script is carried **on the diff**, at the change it supports, and runs there — a deployment script bookends
+  the migration, a change-event script splices in at its change.
 - An optional `( … )` clause carries script options. The only option today is `run_outside_transaction = true`, for
   statements the database forbids inside a transaction (e.g. `CREATE INDEX CONCURRENTLY`).
 - `AS` introduces the body, exactly as for a view (`CREATE VIEW … AS …`).
@@ -191,36 +282,32 @@ Notes on the shape:
   Dollar-quoting lets the body contain its own `;` and single quotes without escaping; the inner content is taken
   verbatim (delimiters stripped, surrounding whitespace trimmed) and is not dialect-translated.
 
-### Legacy script forms
+### Removed script forms
 
-Before NSchema 4.4, bookend scripts and data migrations had their own statements. Both forms still parse into the same
-model, surface a deprecation warning naming the `SCRIPT` replacement, and will be removed in NSchema 5.0:
+Before NSchema 4.4, bookend scripts and data migrations had their own statements (`PRE|POST DEPLOYMENT 'name' AS …` and
+`MIGRATION ['name'] FOR <event> <path> AS …`). They were deprecated in 4.4 and **no longer parse in 5.0**; rewrite them
+as `SCRIPT`. Unlike the old `MIGRATION` form, `SCRIPT` requires a name. See the [upgrade guide](/upgrade/v5/#scripts).
 
-```ebnf
-deployment-script = ( "PRE" | "POST" ) , "DEPLOYMENT" , string , [ "(" , … , ")" ] , "AS" , dollar-body , ";" ;
-data-migration    = "MIGRATION" , [ string ] , "FOR" , script-event , member-path ,
-                    [ "(" , … , ")" ] , "AS" , dollar-body , ";" ;
-```
-
-The legacy `MIGRATION` name is optional (messages fall back to the event and path); the `SCRIPT` form requires one.
+## Declarations
 
 ### Schemas
 
 ```ebnf
-create-schema = "CREATE" , [ "PARTIAL" ] , "SCHEMA" , ident , [ "RENAMED" , "FROM" , ident ] ;
-drop-schema   = "DROP" , "SCHEMA" , ident ;                (* -> DroppedSchemas *)
+create-schema = "CREATE" , "SCHEMA" , ident ;
 ```
 
-`PARTIAL` means tables not listed are left alone rather than dropped. `RENAMED FROM` sets `OldName`.
+There is no `DROP SCHEMA` and no `PARTIAL SCHEMA`: an object is dropped by deleting its declaration, and an object
+NSchema does not [manage](/guides/state/#the-managed-set) is never dropped in the first place, which is what `PARTIAL`
+was reaching for.
 
 ### Tables
 
 ```ebnf
-create-table = "CREATE" , "TABLE" , qualified-name , [ "RENAMED" , "FROM" , ident ] ,
+create-table = "CREATE" , "TABLE" , qualified-name ,
                "(" , table-item , { "," , table-item } , ")" ;
-drop-table   = "DROP" , "TABLE" , qualified-name ;         (* -> DroppedTables (explicit drop, partial schema) *)
 
-table-item   = [ doc-comment ] , ( column-def | pk-def | fk-def | unique-def | check-def | exclude-def | index-def ) ;
+table-item   = [ doc-comment ] , ( column-def | pk-def | fk-def | unique-def | check-def | exclude-def
+                                 | index-def | include-member ) ;
 ```
 
 ### Columns
@@ -230,16 +317,16 @@ column-def   = ident , type ,
                [ "NOT" , "NULL" | "NULL" ] ,
                [ "IDENTITY" , [ "(" , identity-opt , { "," , identity-opt } , ")" ] ] ,
                [ "DEFAULT" , ( paren-expr | default-expr ) ] ,
-               [ "GENERATED" , "ALWAYS" , "AS" , paren-expr , "STORED" ] ,
-               [ "RENAMED" , "FROM" , ident ] ;
+               [ "GENERATED" , "ALWAYS" , "AS" , paren-expr , "STORED" ] ;
 
 identity-opt = ( "START" | "INCREMENT" | "MINVALUE" ) , integer ;
 type         = ident , [ "(" , integer , [ "," , integer ] , ")" ] ;
 ```
 
 Absence of `NOT NULL` means nullable (SQL default). `type` maps to `SqlType`: known names (`int`, `bigint`, `text`, `boolean`, …),
-parametrised `varchar(n)` / `char(n)` / `decimal(p,s)`, and any unknown name → `SqlType.Custom(raw)`. Common SQL spelling aliases
-normalize to the canonical name (see [type reference](/ddl/types/)). The modifier order above is fixed.
+parametrised `varchar(n)` / `char(n)` / `decimal(p,s)`, and any unknown name → a custom type. A custom type may be
+schema-qualified (`app.order_status`), and the schema is carried structurally rather than folded into the name. Common SQL
+spelling aliases normalize to the canonical name (see [type reference](/nsql/types/)). The modifier order above is fixed.
 
 A **`GENERATED ALWAYS AS (expr) STORED`** column is computed from other columns and stored; its expression is opaque 
 (read like a `CHECK`), and `STORED` is required (the only generation kind supported). It is mutually exclusive with `DEFAULT`.
@@ -298,9 +385,8 @@ table-priv = "SELECT" | "INSERT" | "UPDATE" | "DELETE" ;
 ### Views
 
 ```ebnf
-create-view = "CREATE" , [ "MATERIALIZED" ] , "VIEW" , qualified-name , [ "RENAMED" , "FROM" , ident ] ,
+create-view = "CREATE" , [ "MATERIALIZED" ] , "VIEW" , qualified-name ,
               "AS" , view-body ;                            (* view-body: opaque text up to the top-level ';' *)
-drop-view   = "DROP" , [ "MATERIALIZED" ] , "VIEW" , qualified-name ; (* -> DroppedViews (explicit drop, partial schema) *)
 create-index = "CREATE" , [ "UNIQUE" ] , "INDEX" , ident , "ON" , qualified-name , [ "USING" , ident ] ,
                "(" , index-key , { "," , index-key } , ")" ,
                [ "INCLUDE" , "(" , col-list , ")" ] , [ "WHERE" , paren-expr ] ;
@@ -334,9 +420,8 @@ CREATE UNIQUE INDEX daily_totals_date_ix ON app.daily_totals (date);
 ### Enums
 
 ```ebnf
-create-enum = "CREATE" , "ENUM" , qualified-name , [ "RENAMED" , "FROM" , ident ] ,
+create-enum = "CREATE" , "ENUM" , qualified-name ,
               "(" , [ string , { "," , string } ] , ")" ;
-drop-enum   = "DROP" , "ENUM" , qualified-name ;            (* -> DroppedEnums (explicit drop, partial schema) *)
 ```
 
 ```sql
@@ -351,10 +436,9 @@ recreating the type.
 ### Domains
 
 ```ebnf
-create-domain = "CREATE" , "DOMAIN" , qualified-name , [ "RENAMED" , "FROM" , ident ] , "AS" , type ,
+create-domain = "CREATE" , "DOMAIN" , qualified-name , "AS" , type ,
                 { "NOT" , "NULL" | "NULL" | "CONSTRAINT" , ident , "CHECK" , "(" , expr , ")" } ,
                 [ "DEFAULT" , expr ] ;
-drop-domain   = "DROP" , "DOMAIN" , qualified-name ;          (* -> DroppedDomains (explicit drop, partial schema) *)
 ```
 
 ```sql
@@ -371,10 +455,9 @@ default, not-null, or check change never drops the domain. Only a base-type chan
 ### Composite types
 
 ```ebnf
-create-type = "CREATE" , "TYPE" , qualified-name , [ "RENAMED" , "FROM" , ident ] ,
+create-type = "CREATE" , "TYPE" , qualified-name ,
               "AS" , "(" , [ field , { "," , field } ] , ")" ;
 field       = ident , type ;
-drop-type   = "DROP" , "TYPE" , qualified-name ;             (* -> DroppedCompositeTypes (explicit drop, partial schema) *)
 ```
 
 ```sql
@@ -388,12 +471,11 @@ place with `ALTER TYPE`. Fields are matched by name.
 ### Sequences
 
 ```ebnf
-create-sequence = "CREATE" , "SEQUENCE" , qualified-name , [ "RENAMED" , "FROM" , ident ] ,
+create-sequence = "CREATE" , "SEQUENCE" , qualified-name ,
                   [ "(" , seq-option , { "," , seq-option } , ")" ] ;
 seq-option      = "AS" , ident
                 | ( "START" | "INCREMENT" | "MINVALUE" | "MAXVALUE" | "CACHE" ) , [ "-" ] , integer
                 | "CYCLE" ;
-drop-sequence   = "DROP" , "SEQUENCE" , qualified-name ;    (* -> DroppedSequences (explicit drop, partial schema) *)
 ```
 
 ```sql
@@ -407,31 +489,30 @@ Each option may appear at most once.
 
 ```ebnf
 create-extension = "CREATE" , "EXTENSION" , ext-name , [ "VERSION" , string ] ;
-drop-extension   = "DROP" , "EXTENSION" , ext-name ;       (* -> DroppedExtensions (explicit drop only) *)
-ext-name         = ident | string ;
+ext-name         = ident ;                                  (* quoted when it is not a bare identifier *)
 ```
 
 ```sql
 CREATE EXTENSION citext;
 CREATE EXTENSION postgis VERSION '3.4';
-CREATE EXTENSION 'uuid-ossp';
+CREATE EXTENSION "uuid-ossp";
 ```
 
 Extensions are **database-global**, not schema-scoped: declared at the top level (not inside a `CREATE SCHEMA`) and never 
-qualified by a schema. The name may be a quoted string when it is not a bare identifier. `VERSION` is optional; a version 
-change plans an update in place.
+qualified by a schema. A name that isn't a bare identifier is written as a [quoted identifier](#identifiers) (`"uuid-ossp"`),
+not as a string. `VERSION` is optional; a version change plans an update in place.
 
-Unlike every other object, an extension that exists in the database but is absent from the desired schema is left alone:
-it is removed only by an explicit `DROP EXTENSION`. Extensions are shared infrastructure, so absence must never imply a drop.
+An extension you declare becomes [managed](/guides/state/#the-managed-set) when it is applied, and is dropped when you
+delete the declaration, like any other object. An extension NSchema never created is never dropped — extensions are
+shared infrastructure, so one that was already there stays there.
 
 ### Functions and procedures
 
 ```ebnf
-create-function  = "CREATE" , "FUNCTION" , qualified-name , [ "RENAMED" , "FROM" , ident ] ,
+create-function  = "CREATE" , "FUNCTION" , qualified-name ,
                    "(" , [ arg-text ] , ")" , definition-text ;
-create-procedure = "CREATE" , "PROCEDURE" , qualified-name , [ "RENAMED" , "FROM" , ident ] ,
+create-procedure = "CREATE" , "PROCEDURE" , qualified-name ,
                    "(" , [ arg-text ] , ")" , definition-text ;
-drop-function    = "DROP" , ( "FUNCTION" | "PROCEDURE" | "ROUTINE" ) , qualified-name ; (* -> DroppedRoutines *)
 ```
 
 ```sql
@@ -553,12 +634,13 @@ Notes on the shape:
 - Inside a body, **an unqualified name binds to the target schema; a qualified name escapes** to the schema it
   names. Objects must be declared unqualified (each application creates its own copy); references may be either.
   A column type or trigger function the template itself declares is qualified per instance at expansion.
-- A schema template body accepts `CREATE` object statements, table `GRANT`s, and [`SCRIPT` statements](/guides/data-migrations/#migrations-in-templates)
-  (with an unqualified `table.member` path, instantiated per applied schema) — no schemas, extensions, views,
-  drops, deployment scripts, config blocks, or nested templates, and no `GRANT USAGE ON SCHEMA`.
+- A schema template body accepts `CREATE` object statements, table `GRANT`s, [`SCRIPT` directives](/guides/data-migrations/#migrations-in-templates)
+  (with an unqualified `table.member` path, instantiated per applied schema), and object-level
+  [`RENAME` directives](#renames) — no schemas, extensions, views, `RENAME SCHEMA`, configuration statements, or nested
+  templates, and no `GRANT USAGE ON SCHEMA`.
 - An `INCLUDE` member's columns land at the position the include is written; its other members attach alongside the
   table's own. A table template cannot include another template.
-- Definitions, applications, and includes are location- and order-independent across all DDL files; template names
+- Definitions, applications, and includes are location- and order-independent across all project files; template names
   are unique across the project, and instances are strictly identical.
 
 :::note
@@ -568,39 +650,35 @@ objects. See [Templates](/guides/templates/) for the practical guide.
 
 ## Construct → model mapping
 
-| DDL construct                                                 | Model target                                                                         |
+| NSQL construct                                                | Model target                                                                         |
 |---------------------------------------------------------------|--------------------------------------------------------------------------------------|
-| `CREATE [PARTIAL] SCHEMA s`                                   | `SchemaDefinition` (`IsPartial`)                                                     |
-| `CREATE TABLE s.t (…)`                                        | `SchemaDefinition` + `Table`                                                         |
-| `CREATE VIEW s.v AS …`                                        | `SchemaDefinition` + `View` (`Body` opaque, `DependsOn` derived)                     |
-| `RENAMED FROM x` (schema/table/column)                        | `OldName`                                                                            |
-| `name type [NOT NULL] [DEFAULT e]`                            | `Column` (`Type`→`SqlType`, `IsNullable`, `DefaultExpression`)                       |
+| `CREATE SCHEMA s`                                             | `Schema` on the `Database`                                                           |
+| `CREATE TABLE s.t (…)`                                        | `Schema` + `Table`                                                                   |
+| `CREATE VIEW s.v AS …`                                        | `Schema` + `View` (`Body` opaque `SqlText`, `DependsOn` derived)                     |
+| `name type [NOT NULL] [DEFAULT e]`                            | `Column` (`Type`→`SqlType`, `IsNullable`, `DefaultExpression`→`SqlDefaultExpression`) |
 | `IDENTITY (…)`                                                | `Column.IsIdentity` + `IdentityOptions`                                              |
 | `GENERATED ALWAYS AS (e) STORED`                              | `Column.GeneratedExpression` (opaque; excludes `DEFAULT`)                            |
 | `CONSTRAINT n PRIMARY KEY (…)`                                | `Table.PrimaryKey` (`PrimaryKey`)                                                    |
 | `CONSTRAINT n FOREIGN KEY … REFERENCES …`                     | `ForeignKey` (`OnDelete`/`OnUpdate`→`ReferentialAction`)                             |
 | `CONSTRAINT n UNIQUE (…)`                                     | `UniqueConstraint`                                                                   |
 | `CONSTRAINT n CHECK (e)`                                      | `CheckConstraint` (`Expression` = `e`, opaque)                                       |
-| `CONSTRAINT n EXCLUDE [USING m] (c WITH op, …)`               | `ExclusionConstraint` (`Method`, `Elements`, `Predicate`)                            |
+| `CONSTRAINT n EXCLUDE [USING m] (c WITH op, …)`               | `ExclusionConstraint` (`Method`, `Elements`→`ExclusionElement`, `Predicate`)         |
 | `[UNIQUE] INDEX n [USING m] (key, …) [INCLUDE (…)] [WHERE e]` | `TableIndex` (`IsUnique`, `Method`, `Columns`→`IndexColumn`, `Include`, `Predicate`) |
 | `GRANT … ON s.t TO r`                                         | `TableGrant`                                                                         |
 | `GRANT USAGE ON SCHEMA s TO r`                                | `SchemaGrant`                                                                        |
-| `DROP TABLE s.t` / `DROP SCHEMA s`                            | `DroppedTables` / `DroppedSchemas`                                                   |
-| `DROP VIEW s.v`                                               | `DroppedViews`                                                                       |
 | `CREATE MATERIALIZED VIEW s.v AS …`                           | `View` with `IsMaterialized = true`                                                  |
 | `CREATE [UNIQUE] INDEX n ON s.rel (…)`                        | `TableIndex` on the table (`Table.Indexes`) or materialized view (`View.Indexes`)    |
-| `CREATE ENUM s.e ('a', 'b')`                                  | `SchemaDefinition` + `EnumType` (ordered `Values`)                                   |
-| `CREATE DOMAIN s.d AS t [NOT NULL] [CHECK] [DEFAULT]`         | `Domain` (`DataType`, `NotNull`, `Checks`, `Default`)                                |
-| `DROP DOMAIN s.d`                                             | `DroppedDomains`                                                                     |
-| `CREATE TYPE s.t AS (f1 t1, f2 t2)`                           | `CompositeType` (ordered `Fields`)                                                   |
-| `DROP TYPE s.t`                                               | `DroppedCompositeTypes`                                                              |
-| `CREATE SEQUENCE s.q (…)`                                     | `SchemaDefinition` + `Sequence` (`SequenceOptions`)                                  |
-| `DROP ENUM s.e` / `DROP SEQUENCE s.q`                         | `DroppedEnums` / `DroppedSequences`                                                  |
+| `CREATE ENUM s.e ('a', 'b')`                                  | `Schema` + `EnumType` (ordered `EnumLabel` values)                                   |
+| `CREATE DOMAIN s.d AS t [NOT NULL] [CHECK] [DEFAULT]`         | `DomainType` (`DataType`, `NotNull`, `Checks`, `Default`)                            |
+| `CREATE TYPE s.t AS (f1 t1, f2 t2)`                           | `CompositeType` (ordered `CompositeField`s)                                          |
+| `CREATE SEQUENCE s.q (…)`                                     | `Schema` + `Sequence` (`SequenceOptions`)                                            |
 | `CREATE FUNCTION s.f(…) …`                                    | `Routine` (`Kind` = `Function`; opaque)                                              |
 | `CREATE PROCEDURE s.p(…) …`                                   | `Routine` (`Kind` = `Procedure`; opaque)                                             |
-| `DROP {FUNCTION\|PROCEDURE\|ROUTINE} s.r`                     | `DroppedRoutines`                                                                    |
-| `CREATE EXTENSION e [VERSION 'v']`                            | `DatabaseSchema` + `Extension` (root-level)                                          |
-| `DROP EXTENSION e`                                            | `DroppedExtensions` (root-level; explicit drop only)                                 |
+| `CREATE EXTENSION e [VERSION 'v']`                            | `Extension` on the `Database` (root-level)                                           |
 | `CREATE TRIGGER t … ON s.tbl …`                               | `Trigger` on the named table (`Table.Triggers`)                                      |
+| `RENAME <kind> <source> TO n`                                 | a rename directive on the project (never part of the schema model)                   |
+| `SCRIPT … ON PRE\|POST DEPLOYMENT`                            | `DeploymentScript` (`DeploymentPhase`, `RunCondition`)                               |
+| `SCRIPT … ON <change> <path>`                                 | `ChangeScript` (`ChangeTarget`, `RunCondition`)                                      |
 | `TEMPLATE n [FOR …] BEGIN … END` / `APPLY TEMPLATE` / `INCLUDE n` | expanded at load into concrete objects per target — no model construct survives  |
+| `ENGINE` / `PLUGIN` / `DATABASE` / `STATE`                    | the project's configuration, not its schema                                          |
 | `---` / `/** */` before a declaration                         | that object's `Comment`                                                              |
