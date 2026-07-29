@@ -36,8 +36,7 @@ generates an `ALTER TABLE` statement to append it.
 This is the same model tools like Terraform use for infrastructure: describe the goal, let the tool find the path. 
 One key difference though, is that databases are inherently _stateful_. Most accidentally destroyed infrastructure 
 can be recreated, but data lost through a dropped table can only be recovered from backups. (When did you last test those
-again?) NSchema has guardrails and escape hatches for protecting against data loss, but you still need to take care when 
-making destructive changes.
+again?) NSchema has guardrails for protecting against data loss, but you still need to take care when making destructive changes.
 
 ## How it works
 
@@ -70,15 +69,11 @@ It's important to note that while your NSchema files might _look_ like SQL, the 
 DSL meant to feel familiar to SQL authors. That's how it supports features like deployment scripts and configuration. 
 See [Defining schemas](/nsql/defining-schemas/).
 
-## CLI or library
+## Getting Started
 
-There are two ways to use NSchema. The first, and most strongly recommended, is via the CLI. NSchema is a .NET tool that
-works very similar to Terraform: dump a bunch of SQL files with `CREATE` DDL in a folder and run `nschema apply`. This 
-is what most people want, and what the bulk of these docs cover. Start with [Installation](/start/installation/) and the
-[Quickstart Guide](/start/quickstart/).
+NSchema is a .NET tool that works very similar to Terraform: dump a bunch of SQL files with `CREATE` DDL in a folder and 
+run `nschema apply`.Start with [Installation](/start/installation/) and the [Quickstart Guide](/start/quickstart/).
 
-The second way is to consume the `NSchema.Core` library directly, allowing you to build your own harness for managing migrations.
+It is technically possible to consume the `NSchema.Core` library directly, allowing you to build your own harness for managing migrations.
 As much as possible, the CLI is kept as a thin wrapper around the Core, so embedding is kept simple and the behavior remains consistent. 
 This Core package also exposes extension points for features like custom validation policies.
-
-See [Embedding the engine](/library/embedding/).

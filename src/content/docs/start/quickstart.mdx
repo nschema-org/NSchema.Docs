@@ -25,15 +25,15 @@ It assumes you [meet the pre-requisites](/start/installation/) and have a connec
    nschema new
    ```
 
-   The scaffold command just spits out the boilerplate for a fresh project:
+   The [`new`](/cli/commands/new/) command sets up the boilerplate for a fresh project:
 
-   - `config.sql`. The project's [configuration](/cli/configuration/): the engine version it needs, the plugins it depends on, which database to connect to, and where state lives.
-   - `config.env.prod.sql`. The configuration to layer on top when running with `--environment prod`.
-   - `schemas/example.sql` — a sample schema file.
+   - `config.sql` — holds [configuration](/cli/configuration/) for stuff like database providers, or state backends.
+   - `config.env.prod.sql` — the configuration to layer on top when running with `--environment prod`.
+   - `schemas/example.sql` — your hello world sample schema.
 
-   It then runs [`init`](/cli/commands/init/), resolving the plugins it declared and pinning them in the `nschema.lock` lockfile.
+   It then runs [`init`](/cli/commands/init/), to install the required plugins and pin them in the `nschema.lock` lockfile.
 
-   Edit the sample to describe the schema you want, using [NSQL](/nsql/defining-schemas/):
+   Create or edit the SQL files to describe the schema you want, using [NSQL](/nsql/defining-schemas/):
 
    ```sql
    -- schemas/example.sql
@@ -46,10 +46,10 @@ It assumes you [meet the pre-requisites](/start/installation/) and have a connec
    );
    ```
 
-2. **Point at your database.**
+2. **Set up the database connection.**
 
    ```sql
-   -- config.env.sql
+   -- config.sql
    ENGINE (
      version = '[5.0,6.0)'
    );
