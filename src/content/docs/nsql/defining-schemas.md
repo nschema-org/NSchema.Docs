@@ -1,17 +1,17 @@
 ---
 title: Defining schemas
-description: A practical introduction to declaring schemas in NSchema DDL.
+description: A practical introduction to declaring schemas in NSQL.
 ---
 
-The desired schema is declared using a dialect-neutral flavor of SQL with some extensions to support concepts like 
-config, deployment scripts, renames, etc. This page is intended as a practical introduction. The [grammar reference](/ddl/grammar/) 
-is the complete specification, and the [type reference](/ddl/types/) lists supported column types.
+The desired schema is declared in **NSQL**, a dialect-neutral flavor of SQL with some extensions to support concepts like
+configuration, scripts, and renames. This page is intended as a practical introduction. The complete specification can be 
+found over at the  [grammar reference](/nsql/grammar/). Type support is described on the [type reference](/nsql/types/) page.
 
-## A schema in DDL
+## A schema in NSQL
 
 ```sql
 --- The application schema.
-CREATE PARTIAL SCHEMA app;
+CREATE SCHEMA app;
 
 --- All registered users.
 CREATE TABLE app.users
@@ -20,7 +20,7 @@ CREATE TABLE app.users
     --- Primary contact; verified at signup.
     email varchar(255) NOT NULL,
     name text NOT NULL,
-    role_id bigint NOT NULL RENAMED FROM roleid,
+    role_id bigint NOT NULL,
     balance decimal(18, 2) DEFAULT (0),
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT fk_users_role_id FOREIGN KEY (role_id) REFERENCES app.roles (id) ON DELETE CASCADE,
@@ -30,27 +30,30 @@ CREATE TABLE app.users
 GRANT SELECT, INSERT ON app.users TO app_rw;
 ```
 
-A few things to note, each covered in full by the [grammar reference](/ddl/grammar/):
+A few things to note, each covered in full by the [grammar reference](/nsql/grammar/):
 
 - **Objects are always named.** Object names are how the comparer produces a stable diff, so names are required for
   constraints, indexes and keys.
+- **Names are case-sensitive**, and may be [quoted](/nsql/grammar/#identifiers) when they need to carry spaces, dots, or
+  a word the grammar reserves: `CREATE TABLE app."Order Details" (…)`.
 - **Catalog comments are supported.** A `---` line (or `/** … */` block) immediately before a declaration becomes that 
-  object's catalog comment (`COMMENT ON …`). See [Comments](/ddl/grammar/#comments).
-- **Renames** use `RENAMED FROM <old_name>` on a schema, table, or column, so the comparer matches the existing object 
-  instead of dropping and recreating it.
-  **Partial schemas** (`CREATE PARTIAL SCHEMA …`) leave undeclared tables alone rather than dropping them. This is useful 
-  for shared schemas or while migrating to NSchema. A `DROP TABLE app.x;` statement still records an explicit drop.
+  object's catalog comment (`COMMENT ON …`). See [Comments](/nsql/grammar/#comments).
+- **You never write a drop.** Deleting a declaration is what drops the object. There is no `DROP` statement, and NSchema
+  only ever drops something it [manages](/guides/state/#the-managed-set).
+- **Renames are directives.** A `RENAME TABLE app.users TO accounts;` statement tells the comparer the object is the same
+  one under a new name, instead of a drop and a create. See [Directives](/nsql/grammar/#directives) for more.
 - **Other objects.** Other types like views (`CREATE VIEW`), enums (`CREATE ENUM`), domains, composite types, sequences, 
-  functions/procedures, triggers, and extensions each have their own statements. See the [grammar reference](/ddl/grammar/).
+  functions/procedures, triggers, and extensions each have their own statements. See the [grammar reference](/nsql/grammar/).
 - **Repeated structures.** The same table in several schemas, or the same columns on many tables, can be declared once
   as a [template](/guides/templates/) (`TEMPLATE … BEGIN … END`) and instantiated with `APPLY TEMPLATE` or an `INCLUDE` table member.
 
 ## Where the files live
 
-The desired schema is made up of every `*.sql` file found recursively under the project directory. Split your 
-schema across as many files as you like (one per schema, one per table, whatever suits). [Deployment scripts](/guides/deployment-scripts/) live 
-inline in those same files as `PRE`/`POST DEPLOYMENT` blocks, and `*.env.<name>.sql` files can be used for environment-
-specific objects and config. See [environments](/cli/configuration/#environments).
+The schema is every `*.sql` file found recursively under the project directory, except the
+[environment overlays](/cli/configuration/#environments) (`*.env.<name>.sql`). Split your schema across as many files as
+you like (one per schema, one per table, whatever suits) — statements find each other regardless of which file they are
+in. [Scripts](/guides/deployment-scripts/) live inline in those same files as `SCRIPT` statements, and
+[configuration](/cli/configuration/) conventionally lives in `config.sql`.
 
 ## Doc-comments become catalog comments
 
@@ -67,12 +70,16 @@ CREATE TABLE app.users
 );
 ```
 
+Both kinds survive a [`format`](/cli/commands/format/): parsing is lossless, so the formatter rewrites layout without ever
+losing a comment or changing what a statement means.
+
 ## Bootstrapping from an existing database
 
-To adopt an existing database rather than write the DDL by hand, use [`nschema import`](/cli/commands/import/), which writes the live 
-schema out as DDL source files ready to check in. See [Adopting an existing database](/guides/adopting-a-database/).
+To adopt an existing database rather than write the schema by hand, use [`nschema import`](/cli/commands/import/), which
+writes the live schema out as NSQL source files ready to check in. See
+[Adopting an existing database](/guides/adopting-a-database/).
 
 ## More reading
 
-- [Grammar reference](/ddl/grammar/). The complete specification of every statement.
-- [Type reference](/ddl/types/). Every column type and its canonical spelling.
+- [Grammar reference](/nsql/grammar/). The complete specification of every statement.
+- [Type reference](/nsql/types/). Every column type and its canonical spelling.
