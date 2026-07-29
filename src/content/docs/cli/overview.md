@@ -11,17 +11,17 @@ every command in detail; the pages below cover the cross-cutting pieces they all
 
 | Command                                   | What it does                                                           |
 |-------------------------------------------|------------------------------------------------------------------------|
-| [`scaffold`](/cli/commands/scaffold/)     | Scaffold a new project in the current directory.                       |
+| [`new`](/cli/commands/new/)               | Scaffold a new project in the current directory.                       |
 | [`init`](/cli/commands/init/)             | Resolve and lock the declared plugins, and restore them.               |
 | [`validate`](/cli/commands/validate/)     | Check that the desired-schema files are well-formed.                   |
-| [`fmt`](/cli/commands/fmt/)               | Reformat `.sql` files to a canonical layout.                           |
+| [`format`](/cli/commands/format/)         | Reformat `.sql` files to a canonical layout.                           |
 | [`plan`](/cli/commands/plan/)             | Compute and show the migration plan, changing nothing.                 |
 | [`apply`](/cli/commands/apply/)           | Compute the plan and apply it to the database.                         |
 | [`refresh`](/cli/commands/refresh/)       | Read the live schema and write it to the state store.                  |
 | [`import`](/cli/commands/import/)         | Write the live schema out as desired-schema files.                     |
 | [`destroy`](/cli/commands/destroy/)       | Drop all managed schema objects from the database.                     |
 | [`state`](/cli/commands/state/)           | Inspect the schema recorded in the state store.                        |
-| [`db`](/cli/commands/db/)                 | Inspect the live database schema directly.                             |
+| [`database`](/cli/commands/database/)     | Inspect the live database schema directly.                             |
 | [`drift`](/cli/commands/drift/)           | Report how the live database differs from recorded state.              |
 | [`doctor`](/cli/commands/doctor/)         | Check the database and state store are reachable.                      |
 | [`lock`](/cli/commands/lock/)             | Inspect, hold, or release the state-store lock.                        |
