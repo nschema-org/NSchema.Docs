@@ -10,14 +10,14 @@ version numbers mean and how the pieces fit together.
 
 ## The packages
 
-| Package             | Role                                             |
-|---------------------|--------------------------------------------------|
-| `NSchema`           | The `nschema` CLI / .NET global tool.            |
-| `NSchema.Core`      | The provider-agnostic engine (also the library). |
-| `NSchema.Postgres`  | PostgreSQL provider.                             |
-| `NSchema.SqlServer` | SQL Server provider.                             |
-| `NSchema.Sqlite`    | SQLite provider.                                 |
-| `NSchema.Aws`       | S3-backed state store.                           |
+| Package             | Role                                  |
+|---------------------|---------------------------------------|
+| `NSchema`           | The `nschema` CLI / .NET global tool. |
+| `NSchema.Core`      | The provider-agnostic engine.         |
+| `NSchema.Postgres`  | PostgreSQL provider.                  |
+| `NSchema.SqlServer` | SQL Server provider.                  |
+| `NSchema.Sqlite`    | SQLite provider.                      |
+| `NSchema.Aws`       | S3-backed state store.                |
 
 Everything depends on `NSchema.Core`; the providers and state stores plug into it, and the CLI loads the ones your
 project declares.
@@ -35,9 +35,7 @@ NSchema follows [Semantic Versioning](https://semver.org/): given `MAJOR.MINOR.P
 Any packages with the same `MAJOR` version number should be compatible. `NSchema.Core` follows strict semantic versioning,
 while all the other packages keep their major version in sync, so a `5.x` CLI runs `5.x` plugins.
 
-If you're using the CLI, pinning is handled by your `PLUGIN` declarations and
-[`nschema.lock`](/cli/configuration/#the-lockfile). See [Installation](/start/installation/). If you're embedding the
-engine directly, see [embedding](/library/embedding/).
+Pinning is handled by your `PLUGIN` declarations and [`nschema.lock`](/cli/configuration/#the-lockfile). See [Installation](/start/installation/).
 
 ## The state format
 

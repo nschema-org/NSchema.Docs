@@ -13,16 +13,16 @@ hear about it.
 NSchema is split across several repositories under the [`nschema-org`](https://github.com/nschema-org) organisation. 
 Knowing which repo owns what saves everyone time when filing issues or opening pull requests:
 
-| Repository                                                              | Role                                                                                       |
-|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| [`NSchema`](https://github.com/nschema-org/NSchema)                     | The `nschema` CLI / .NET global tool; a thin front-end over the core.                      |
-| [`NSchema.Core`](https://github.com/nschema-org/NSchema.Core)           | The engine and library: schema model, DDL parser, diff, planner, state. Provider-agnostic. |
-| [`NSchema.Postgres`](https://github.com/nschema-org/NSchema.Postgres)   | PostgreSQL provider.                                                                       |
-| [`NSchema.SqlServer`](https://github.com/nschema-org/NSchema.SqlServer) | SQL Server provider.                                                                       |
-| [`NSchema.Sqlite`](https://github.com/nschema-org/NSchema.Sqlite)       | SQLite provider.                                                                           |
-| [`NSchema.Aws`](https://github.com/nschema-org/NSchema.Aws)             | S3-backed state backend.                                                                   |
-| [`NSchema.Build`](https://github.com/nschema-org/NSchema.Build)         | The build/release pipeline that versions and publishes the packages.                       |
-| [`NSchema.Docs`](https://github.com/nschema-org/NSchema.Docs)           | This documentation site.                                                                   |
+| Repository                                                              | Role                                                                           |
+|-------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| [`NSchema`](https://github.com/nschema-org/NSchema)                     | The `nschema` CLI / .NET global tool; a thin front-end over the core.          |
+| [`NSchema.Core`](https://github.com/nschema-org/NSchema.Core)           | The engine: schema model, DDL parser, diff, planner, state. Provider-agnostic. |
+| [`NSchema.Postgres`](https://github.com/nschema-org/NSchema.Postgres)   | PostgreSQL provider.                                                           |
+| [`NSchema.SqlServer`](https://github.com/nschema-org/NSchema.SqlServer) | SQL Server provider.                                                           |
+| [`NSchema.Sqlite`](https://github.com/nschema-org/NSchema.Sqlite)       | SQLite provider.                                                               |
+| [`NSchema.Aws`](https://github.com/nschema-org/NSchema.Aws)             | S3-backed state backend.                                                       |
+| [`NSchema.Build`](https://github.com/nschema-org/NSchema.Build)         | The build/release pipeline that versions and publishes the packages.           |
+| [`NSchema.Docs`](https://github.com/nschema-org/NSchema.Docs)           | This documentation site.                                                       |
 
 The dependency direction is one-way: providers, backends, and the CLI depend on `NSchema.Core`; Core depends on none of 
 them. A change to engine behavior usually means a change in `NSchema.Core` first.
