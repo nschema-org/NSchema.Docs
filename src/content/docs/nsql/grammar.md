@@ -32,7 +32,7 @@ These were settled deliberately; the rationale matters for anyone extending the 
    there (a rename, a script). A `RENAMED FROM` clause hanging off a `CREATE` made the declaration about history rather
    than about the desired shape. See [Directives](#directives).
 7. **Parsing is lossless.** The syntax tree keeps every character of the source, including comments and layout, which is
-   what lets [`fmt`](/cli/commands/fmt/) reformat a file without ever rewriting what it means.
+   what lets [`format`](/cli/commands/format/) reformat a file without ever rewriting what it means.
 
 ## Lexical
 
@@ -629,7 +629,7 @@ CREATE TABLE app.widgets (
 Notes on the shape:
 
 - The body is delimited by `BEGIN … END` — parsed like PostgreSQL's `BEGIN ATOMIC` function bodies, not an opaque
-  block — so errors surface at the definition, and `fmt` formats the contents.
+  block — so errors surface at the definition, and `format` formats the contents.
 - `FOR SCHEMA` is the default and may be omitted.
 - Inside a body, **an unqualified name binds to the target schema; a qualified name escapes** to the schema it
   names. Objects must be declared unqualified (each application creates its own copy); references may be either.
