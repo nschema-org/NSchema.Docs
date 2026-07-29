@@ -43,10 +43,10 @@ The connection string is a secret, so you should probably supply it through an e
 it, but I promise not to report you to the connection string police:
 
 ```sh
-export NSCHEMA_SQLSERVER_CONNECTION_STRING="Server=localhost;Database=app;User Id=sa;Password=hunter2;TrustServerCertificate=True"
+export NSCHEMA_DATABASE_CONNECTION_STRING="Server=localhost;Database=app;User Id=sa;Password=hunter2;TrustServerCertificate=True"
 ```
 
-`NSCHEMA_SQLSERVER_CONNECTION_STRING` **takes precedence** over a `connection_string` set in the statement.
+`NSCHEMA_DATABASE_CONNECTION_STRING` **takes precedence** over a `connection_string` set in the statement.
 
 ## Credentials supplied separately
 
@@ -54,9 +54,9 @@ When a secret store (e.g. AWS Secrets Manager) injects the database username and
 non-secret host/database in the connection string and supply the credentials on their own:
 
 ```sh
-export NSCHEMA_SQLSERVER_CONNECTION_STRING="Server=db.internal;Database=app;TrustServerCertificate=True"
-export NSCHEMA_SQLSERVER_USERNAME="$DB_USER"
-export NSCHEMA_SQLSERVER_PASSWORD="$DB_PASSWORD"
+export NSCHEMA_DATABASE_CONNECTION_STRING="Server=db.internal;Database=app;TrustServerCertificate=True"
+export NSCHEMA_DATABASE_USERNAME="$DB_USER"
+export NSCHEMA_DATABASE_PASSWORD="$DB_PASSWORD"
 ```
 
 These (also settable as `username` / `password` in the statement) override any user/password embedded in the connection

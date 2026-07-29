@@ -37,10 +37,10 @@ not a secret, so keeping it in the `DATABASE sqlite` statement is fine. You can 
 in CI) or to point at a different database file per [environment](/cli/configuration/#environments) without editing the checked-in `.sql`:
 
 ```sh
-export NSCHEMA_SQLITE_CONNECTION_STRING="Data Source=/var/data/app.db"
+export NSCHEMA_DATABASE_CONNECTION_STRING="Data Source=/var/data/app.db"
 ```
 
-`NSCHEMA_SQLITE_CONNECTION_STRING` takes precedence over a `connection_string` set in the statement.
+`NSCHEMA_DATABASE_CONNECTION_STRING` takes precedence over a `connection_string` set in the statement.
 
 ## The `main` schema
 

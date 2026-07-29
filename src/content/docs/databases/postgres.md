@@ -37,10 +37,10 @@ hand. (To embed the engine as a library instead, see [Using the library](#using-
 The connection string is a secret. Supply it through an environment variable rather than committing it:
 
 ```sh
-export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
+export NSCHEMA_DATABASE_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
 ```
 
-`NSCHEMA_POSTGRES_CONNECTION_STRING` **takes precedence** over a `connection_string` set in the statement. A
+`NSCHEMA_DATABASE_CONNECTION_STRING` **takes precedence** over a `connection_string` set in the statement. A
 `connection_string` in the statement is fine for a local database, but keep real secrets in the environment.
 
 ## Credentials supplied separately
@@ -49,9 +49,9 @@ When a secret store (e.g. AWS Secrets Manager) injects the database username and
 non-secret host/port/database in the connection string and supply the credentials on their own:
 
 ```sh
-export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=db.internal;Port=5432;Database=app"
-export NSCHEMA_POSTGRES_USERNAME="$DB_USER"
-export NSCHEMA_POSTGRES_PASSWORD="$DB_PASSWORD"
+export NSCHEMA_DATABASE_CONNECTION_STRING="Host=db.internal;Port=5432;Database=app"
+export NSCHEMA_DATABASE_USERNAME="$DB_USER"
+export NSCHEMA_DATABASE_PASSWORD="$DB_PASSWORD"
 ```
 
 These override any user/password embedded in the connection string. The base connection string is applied first, then the
