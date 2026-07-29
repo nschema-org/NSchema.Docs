@@ -20,8 +20,7 @@ DATABASE sqlserver (
 ```
 
 The label (`sqlserver` here) is yours to choose; the `DATABASE` statement selects the plugin by referencing it. The
-package is resolved and locked by [`init`](/cli/commands/init/) and restored on first use — for CLI use you don't install
-it by hand. (To embed the engine as a library instead, see [Using the library](#using-the-library).)
+package is resolved and locked by [`init`](/cli/commands/init/) and restored on first use — for CLI use you don't install it by hand.
 
 ## Requirements
 
@@ -79,46 +78,3 @@ SQL Server is a full server database, so this provider covers most of NSchema's 
 - **Not supported:** schema renames, materialized views, exclusion constraints, in-place identity/computed-column
   changes, and `BEFORE` / row-level / `WHEN` / function-style triggers. Each is reported as an **error diagnostic on the
   plan** — the plan still renders in full, so you can see everything else it would do.
-
-## Using the library
-
-When [embedding the engine](/library/embedding/) instead of the CLI, register SQL Server with the `NSchema.SqlServer`
-package:
-
-```sh
-dotnet add package NSchema.Core
-dotnet add package NSchema.SqlServer
-```
-
-`UseSqlServer` wires up both the database introspector and the SQL dialect. The two connection-aware overloads also
-register the connection source the introspector reads from and the data source the executor applies through:
-
-```csharp
-// 1. Connection string.
-builder.UseSqlServer("Server=localhost;Database=app;User Id=sa;Password=…;TrustServerCertificate=True");
-
-// 2. Configure the SqlConnectionStringBuilder directly.
-builder.UseSqlServer(b =>
-{
-    b.DataSource = "localhost";
-    b.InitialCatalog = "app";
-    b.IntegratedSecurity = true;
-    b.TrustServerCertificate = true;
-});
-```
-
-If you only need SQL rendering and not introspection (for example, to render the migration SQL without connecting to a
-database), register just the dialect with `UseSqlServerDialect()`.
-
-### SQL Server-specific types
-
-`SqlTypeSqlServerExtensions` adds SQL Server-only members to `SqlType` for code-built schemas:
-
-| Member               | SQL Server type | Notes                                                  |
-|----------------------|-----------------|--------------------------------------------------------|
-| `SqlType.Money`      | `money`         | Fixed-point currency value.                            |
-| `SqlType.Xml`        | `xml`           | XML documents and fragments.                           |
-| `SqlType.RowVersion` | `rowversion`    | Automatically maintained row-version stamp.            |
-
-In [NSQL](/nsql/types/) you write these as ordinary type names (`money`, `xml`, `rowversion`); unrecognized names pass through as 
-custom types.

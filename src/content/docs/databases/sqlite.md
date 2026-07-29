@@ -19,8 +19,7 @@ DATABASE sqlite (
 ```
 
 The label (`sqlite` here) is yours to choose; the `DATABASE` statement selects the plugin by referencing it. The package
-is resolved and locked by [`init`](/cli/commands/init/) and restored on first use — for CLI use you don't install it by
-hand. (To embed the engine as a library instead, see [Using the library](#using-the-library).)
+is resolved and locked by [`init`](/cli/commands/init/) and restored on first use — for CLI use you don't install it by hand.
 
 ## Attributes
 
@@ -77,26 +76,3 @@ SQLite has a deliberately small surface, so this provider only allows what SQLit
 
 Nothing here throws: an unsupported action is an error diagnostic on the plan, so you always get the complete plan and
 can see every step it would have taken.
-
-## Using the library
-
-When [embedding the engine](/library/embedding/) instead of the CLI, register SQLite with the `NSchema.Sqlite` package:
-
-```sh
-dotnet add package NSchema.Core
-dotnet add package NSchema.Sqlite
-```
-
-`UseSqlite` wires up both the database introspector and the SQL dialect. The two connection-aware overloads also
-register the connection source the introspector reads from and the data source the executor applies through:
-
-```csharp
-// 1. Connection string.
-builder.UseSqlite("Data Source=app.db");
-
-// 2. Configure the SqliteConnectionStringBuilder directly.
-builder.UseSqlite(b => b.DataSource = "app.db");
-```
-
-If you only need SQL rendering and not introspection (for example, to render the migration SQL without connecting to a
-database), register just the dialect with `UseSqliteDialect()`.

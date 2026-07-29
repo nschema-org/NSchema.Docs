@@ -20,8 +20,7 @@ DATABASE postgres (
 ```
 
 The label (`postgres` here) is yours to choose; the `DATABASE` statement selects the plugin by referencing it. The package
-is resolved and locked by [`init`](/cli/commands/init/) and restored on first use — for CLI use you don't install it by
-hand. (To embed the engine as a library instead, see [Using the library](#using-the-library).)
+is resolved and locked by [`init`](/cli/commands/init/) and restored on first use — for CLI use you don't install it by hand.
 
 ## Attributes
 
@@ -65,46 +64,3 @@ translated to PostgreSQL's spelling on output, and any opaque expressions in `DE
 The provider also registers **equivalence rules** for comparison, so spellings the catalog and your project may
 legitimately disagree on (`bool` against `boolean`, a default the server has rewritten with a cast) compare equal in
 either direction and don't show up as drift.
-
-## Using the library
-
-When [embedding the engine](/library/embedding/) instead of the CLI, register Postgres with the `NSchema.Postgres` package:
-
-```sh
-dotnet add package NSchema.Core
-dotnet add package NSchema.Postgres
-```
-
-`UsePostgres` has four overloads. The three connection-aware overloads register an `NpgsqlDataSource` for you (via
-`AddNpgsqlDataSource`) and wire up the introspector, the SQL dialect, and the equivalence rules; the no-arg overload
-assumes you've already registered an `NpgsqlDataSource`:
-
-```csharp
-// 1. Connection string.
-builder.UsePostgres("Host=localhost;Database=app;Username=postgres;Password=postgres");
-
-// 2. Configure the NpgsqlDataSourceBuilder directly.
-builder.UsePostgres(b => b.EnableDynamicJson());
-
-// 3. As above, with access to the IServiceProvider.
-builder.UsePostgres((sp, b) => b.UseLoggerFactory(sp.GetRequiredService<ILoggerFactory>()));
-
-// 4. Bring your own data source (register it yourself first).
-builder.Services.AddNpgsqlDataSource(connectionString);
-builder.UsePostgres();
-```
-
-To render SQL without ever connecting to a database, register just the dialect with `UsePostgresDialect()` (and, if you
-are comparing captured schemas, `UsePostgresEquivalence()`).
-
-### Postgres-specific types
-
-`SqlTypePostgresExtensions` adds Postgres-only members to `SqlType` for code-built schemas:
-
-| Member           | Postgres type | Notes                                                   |
-|------------------|---------------|---------------------------------------------------------|
-| `SqlType.Citext` | `citext`      | Case-insensitive text. Requires the `citext` extension. |
-| `SqlType.Jsonb`  | `jsonb`       | Binary JSON.                                            |
-
-In [NSQL](/nsql/types/) you write these as ordinary type names (`citext`, `jsonb`); unrecognized names pass through as custom types. 
-`citext` requires the extension to exist in the target database, NSchema does not create it for you.
