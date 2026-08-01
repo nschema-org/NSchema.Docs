@@ -27,8 +27,8 @@ and in side projects, so I have a personal commitment to it regardless, but I'm 
 It's been said before, but I have zero interest making money off this. Our industry runs on open source software, and I 
 just wanted to offer something cool that I built in the hope that it will help others as it's helped me. 
 
-See the [Roadmap](/project/roadmap/) for where things are headed and [Versioning & compatibility](/project/versioning/) 
-for how I approach things like breaking changes (spoiler alert: it's SemVer).
+Check [GitHub](https://github.com/nschema-org/NSchema.Core/issues) for what I'm currently working on, and [Versioning & compatibility](/project/versioning/) for how I approach things 
+like breaking changes (spoiler alert: it's SemVer).
 
 ## AI Disclosure
  
