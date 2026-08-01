@@ -17,8 +17,8 @@ nschema plan
 nschema apply
 ```
 
-**Note:** You will still see the plan if you just run `apply`, but `plan` can run offline by planning against a snapshot
-of your database instead of the live schema.
+**Note:** You will still see the plan if you just run `apply`. A plan is always computed against the recorded
+[state](/guides/state/), so it never depends on reading the live database first.
 
 ## Scoping a run
 

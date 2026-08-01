@@ -32,9 +32,9 @@ for how I approach things like breaking changes (spoiler alert: it's SemVer).
 
 ## AI Disclosure
  
-This wasn't vibecoded, but I do use Claude (Opus, and more recently Fable), as both a pair programmer and workhorse. The 
-architecture and design calls here are all mine (for better or worse), and anything I didn't write personally, I've reviewed:
-AI tooling is never an excuse to disregard good engineering practice.
+This project wasn't vibecoded, but I do use Claude (Opus, and more recently Fable), as both a pair programmer and workhorse. 
+The architecture and design calls here are all mine (for better or worse), and anything I didn't write personally, I've 
+reviewed: AI tooling is never an excuse to disregard good engineering discipline.
 
 ## License
 
