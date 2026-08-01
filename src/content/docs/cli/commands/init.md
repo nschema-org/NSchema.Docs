@@ -1,6 +1,6 @@
 ---
 title: init
-description: Restore the provider and backend plugins pinned in the project configuration.
+description: Install the declared plugins.
 sidebar:
   order: 2
 ---

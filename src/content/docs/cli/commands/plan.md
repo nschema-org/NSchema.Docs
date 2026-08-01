@@ -13,13 +13,6 @@ nschema plan --out tonight.nplan       # save it to apply later
 nschema plan --detailed-exitcode       # CI: exit 2 if the schema would change
 ```
 
-:::note[Needs]
-A desired schema (your `*.sql` files) **and** a current-state source: either a live database (a `PROVIDER postgres` block) 
-or, for offline planning, a state store (a `BACKEND` block).
-
-See [Configuration blocks](/cli/configuration/).
-:::
-
 ## Options
 
 - **`-s`, `--scope <name>`** — limit the migration to specific database schemas (namespaces). May be repeated.

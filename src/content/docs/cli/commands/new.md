@@ -1,6 +1,6 @@
 ---
-title: scaffold
-description: Scaffold a new NSchema project in the current directory.
+title: new
+description: Create a new NSchema project in the current directory.
 sidebar:
   order: 1
 ---
@@ -8,7 +8,7 @@ sidebar:
 Scaffold a simple project in the current directory, to get a new project going.
 
 ```sh
-nschema scaffold
+nschema new
 ```
 
 This writes:
