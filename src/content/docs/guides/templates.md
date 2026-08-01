@@ -79,3 +79,18 @@ schema including it would collide. The `validate` command will detect this, alon
 
 A schema template can also carry [`SCRIPT` statements](/guides/data-migrations/#migrations-in-templates) for the tables 
 it declares, so a backfill travels with the template instead of being repeated for every schema.
+
+## Renames in templates
+
+A schema template body may also carry object-level [`RENAME` directives](/nsql/grammar/#directives), so renaming a templated table can be done in one place:
+
+```sql
+TEMPLATE outbox
+BEGIN
+  RENAME TABLE outbox_messages TO outbox;
+  -- …the declarations…
+END;
+```
+
+Only the object-level kinds belong in a template (`TABLE`, `COLUMN`, `VIEW`, `ENUM`, `DOMAIN`, `TYPE`, `SEQUENCE`,
+routines). `RENAME SCHEMA` is rejected.
