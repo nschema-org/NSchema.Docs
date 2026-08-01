@@ -51,8 +51,3 @@ The option applies to both [`plan`](/cli/commands/plan/) and [`apply`](/cli/comm
 Declaring a matching [change-event `SCRIPT`](/guides/data-migrations/) silences the corresponding hazard: the script states
 how the data gets into shape (a backfill before `SET NOT NULL`, a de-duplication before a unique constraint), so there
 is nothing left to warn about. The plan output shows the script against its change instead.
-
-## Teardowns are exempt
-
-Like every diff policy, data-hazard detection applies to forward migrations. A teardown ([`destroy`](/cli/commands/destroy/), 
-[`plan --destroy`](/cli/commands/plan/)) bypasses the diff and its policies entirely.
