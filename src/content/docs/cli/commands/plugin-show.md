@@ -5,19 +5,19 @@ sidebar:
   order: 14.2
 ---
 
-Show the detail of a single [plugin](/cli/configuration/#plugins-and-versions) your project uses, named by the label from
-its `PROVIDER` / `BACKEND` block (`postgres`, `s3`, …): its package, pinned version, and whether it exists in the cache.
+Show the detail of a single [plugin](/cli/configuration/#plugins) your project uses, named by the label its `DATABASE` /
+`STATE` statement references: its package, resolved version, and whether it exists in the cache.
 
 ```sh
 nschema plugin show postgres
 ```
 
 ```text
-postgres (provider)
+postgres (database)
   Package: NSchema.Postgres
-  Version: 4.0.0
+  Version: 5.0.0
   Restored: yes
-  Cache path: /home/you/.nschema/plugins/NSchema.Postgres/4.0.0
+  Cache path: /home/you/.nschema/plugins/NSchema.Postgres/5.0.0
 ```
 
 If the label isn't one your project configures, the command lists the labels that are. Use
@@ -28,12 +28,7 @@ If the label isn't one your project configures, the command lists the labels tha
 - **`--json`** — emit a single structured object instead of text:
 
   ```json
-  { "role": "provider", "label": "postgres", "packageId": "NSchema.Postgres", "version": "4.0.0", "restored": true, "cachePath": "/home/you/.nschema/plugins/NSchema.Postgres/4.0.0" }
+  { "role": "database", "label": "postgres", "packageId": "NSchema.Postgres", "version": "5.0.0", "restored": true, "cachePath": "/home/you/.nschema/plugins/NSchema.Postgres/5.0.0" }
   ```
 
   `cachePath` is omitted when the plugin is not restored.
-
-## Needs
-
-Nothing beyond the project's config; like [`plugin list`](/cli/commands/plugin-list/) it reads only the config blocks and
-the local cache.
