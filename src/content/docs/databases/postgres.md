@@ -54,7 +54,7 @@ export NSCHEMA_DATABASE_PASSWORD="$DB_PASSWORD"
 ```
 
 These override any user/password embedded in the connection string. The base connection string is applied first, then the
-discrete overrides are layered on top. See [Environment variables](/cli/environment-variables/#separate-credentials).
+discrete overrides are layered on top. See [Environment variables](/cli/environment-variables).
 
 ## Dialect and equivalence
 
