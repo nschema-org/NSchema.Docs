@@ -10,7 +10,7 @@ the [repository map](/project/contributing/#the-repositories).
 
 ## Asking a question
 
-If something in the docs doesn't make sense, or something is outright missing, please open an issue on the repo and I'll 
+If something in the docs doesn't make sense, or something is outright missing, please [open an issue](https://github.com/nschema-org/NSchema/issues) on the repo and I'll 
 see about pointing you in the right direction, or fixing it.
 
 ## Reporting a bug
