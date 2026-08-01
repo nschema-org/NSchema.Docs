@@ -23,10 +23,6 @@ nschema state pull > backup.json
 Pull never interprets the payload, so state that has become unreadable (a corrupt or truncated payload) can still be
 pulled for repair; fix it by hand, and [`push`](/cli/commands/state-push/) it back.
 
-:::note[Needs]
-A state store (a `BACKEND` block). The live database is never contacted.
-:::
-
 ## Arguments
 
 - **`file`** *(optional)* — write the payload to this file instead of standard output.

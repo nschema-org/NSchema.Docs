@@ -10,7 +10,7 @@ the [repository map](/project/contributing/#the-repositories).
 
 ## Asking a question
 
-If something in the docs doesn't make sense, or something is outright missing, please open an issue on the repo and I'll 
+If something in the docs doesn't make sense, or something is outright missing, please [open an issue](https://github.com/nschema-org/NSchema/issues) on the repo and I'll 
 see about pointing you in the right direction, or fixing it.
 
 ## Reporting a bug
@@ -27,5 +27,5 @@ For unexpected plans or migrations, the output of `nschema plan` (and a saved [p
 ## Requesting a feature
 
 Feature requests are welcome: open an issue describing the problem you're trying to solve, and we can work on a solution together. 
-Context about the underlying need often leads to a better outcome. It's also worth checking the [Roadmap](/project/roadmap/) 
+Context about the underlying need often leads to a better outcome.
 first to see if it's already on the radar.

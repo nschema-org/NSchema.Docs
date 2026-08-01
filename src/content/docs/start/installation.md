@@ -10,7 +10,7 @@ NSchema is deployed as a **[.NET tool](https://learn.microsoft.com/en-us/dotnet/
 ## Prerequisites
 
 - **.NET SDK 10.0 or later.** The tool targets `net10.0`. Check with `dotnet --version`; install from [dotnet.microsoft.com](https://dotnet.microsoft.com/download) if needed.
-- **A database.** This tool is for managing database schemas after all. See [Providers](/providers/) for supported databases.
+- **A database.** This tool is for managing database schemas after all. See [Databases](/databases/) for supported databases.
 
 ## Install
 
@@ -18,7 +18,7 @@ These instructions assume you want to install `nschema` globally just for the sa
 If you just want to install it locally, you can do that too. 
 
 ```sh
-dotnet tool install --global nschema
+dotnet tool install nschema --global
 ```
 
 This installs the `nschema` command onto your `PATH`. You can verify it using:
@@ -29,9 +29,19 @@ nschema --version
 
 ## Providers are plugins
 
-Database providers and remote state backends aren't bundled with the CLI: each ships as its own NuGet package. You name 
-and pin one in your project config (e.g. `PROVIDER postgres ( version = '4.0.0' )`) and `nschema` restores it on first use. 
-The local-file state backend is the one exception — it's built in.
+Database providers and remote state stores aren't bundled with the CLI: each ships as its own NuGet package. When you need
+to use a plugin, declare it in a `PLUGIN` block, pinning the package source and version. NSchema will pin the selected
+version in a lockfile so runs are consistent. Source accepts any NuGet package ID, so third party plugins are supported.
+
+```sql
+PLUGIN postgres (
+  source  = 'NSchema.Postgres',
+  version = '[5.0,6.0)'
+);
+```
+
+The local `file` state store is the one exception to the plug-in system, as it's built in. 
+See [Configuration](/cli/configuration/#plugins).
 
 ## Update
 

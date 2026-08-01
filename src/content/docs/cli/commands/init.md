@@ -1,39 +1,34 @@
 ---
 title: init
-description: Restore the provider and backend plugins pinned in the project configuration.
+description: Install the declared plugins.
 sidebar:
   order: 2
 ---
 
-Restore the provider and backend [plugins](/cli/configuration/#plugins-and-versions) pinned by your project, so a later command doesn't have to.
+Installs every [plugin](/cli/configuration/#plugins) your project declares (respecting the current environment), pinning
+the resolved versions in the lockfile if necessary.
 
 ```sh
 nschema init
 ```
 
-Plugins are restored implicitly on first use, so `init` is optional, it just does the restore up front. Run it to:
+Install follows the `version` on each `PLUGIN` statement:
 
-- Warm the cache before a timed step, so the first real command isn't slowed by a download.
-- Fail fast on a bad version pin or an unreachable feed, at a predictable point rather than mid-operation.
+- A rang (`'[5.0,6.0)'`) resolves to the highest available version, and the result is written to the [lockfile](/cli/configuration/#the-lockfile).
+- An exact pin (`'5.0.0'`) doesn't need resolving, and just installs directly.
 
-To create a *new* project's files, use [`scaffold`](/cli/commands/scaffold/) instead — `init` only restores plugins for an existing project. 
-Pairs with the [`--no-init`](#skipping-the-implicit-restore) flag below.
+`init` **respects an existing lockfile**: a plugin already pinned there keeps its pin, unless the version in the plugin 
+declaration is changed.
 
 ## Skipping the implicit restore
 
-Every operation accepts **`--no-init`** (analogous to `dotnet --no-restore`). It skips the implicit restore and requires
-the pinned plugins to already be cached, failing fast with guidance if one is missing. The pattern in CI is to restore
-once up front and require the cache thereafter:
+Restore also happens implicitly on first use. Every command accepts **`--no-init`**, which skips that restore and requires 
+the locked plugins to already be available.
 
 ```sh
-nschema init                 # restore once
+nschema init                 # resolve, lock, restore
 nschema plan   --no-init     # require the cache, never fetch
 nschema apply  --no-init
 ```
 
-The built-in `file` backend has no plugin, so it never needs restoring.
-
-## Needs
-
-The **.NET SDK and network access** to your NuGet feed (the restore shells out to `dotnet`). A project with only the
-built-in `file` backend and no provider has nothing to restore.
+The built-in `file` state store has no plugin, so it never needs declaring or restoring.

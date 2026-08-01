@@ -25,10 +25,6 @@ Pushing replaces the recorded state wholesale. The schema half can always be reb
 Pull a backup first if you're unsure.
 :::
 
-:::note[Needs]
-A state store (a `BACKEND` block). The live database is never contacted.
-:::
-
 ## Arguments
 
 - **`file`** *(required)* — the state payload to push, e.g. a pulled state file after hand-editing.

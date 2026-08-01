@@ -36,21 +36,24 @@ generates an `ALTER TABLE` statement to append it.
 This is the same model tools like Terraform use for infrastructure: describe the goal, let the tool find the path. 
 One key difference though, is that databases are inherently _stateful_. Most accidentally destroyed infrastructure 
 can be recreated, but data lost through a dropped table can only be recovered from backups. (When did you last test those
-again?) NSchema has guardrails and escape hatches for protecting against data loss, but you still need to take care when 
-making destructive changes.
+again?) NSchema has guardrails for protecting against data loss, but you still need to take care when making destructive changes.
 
 ## How it works
 
 Each `apply` run flows through a simple pipeline:
 
-1. **Read the desired schema.** The SQL files in your project directory are composed into a single view of your goal schema.
-2. **Validate the desired schema.** Checks are done to make sure the schema is valid: primary keys, referential integrity, etc.  
-3. **Read the current schema.** The current schema is introspected from the target database's metadata tables.
-4. **Diff the schemas.** The schemas are compared and output as a hierarchical diff.
-5. **Validate the diff.** Checks the plan against configured policies (for example, the built-in guard against destructive changes).
-6. **Linearize the diff.** The complex diff is reduced to a dependency-ordered list of actions (create table, add index, etc.).
-7. **Generate SQL.** The action list is handed off to a database-specific provider to generate the required SQL.
-8. **Apply.** Run the SQL against the target database if given approval.
+1. **Read the project.** The files in your project directory are composed into a single view of your desired state,
+   along with any scripts and directives.
+2. **Validate the project.** Checks are done to make sure the schema is valid: primary keys, referential integrity, etc.  
+3. **Read the current state.** The state NSchema last recorded in its [state store](/guides/state/).
+4. **Diff the two.** They are compared and output as a hierarchical diff, with any directives enacted (renames, migration scripts, etc.)
+5. **Linearize the diff.** The diff is reduced to a dependency-ordered list of actions (create table, add index, etc.).
+6. **Render SQL.** Each action is rendered by the database-specific provider into the SQL that performs it.
+7. **Check the policies.** The finished plan is checked against the configured policies (like the built-in guard against destructive changes).
+8. **Apply.** Run the SQL against the target database if given approval, then record the result.
+
+The diff is done against an offline snapshot of the state, not from a live read, so a plan is reproducible and reviewable, 
+and a change someone made to the database out of band shows up as [drift](/guides/drift/) instead of going unnoticed.
 
 Because the plan is computed and rendered before anything is executed, you always see a visual diff of the changes 
 and the exact SQL that will be executed first. You can even [save a plan to a file](/cli/commands/plan/) and apply
@@ -62,20 +65,15 @@ NSchema covers most major structures supported by relational databases, includin
 foreign keys, constraints, indexes, views, functions, procedures, triggers, sequences, extensions, grants, enums, 
 domains and composite types. For anything more niche, NSchema also supports arbitrary [pre-deployment and post-deployment scripts](/guides/deployment-scripts).
 
-It's important to note that while your NSchema scripts might _look_ like SQL, it's actually a provider-neutral DSL meant
-to feel familiar to SQL authors. That's how it supports features like deployment scripts and provider configuration. It
-also means that unsupported objects fail the parsing check before they ever get near a database, meaning you can't accidentally
-write SQL for an object that isn't supported.
+It's important to note that while your NSchema files might _look_ like SQL, the language is **NSQL**: a provider-neutral
+DSL meant to feel familiar to SQL authors. That's how it supports features like deployment scripts and configuration. 
+See [Defining schemas](/nsql/defining-schemas/).
 
-## CLI or library
+## Getting Started
 
-There are two ways to use NSchema. The first, and most strongly recommended, is via the CLI. NSchema is a .NET tool that
-works very similar to Terraform: dump a bunch of SQL files with `CREATE` DDL in a folder and run `nschema apply`. This 
-is what most people want, and what the bulk of these docs cover. Start with [Installation](/start/installation/) and the
-[Quickstart Guide](/start/quickstart/).
+NSchema is a .NET tool that works very similar to Terraform: dump a bunch of SQL files with `CREATE` DDL in a folder and 
+run `nschema apply`.Start with [Installation](/start/installation/) and the [Quickstart Guide](/start/quickstart/).
 
-The second way is to consume the `NSchema.Core` library directly, allowing you to build your own harness for managing migrations.
+It is technically possible to consume the `NSchema.Core` library directly, allowing you to build your own harness for managing migrations.
 As much as possible, the CLI is kept as a thin wrapper around the Core, so embedding is kept simple and the behavior remains consistent. 
 This Core package also exposes extension points for features like custom validation policies.
-
-See [Embedding the engine](/library/embedding/).

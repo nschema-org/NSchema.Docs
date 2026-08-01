@@ -8,39 +8,44 @@ sidebar:
 import { Steps } from "@astrojs/starlight/components";
 
 If you already have a database with an unmanaged schema, you don't have to write your SQL from scratch. The
-[`nschema import`](/cli/commands/import/) command reads a live schema and writes it out as [DDL source files](/ddl/defining-schemas/), so
+[`nschema import`](/cli/commands/import/) command reads a live schema and writes it out as [NSQL source files](/nsql/defining-schemas/), so
 you can adopt an existing database and manage it going forward.
 
 <Steps>
 
-1. **Declare the provider.** Import reads from a live database, so it needs a `PROVIDER` block naming the provider and
-   pinning its plugin version. Create a single `.sql` file in your project directory with just that block — the schema
-   files themselves will come from the import:
+1. **Declare the database.** The import command reads from a live database, so it needs a `PLUGIN` declaration and a `DATABASE`
+   statement. Create a configuration file in your project directory with just those. The schema files themselves will
+   come from the import:
 
    ```sql
-   -- provider.sql
-   PROVIDER postgres (
-     version = '4.0.0'
+   -- config.sql
+   PLUGIN postgres (
+     source  = 'NSchema.Postgres',
+     version = '[5.0,6.0)'
    );
+
+   DATABASE postgres ();
    ```
 
-   Supply the connection string out of band so it stays out of source control (see [Configuration blocks](/cli/configuration/)):
+   Then run [`nschema init`](/cli/commands/init/) to install the plugins.
+
+   Supply the connection string as an environment variable, so it stays out of source control (see [Configuration](/cli/configuration/)):
 
    ```sh
-   export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
+   export NSCHEMA_DATABASE_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
    ```
 
-2. **Import the schema** into a directory:
+2. **Import the database schema** into a directory:
 
    ```sh
    nschema import --out-dir ./schemas
    ```
 
-   This writes the live schema out as `.sql` files. To adopt only part of the database, you can use the same `--scope`
+   This writes the live database schema out as `.sql` files. To adopt only part of the database, you can use the same `--scope`
    argument that works with `plan` and `apply`:
 
    ```sh
-   nschema import --out-dir ./schemas --scope app --scope billing
+   nschema import --out-dir ./schemas --scope app.orders --scope billing
    ```
 
    As a safety measure, `import` won't import into a directory that already contains `.sql` files; pass `--force` if you
@@ -48,21 +53,22 @@ you can adopt an existing database and manage it going forward.
 
 3. **Review and commit.** Read the generated files, tidy them if you like, and check them into source control.
 
-4. **Verify a no-op plan.** A plan immediately after import should show no changes:
+4. **Apply to adopt.** NSchema diffs your project against the recorded [state](/guides/state/), so running [`apply`](/cli/commands/apply/)
+  will first refresh your state with the latest database snapshot, before displaying any differences as a migration plan.
+  This first plan should be empty, if you haven't made any changes, but the output will show a number of objects to be "adopted" (see below).
 
    ```sh
-   nschema plan
+   nschema apply
    ```
 
 5. **Manage changes from here.** Edit the `.sql` files and use the normal [plan / apply workflow](/guides/workflow/) from now on.
 
 </Steps>
 
-## Seeding state at the same time
+## Adoption is gradual
 
-If you plan to use a [state store](/guides/state/) for offline planning, don't forget to seed it from the live database
-with [`nschema refresh`](/cli/commands/refresh/) once your `BACKEND` block is configured:
-
-```sh
-nschema refresh
-```
+The state store records what the entire database contains, for dependency resolution, but NSchema only controls what the
+project declares. In the state, this is referred to as the [managed set](/guides/state/#the-managed-set). When you declare a new object, or adopt an
+existing one, it's added to the managed set, and a drop is what happens when an object in the managed set no longer exists
+in the declared project. That way, NSchema won't ever drop anything that it doesn't manage, so importing a whole database
+and then declaring one schema at a time is safe: the parts you haven't adopted yet are simply left alone.

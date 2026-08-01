@@ -13,10 +13,6 @@ nschema lock release <lock-id>   # release a specific lock (safe default)
 nschema lock release --force     # release whatever lock is held
 ```
 
-:::note[Needs]
-A state store (a `BACKEND file` or `BACKEND s3` block); the lock lives with it. The live database is never contacted.
-:::
-
 The `lock-id` is shown by [`lock status`](/cli/commands/lock-status/), by [`lock acquire`](/cli/commands/lock-acquire/), 
 and in the error of the operation that was blocked. `lock release` reads the held lock first and refuses if the id no 
 longer matches, so you can't accidentally release a legitimate lock.

@@ -4,7 +4,7 @@ The documentation site for [NSchema](https://github.com/nschema-org/NSchema), bu
 [Starlight](https://starlight.astro.build) (Astro). Published to
 [nschema.dev](https://nschema.dev).
 
-This is the central home for all NSchema documentation: the CLI, the DDL language, the providers/backends, and the 
+This is the central home for all NSchema documentation: the CLI, the NSchema language, the databases/state, and the 
 `NSchema.Core` library. The other repositories link here.
 
 ## Develop

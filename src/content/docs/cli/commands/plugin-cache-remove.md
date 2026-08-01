@@ -9,7 +9,7 @@ Remove a plugin package from the shared cache (`~/.nschema/plugins`), naming it 
 just that one; omit it to remove **every** cached version of the package.
 
 ```sh
-nschema plugin cache remove NSchema.Postgres 4.0.0   # one version
+nschema plugin cache remove NSchema.Postgres 5.0.0   # one version
 nschema plugin cache remove NSchema.Postgres         # all versions of the package
 ```
 

@@ -1,22 +1,28 @@
 ---
-title: Offline planning & state
-description: How NSchema's optional state store enables planning without a database.
+title: State
+description: How the state store enables planning without a database.
 sidebar:
   order: 30
 ---
 
-By default, NSchema will `plan` against the **live database**: it introspects the database schema and diffs it against the
-desired schema. But your PR build can't just connect to the database to compute that diff (and if it can: fix that first, 
-then we'll talk), so instead, NSchema can configure a `BACKEND` store that contains a persisted snapshot of the last known 
-state of the database schema that planning can run against instead.
+Rather than comparing directly against the live database, NSchema plans against an offline snapshot held in the state store.
+Alongside the schema, it holds information about [scripts](#script-executions) that have been run, and which database objects are _[managed](#the-managed-set)_ by
+NSchema. This approach has three major advantages:
+
+1. **Offline planning.** By using the state store, your CI pipelines can produce a migration plan without being able to access the real database.
+2. **Drift detection.** By comparing the recorded state against the live database, you can detect changes made out-of-band.
+3. **Ledger history.** Most database management tools install some kind of ledger table to record scripts run against the database, but NSchema can use its own state store instead.
+
+Offline planning is the most obvious win, because your PR build can't connect to your production database to plan a migration
+(and if it can, you need to fix that immediately). By using the state store, NSchema can produce a plan at PR time, which
+can be reviewed, audited, or saved as its own independent artifact.
 
 ## Enabling a state store
 
-Enabling a state store is as simple as writing a [`BACKEND` block](/backends/) in your DDL. The most basic option is a 
-local file:
+Write a [`STATE` statement](/state/) in your configuration. The simplest option is a local file:
 
 ```sql
-BACKEND file (
+STATE file (
   path = './nschema.state.json'
 );
 ```
@@ -24,20 +30,30 @@ BACKEND file (
 For a team, or in a CI environment, you'll want somewhere more persistent, like Amazon S3:
 
 ```sql
-BACKEND s3 (
-  version = '4.0.0',
+PLUGIN s3 (
+  source  = 'NSchema.Aws',
+  version = '[5.0,6.0)'
+);
+
+STATE s3 (
   bucket = 'my-bucket',
   key = 'env/state.json'
 );
 ```
 
-## How it changes each command
+## The managed set
 
-With a state store configured:
+Rather than only storing objects that NSchema manages, the state snapshot covers the entire database. Alongside that is
+declared the managed set: the names of every database object that NSchema is responsible for managing. Counterintuitively, 
+this is actually what enables partial adoption. Database schemas can get complex, and their dependencies are what guarantee
+data integrity. By keeping the whole database snapshot in state, NSchema can validate at plan time that it won't error 
+due to out of scope dependencies (like dropping a custom type used by a table in a schema you haven't imported yet). 
 
-- **`plan`** will run offline, against the recorded snapshot, with no database connection.
-- **`apply`** always reads the **live** database, and after a successful apply it refreshes the state snapshot.
-- **`refresh`**, **`drift`**, **`state show`**, and the **`lock`** subcommands all operate against the store see their command pages.
+Objects not in the managed set are _never_ modified by NSchema, they are used as reference only, so you can't accidentally
+drop something that isn't managed, even by doing a full [`destroy`](/cli/commands/destroy/).
+
+This is why [`refresh`](/cli/commands/refresh/) is safe to run against a shared database: capturing the live schema
+records an observation, not an adoption.
 
 ## Script executions
 
@@ -53,6 +69,19 @@ nschema script list                 # what has run, when, and with which body
 nschema script taint seed-users     # forget an execution — the script runs again on the next apply
 nschema script untaint seed-users   # record a pending script as executed, without running it
 ```
+
+## Ephemeral state
+
+Some databases are disposable, like a container instance in an integration test, or your local dev environment (yes, it
+should be disposable), but planning still needs state to work from. For these cases, you can use the `--ephemeral` flag:
+
+```sh
+nschema apply --ephemeral --auto-approve
+```
+
+This configures an in-memory store that lives only as long as the command, standing in for a configured `STATE` statement. 
+Because the state is refreshed before an `apply`, the diff will run correctly: only new objects will be added, but any 
+scripts won't be remembered the next time you apply. The easiest way around this is to just write them idempotently.
 
 ## Seeding and repairing state
 
@@ -94,7 +123,7 @@ nschema state pull > state.json
 nschema state push state.json
 ```
 
-This also serves as backup/restore, and as migration between backends: pull with one `BACKEND` configuration, push with 
+This also serves as backup/restore, and as migration between backends: pull with one `STATE` configuration, push with 
 the other. When an edit touches the script ledger, [`script hash`](/cli/commands/script-hash/) computes the body hash a ledger entry must carry.
 
 **Refresh → untaint** rebuilds after state loss. The schema snapshot is just a cache of the live database, so
@@ -110,12 +139,11 @@ Pushes, taints, and untaints run under the [state lock](/cli/commands/lock/), li
 
 ## State format and compatibility
 
-Pull and push make the state payload something you can hold in your hands, so its compatibility rules form part of our 
-semantic versioning contract:
+Pull and push make the state payload a public surface, so its compatibility rules form part of the semantic versioning contract:
 
 - The payload is JSON, carrying a format `version` number.
-- **Within a major version of NSchema, the format only changes additively.** Every 4.x release reads state written by
-  every other 4.x release. A payload written by a *newer minor* may carry fields an older release doesn't know.
+- **Within a major version of NSchema, the format only changes additively.** Every 5.x release reads state written by
+  every other 5.x release. A payload written by a *newer minor* may carry fields an older release doesn't know.
 - **A payload from a newer major version is refused, never misread.** The format `version` number changes at most at
   a major release, and a reader that encounters a newer one fails with an explicit error instead of guessing.
 - **Hand-edits are preserved.** A push validates that the payload parses, then stores your bytes verbatim. 

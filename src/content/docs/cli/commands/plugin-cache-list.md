@@ -18,7 +18,7 @@ Plugin cache: /home/you/.nschema/plugins
 ╭──────────────────┬─────────┬─────────╮
 │ Package          │ Version │    Size │
 ├──────────────────┼─────────┼─────────┤
-│ NSchema.Postgres │ 4.0.0   │ 9.0 MiB │
+│ NSchema.Postgres │ 5.0.0   │ 9.0 MiB │
 ╰──────────────────┴─────────┴─────────╯
   1 cached, 9.0 MiB total. Remove with: nschema plugin cache remove <package> [version]
 ```
@@ -28,7 +28,7 @@ Plugin cache: /home/you/.nschema/plugins
 - **`--json`** — emit the cache contents as a structured object:
 
   ```json
-  { "cacheRoot": "/home/you/.nschema/plugins", "plugins": [{ "packageId": "NSchema.Postgres", "version": "4.0.0", "path": "/home/you/.nschema/plugins/NSchema.Postgres/4.0.0", "sizeBytes": 9437184 }] }
+  { "cacheRoot": "/home/you/.nschema/plugins", "plugins": [{ "packageId": "NSchema.Postgres", "version": "5.0.0", "path": "/home/you/.nschema/plugins/NSchema.Postgres/5.0.0", "sizeBytes": 9437184 }] }
   ```
 
 ## Needs

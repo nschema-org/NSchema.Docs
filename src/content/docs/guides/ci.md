@@ -8,8 +8,9 @@ sidebar:
 NSchema is built to run unattended and be easy to automate. A few things facilitate this: 
 - a strict [exit-code contract](/cli/exit-codes/),
 - opt-in "did anything change?" signals, 
-- [offline planning](/guides/state/) that needs no database at plan time,
-- and built-in linting, validation and drifting checks.
+- planning against [recorded state](/guides/state/),
+- built-in linting, validation and drift guardrails,
+- and multiple output formats depending on whether the audience is a human or a machine.
 
 ## Always pass `--auto-approve` for applies
 
@@ -23,27 +24,26 @@ nschema apply --auto-approve
 
 ## Supply secrets through the environment
 
-While the `PROVIDER` block supports setting the connection string and password directly, it is _strongly_ recommended to
+While the `DATABASE` statement supports setting the connection string and password directly, it is _strongly_ recommended to
 provide them via environment variables instead. Connection strings don't belong in source control:
 
 ```sh
-export NSCHEMA_POSTGRES_CONNECTION_STRING="$DB_CONNECTION_STRING"
+export NSCHEMA_DATABASE_CONNECTION_STRING="$DB_CONNECTION_STRING"
 # optionally, credentials out of band:
-export NSCHEMA_POSTGRES_USERNAME="$DB_USER"
-export NSCHEMA_POSTGRES_PASSWORD="$DB_PASSWORD"
+export NSCHEMA_DATABASE_USERNAME="$DB_USER"
+export NSCHEMA_DATABASE_PASSWORD="$DB_PASSWORD"
 ```
 
 See [Environment variables](/cli/environment-variables/).
 
-## Plugins are restored on first use
+## Commit the lockfile
 
-Providers and backends are [plugins](/cli/configuration/#plugins-and-versions): `nschema` downloads the version pinned in
-your config the first time a command needs one. In CI that means:
+Database providers and state stores are [plugins](/cli/configuration/#plugins), resolved from the versions your `PLUGIN` statements declare and 
+pinned in `nschema.lock`. In CI that means:
 
+- **Check `nschema.lock` in.** It's what makes `nschema init` resolve consistently between runs.
 - The agent needs the .NET SDK and network access to your NuGet feed (the restore shells out to `dotnet`).
-- More control in provider versioning by pinning versions in your `PROVIDER` / `BACKEND` blocks.
-- To control *when* the fetch happens: fail fast on a bad pin, or warm the cache before timed steps. Run `nschema init`
-  up front, and pass `--no-init` to later commands to require the cache and skip any restore.
+- Run `nschema init` up front to fail fast, then pass `--no-init` to later commands to skip the restore.
 
 ## Gate a pull request on changes
 
@@ -54,14 +54,15 @@ NSchema will return `2` when there are changes, so a check can fail (or comment)
 nschema plan --detailed-exitcode    # 0 = no changes, 2 = changes, 1 = error
 ```
 
-If a state store is configured, this will run **without a database connection**. See [Offline planning & state](/guides/state/).
+The plan is computed from recorded [state](/guides/state/), so the runner needs the state store, but never reads the
+live database.
 
 ## Enforce formatting
 
 Fail the build if any `.sql` file isn't canonically formatted:
 
 ```sh
-nschema fmt --check    # exits 2 if files need formatting, 1 on error
+nschema format --check    # exits 2 if files need formatting, 1 on error
 ```
 
 ## Validate schema files fast
@@ -86,6 +87,16 @@ nschema plan --out migration.nplan
 nschema apply --plan-file migration.nplan --auto-approve
 ```
 
+## Disposable databases
+
+Although a state store is required, there will be occasions where you need to spin up and deploy a schema to a temporary
+database, like during integration tests. For these, you can use [`--ephemeral`](/guides/state/#ephemeral-state) flag 
+instead of configuring a `STATE` store:
+
+```sh
+nschema apply --ephemeral --auto-approve
+```
+
 ## Monitor for drift on a schedule
 
 A scheduled job can alert when the live database diverges from recorded state:
@@ -98,11 +109,11 @@ See [Detecting drift](/guides/drift/).
 
 ## Exit codes, summarized
 
-| Code  | Meaning                                                        |
-|-------|----------------------------------------------------------------|
-| `0`   | Success / no changes.                                          |
-| `1`   | Error, or a declined `apply`/`destroy`.                        |
-| `2`   | Changes present, from `--detailed-exitcode` and `fmt --check`. |
-| `130` | Cancelled (Ctrl-C).                                            |
+| Code  | Meaning                                                           |
+|-------|-------------------------------------------------------------------|
+| `0`   | Success / no changes.                                             |
+| `1`   | Error, or a declined `apply`/`destroy`.                           |
+| `2`   | Changes present, from `--detailed-exitcode` and `format --check`. |
+| `130` | Cancelled (Ctrl-C).                                               |
 
 See the [full exit-code contract](/cli/exit-codes/).

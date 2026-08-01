@@ -22,11 +22,6 @@ without running it, [`taint`](/cli/commands/script-taint/) first, then untaint.
 
 The change runs under the [state lock](/cli/commands/lock/).
 
-:::note[Needs]
-A state store (a `BACKEND` block) and the project's `*.sql` files — the recorded hash comes from the script's
-declaration. No provider is required, and the live database is never contacted.
-:::
-
 ## Arguments
 
 - **`name`** *(required)* — the script's declared name.

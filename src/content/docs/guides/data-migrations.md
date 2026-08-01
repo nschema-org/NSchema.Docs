@@ -16,13 +16,14 @@ CREATE TABLE app.users (
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
-SCRIPT 'backfill emails' RUN ON ADD COLUMN app.users.email AS $$
+SCRIPT backfill_emails RUN ON ADD COLUMN app.users.email AS $$
     UPDATE app.users SET email = username || '@legacy.example' WHERE email IS NULL;
 $$;
 ```
 
-If the plan adds `app.users.email`, the script's SQL is spliced into the migration. If it doesn't, because the column already
-exists, or the change was applied last week, the script does nothing, and `plan` tells you it is safe to delete.
+If the plan adds `app.users.email`, the script's SQL is spliced into the migration at that change. If it doesn't, because 
+the column already exists, or the change was applied last week, then the script does nothing, and `plan` tells you it is 
+safe to delete.
 
 ## Change events
 
@@ -123,9 +124,3 @@ SCRIPT 'dedupe emails' RUN ON ADD CONSTRAINT app.users.users_email_uq (run_outsi
     WHERE a.id > b.id AND a.email = b.email;
 $$;
 ```
-
-## The legacy form
-
-Before NSchema 4.4, change-event scripts were declared as `MIGRATION ['name'] FOR <trigger> <path> AS $$…$$;` (with an
-optional name). The old form still parses, but plans surface a deprecation warning naming the `SCRIPT` replacement, and
-it will be removed in NSchema 5.0. Note the `SCRIPT` form requires a name.

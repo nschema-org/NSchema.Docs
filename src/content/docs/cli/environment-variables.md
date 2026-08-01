@@ -3,47 +3,30 @@ title: Environment variables
 description: Every environment variable the nschema CLI reads as a configuration override.
 ---
 
-The CLI offers a small list of environment variables as configuration overrides. Environment values sit above config 
-blocks and below command-line flags in [precedence](/cli/configuration/#precedence).
+Environment values sit above configuration statements and below command-line flags in
+[precedence](/cli/configuration/#precedence).
 
-| Variable                              | Overrides                        | Notes                                                                                                               |
-|---------------------------------------|----------------------------------|---------------------------------------------------------------------------------------------------------------------|
-| `NSCHEMA_POSTGRES_CONNECTION_STRING`  | The Postgres connection string   | Overrides the `connection_string` set in the `PROVIDER postgres` block.                                             |
-| `NSCHEMA_POSTGRES_USERNAME`           | The Postgres username            | Layered onto the connection string, overriding any user embedded in it.                                             |
-| `NSCHEMA_POSTGRES_PASSWORD`           | The Postgres password            | Layered onto the connection string, overriding any password embedded in it.                                         |
-| `NSCHEMA_SQLITE_CONNECTION_STRING`    | The SQLite connection string     | Overrides the `connection_string` set in the `PROVIDER sqlite` block.                                               |
-| `NSCHEMA_SQLSERVER_CONNECTION_STRING` | The SQL Server connection string | Overrides the `connection_string` set in the `PROVIDER sqlserver` block.                                            |
-| `NSCHEMA_SQLSERVER_USERNAME`          | The SQL Server username          | Layered onto the connection string, overriding any user embedded in it.                                             |
-| `NSCHEMA_SQLSERVER_PASSWORD`          | The SQL Server password          | Layered onto the connection string, overriding any password embedded in it.                                         |
-| `NSCHEMA_DESTRUCTIVE_ACTION_POLICY`   | The destructive-action policy    | `error` (default), `warn`, or `allow`. Equivalent to `--destructive-actions`.                                       |
-| `NSCHEMA_DATA_HAZARD_POLICY`          | The data-hazard policy           | `error`, `warn` (default), `allow`, or `ignore`. Equivalent to `--data-hazards`.                                    |
-| `NSCHEMA_ENVIRONMENT`                 | The target environment           | Selects the `*.env.<name>.sql` [overlay files](/cli/configuration/#environments). Equivalent to `--environment`.    |
-| `NO_COLOR`                            | Colored output                   | The well-known [`NO_COLOR`](https://no-color.org) convention; any value disables color. Equivalent to `--no-color`. |
+## Overriding a setting
 
-## The connection string
+**Any** setting on a `DATABASE` or `STATE` statement can be supplied from the environment, using its statement keyword
+and its own name:
 
-The connection string is a secret. Supply it through the environment rather than committing it:
-
-```sh
-export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
+```
+NSCHEMA_<KEYWORD>_<SETTING>
 ```
 
-## Separate credentials
-
-When your platform manages the database username and password apart from the rest of the connection (for example, AWS 
-Secrets Manager injecting them out of band), keep only the non-secret host in the connection string and supply the 
-credentials on their own:
+So `connection_string` on the `DATABASE` statement is `NSCHEMA_DATABASE_CONNECTION_STRING`, and `bucket` on the `STATE`
+statement is `NSCHEMA_STATE_BUCKET`.
 
 ```sh
-export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=db.internal;Port=5432;Database=app"
-export NSCHEMA_POSTGRES_USERNAME="$DB_USER"
-export NSCHEMA_POSTGRES_PASSWORD="$DB_PASSWORD"
+export NSCHEMA_DATABASE_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
 ```
 
-`NSCHEMA_POSTGRES_USERNAME` / `NSCHEMA_POSTGRES_PASSWORD` (also settable as `username` / `password` in the `PROVIDER postgres` block) 
-override any user/password embedded in the connection string, so you don't need to recombine the pieces into a single string yourself.
+## The rest
 
-The base connection string is applied first, then these discrete overrides are layered on top.
-
-SQL Server works the same way: `NSCHEMA_SQLSERVER_USERNAME` / `NSCHEMA_SQLSERVER_PASSWORD` (or `username` / `password` in
-the `PROVIDER sqlserver` block) compose onto `NSCHEMA_SQLSERVER_CONNECTION_STRING`.
+| Variable                            | Overrides                     | Notes                                                                                                                  |
+|-------------------------------------|-------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| `NSCHEMA_DESTRUCTIVE_ACTION_POLICY` | The destructive-action policy | `error` (default), `warn`, `allow`, or `ignore`. Equivalent to `--destructive-actions`.                                |
+| `NSCHEMA_DATA_HAZARD_POLICY`        | The data-hazard policy        | `error`, `warn` (default), `allow`, or `ignore`. Equivalent to `--data-hazards`.                                       |
+| `NSCHEMA_ENVIRONMENT`               | The target environment        | Selects the `*.env.<name>.sql` [configuration files](/cli/configuration/#environments). Equivalent to `--environment`. |
+| `NO_COLOR`                          | Colored output                | The well-known [`NO_COLOR`](https://no-color.org) convention; any value disables color. Equivalent to `--no-color`.    |

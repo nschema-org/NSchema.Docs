@@ -15,10 +15,6 @@ nschema lock acquire --reason "release 4.0 migration window"
 nschema lock acquire --ttl 2h
 ```
 
-:::note[Needs]
-A state store (a `BACKEND` block); the lock lives with it.
-:::
-
 It prints the new lock's id and the exact command to release it.
 
 ## Scripting

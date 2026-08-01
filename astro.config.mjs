@@ -23,13 +23,16 @@ export default defineConfig({
         }),
         starlightChangelogs(),
         // Multi-version docs. The live `src/content/docs/` tree is the current
-        // (v4) docs; each archived version lives under `src/content/docs/<slug>/`
+        // (v5) docs; each archived version lives under `src/content/docs/<slug>/`
         // with a sidebar snapshot in `src/content/versions/<slug>.json`. To cut a
         // new version, add it here and start the dev server — the plugin archives
         // the current docs into that slug. See CLAUDE.md "Versioned docs".
         starlightVersions({
-          current: { label: "Latest (4.x)" },
-          versions: [{ slug: "v3", label: "v3.x" }],
+          current: { label: "Latest (5.x)" },
+          versions: [
+            { slug: "v4", label: "v4.x" },
+            { slug: "v3", label: "v3.x" },
+          ],
         }),
       ],
       title: "NSchema",
@@ -66,7 +69,7 @@ export default defineConfig({
         { label: "Start Here", items: [{ autogenerate: { directory: "start" } }] },
         { label: "Guides", items: [{ autogenerate: { directory: "guides" } }] },
         { label: "CLI Reference", items: [{ autogenerate: { directory: "cli" } }] },
-        { label: "DDL Language", items: [{ autogenerate: { directory: "ddl" } }] },
+        { label: "NSQL Language", items: [{ autogenerate: { directory: "nsql" } }] },
         { label: "Providers", items: [{ autogenerate: { directory: "providers" } }] },
         { label: "Backends", items: [{ autogenerate: { directory: "backends" } }] },
         { label: "Library (Core)", items: [{ autogenerate: { directory: "library" } }] },

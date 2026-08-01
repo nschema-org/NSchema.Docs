@@ -7,24 +7,33 @@ sidebar:
 
 import { Steps } from "@astrojs/starlight/components";
 
-This guide will walk you through setting up NSchema in an empty directory and applying a basic Schema to a live
-PostgreSQL database. It assumes you've [installed `nschema`](/start/installation/) and have a connection string to a database available.
+This guide will walk you through setting up NSchema in an empty directory and applying a basic Schema to a real PostgreSQL database.
+It assumes you [meet the pre-requisites](/start/installation/) and have a connection string to a database to hand.
 
 <Steps>
+0. **Install NSchema.**
+
+   ```sh
+   dotnet tool install nschema --global
+   ```
+
+   NSchema is installed as a .NET tool. It can also be installed locally, but global is easier for demonstration.
 
 1. **Scaffold the project.**
 
    ```sh
-   nschema scaffold
+   nschema new
    ```
 
-   This writes three files:
+   The [`new`](/cli/commands/new/) command sets up the boilerplate for a fresh project:
 
-   - `config.sql`. The default `PROVIDER` / `BACKEND` configuration (which database to connect to, and where state lives).
-   - `config.env.prod.sql`. The `PROVIDER` / `BACKEND` configuration to use when running with `--environment production`.
-   - `schemas/example.sql` — a sample desired-schema file.
+   - `config.sql` — holds [configuration](/cli/configuration/) for stuff like database providers, or state backends.
+   - `config.env.prod.sql` — the configuration to layer on top when running with `--environment prod`.
+   - `schemas/example.sql` — your hello world sample schema.
 
-   Edit the sample to describe the schema you want, using [NSchema DDL](/ddl/defining-schemas/):
+   It then runs [`init`](/cli/commands/init/), to install the required plugins and pin them in the `nschema.lock` lockfile.
+
+   Create or edit the SQL files to describe the schema you want, using [NSQL](/nsql/defining-schemas/):
 
    ```sql
    -- schemas/example.sql
@@ -37,36 +46,41 @@ PostgreSQL database. It assumes you've [installed `nschema`](/start/installation
    );
    ```
 
-2. **Point at your database.**
+2. **Set up the database connection.**
 
    ```sql
-   -- NSchema project configuration. These blocks tell NSchema which database to
-   -- connect to and where to keep state. Config blocks may live in any .sql file.
+   -- config.sql
+   ENGINE (
+     version = '[5.0,6.0)'
+   );
 
-   PROVIDER postgres (
-     version = '4.0.0',
-     -- Prefer the NSCHEMA_POSTGRES_CONNECTION_STRING environment variable, which
+   PLUGIN postgres (
+     source  = 'NSchema.Postgres',
+     version = '[5.0,6.0)'
+   );
+
+   DATABASE postgres (
+     -- Prefer the NSCHEMA_DATABASE_CONNECTION_STRING environment variable, which
      -- overrides the value below.
      connection_string = ''
      -- Credentials may be supplied separately from the connection string (e.g. from
-     -- a secret store) via NSCHEMA_POSTGRES_USERNAME / NSCHEMA_POSTGRES_PASSWORD.
+     -- a secret store) via NSCHEMA_DATABASE_USERNAME / NSCHEMA_DATABASE_PASSWORD.
      -- They override any user/password embedded in connection_string.
    );
 
-   BACKEND file (
+   STATE file (
      path = './nschema.state.json'
    );
    ```
 
-   The configuration in your `config.sql` files is the default, so you could enter `connection_string` directly, but
-   connection strings need to remain secret, so the safer approach is to set the connection string by environment
-   variable instead:
+   The value in `config.sql` is the default, so you could enter `connection_string` directly, but connection strings
+   need to remain secret, so the safer approach is to set the connection string by environment variable instead:
 
    ```sh
-   export NSCHEMA_POSTGRES_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
+   export NSCHEMA_DATABASE_CONNECTION_STRING="Host=localhost;Database=app;Username=postgres;Password=postgres"
    ```
 
-   See [Configuration blocks](/cli/configuration/) for setting the provider and backend, and [Environment variables](/cli/environment-variables/)
+   See [Configuration](/cli/configuration/) for the four statements, and [Environment variables](/cli/environment-variables/)
    for the full list of overrides.
 
 3. **Check the schema files are well-formed** (optional, but a fast pre-flight):
@@ -83,8 +97,13 @@ PostgreSQL database. It assumes you've [installed `nschema`](/start/installation
    nschema plan
    ```
 
-   `plan` computes the changes and prints them. If you have a backend configured, the comparison will be done against the
-   last state snapshot without touching the database.
+   `plan` computes the changes and prints them. The comparison is made against the recorded [state](/guides/state/), which will be
+  empty on a fresh project, so it never depends on reading the live database.
+
+   :::tip[Already have objects in that database?]
+   Run [`nschema refresh`](/cli/commands/refresh/) first to capture the live schema into state, so the plan reflects
+   what's actually there. Capturing is not adopting: NSchema still won't touch anything it doesn't [manage](/guides/state/#the-managed-set).
+   :::
 
 5. **Apply it.**
 
@@ -102,6 +121,7 @@ Congrats! You just deployed your first database using NSchema.
 ## What next?
 
 - **Already have a database?** You can use the [`import`](/cli/commands/import/) command bootstrap your NSchema project from an existing database. See [Adopting an existing database](/guides/adopting-a-database/).
-- **Learn the schema language.** [Defining schemas](/ddl/defining-schemas/) is a practical introduction; the [grammar reference](/ddl/grammar/) is the complete spec.
+- **Learn the language.** [Defining schemas](/nsql/defining-schemas/) is a practical introduction; the [grammar reference](/nsql/grammar/) is the complete spec.
 - **Understand the workflow.** [The plan / apply workflow](/guides/workflow/) covers saved plans, scoping, and the core developer loop.
-- **Automate it.** [Running in CI](/guides/ci/) covers `--auto-approve`, detailed exit codes, and offline planning.
+- **Automate it.** [Running in CI](/guides/ci/) covers `--auto-approve`, detailed exit codes, and the lockfile.
+- **Upgrading from 4.x?** See the [v4 → v5 upgrade guide](/upgrade/v5/).

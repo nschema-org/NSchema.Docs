@@ -24,10 +24,6 @@ nschema script hash seed-users
 Without a name, every run-once declaration is listed with its hash (`--json` emits a single array of`{name, hash}` objects).
 The hashes are computed from the declarations in your `.sql` files — template-expanded, exactly as an apply would record them.
 
-:::note[Needs]
-Only the project's `*.sql` files. No state store or provider is required, and the live database is never contacted.
-:::
-
 ## Arguments
 
 - **`name`** *(optional)* — a run-once script's declared name; omit to list all run-once declarations.
