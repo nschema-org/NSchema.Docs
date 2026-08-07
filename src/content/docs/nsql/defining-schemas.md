@@ -49,11 +49,9 @@ A few things to note, each covered in full by the [grammar reference](/nsql/gram
 
 ## Where the files live
 
-The schema is every `*.sql` file found recursively under the project directory, except the
-[environment overlays](/cli/configuration/#environments) (`*.env.<name>.sql`). Split your schema across as many files as
-you like (one per schema, one per table, whatever suits) — statements find each other regardless of which file they are
-in. [Scripts](/guides/deployment-scripts/) live inline in those same files as `SCRIPT` statements, and
-[configuration](/cli/configuration/) conventionally lives in `config.sql`.
+The schema is every `*.sql` file found recursively under the project directory, including the
+[environment overlays](/cli/configuration/#environments) (`*.env.<name>.sql`) for the selected environment. Split your 
+schema across as many files as you like.
 
 ## Doc-comments become catalog comments
 
