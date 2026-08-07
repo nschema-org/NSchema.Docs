@@ -130,9 +130,8 @@ Three kinds of statement share the one grammar:
 - **[Directives](#directives)** say how the difference is managed: a [rename](#renames) or a [script](#scripts).
 - **[Configuration](#configuration-statements)** says what the project runs against.
 
-Which kinds a given file may hold is a rule of the *file*, not of the grammar: configuration is read from your
-[configuration files](/cli/configuration/#where-configuration-files-live), and schema declarations from every file that
-isn't an environment overlay.
+Any file may hold any of the three. Which files a run reads is a rule of the project layout, not of the grammar — see
+[where files live](/cli/configuration/#where-configuration-files-live).
 
 ## Configuration statements
 
@@ -650,35 +649,35 @@ objects. See [Templates](/guides/templates/) for the practical guide.
 
 ## Construct → model mapping
 
-| NSQL construct                                                | Model target                                                                         |
-|---------------------------------------------------------------|--------------------------------------------------------------------------------------|
-| `CREATE SCHEMA s`                                             | `Schema` on the `Database`                                                           |
-| `CREATE TABLE s.t (…)`                                        | `Schema` + `Table`                                                                   |
-| `CREATE VIEW s.v AS …`                                        | `Schema` + `View` (`Body` opaque `SqlText`, `DependsOn` derived)                     |
-| `name type [NOT NULL] [DEFAULT e]`                            | `Column` (`Type`→`SqlType`, `IsNullable`, `DefaultExpression`→`SqlDefaultExpression`) |
-| `IDENTITY (…)`                                                | `Column.IsIdentity` + `IdentityOptions`                                              |
-| `GENERATED ALWAYS AS (e) STORED`                              | `Column.GeneratedExpression` (opaque; excludes `DEFAULT`)                            |
-| `CONSTRAINT n PRIMARY KEY (…)`                                | `Table.PrimaryKey` (`PrimaryKey`)                                                    |
-| `CONSTRAINT n FOREIGN KEY … REFERENCES …`                     | `ForeignKey` (`OnDelete`/`OnUpdate`→`ReferentialAction`)                             |
-| `CONSTRAINT n UNIQUE (…)`                                     | `UniqueConstraint`                                                                   |
-| `CONSTRAINT n CHECK (e)`                                      | `CheckConstraint` (`Expression` = `e`, opaque)                                       |
-| `CONSTRAINT n EXCLUDE [USING m] (c WITH op, …)`               | `ExclusionConstraint` (`Method`, `Elements`→`ExclusionElement`, `Predicate`)         |
-| `[UNIQUE] INDEX n [USING m] (key, …) [INCLUDE (…)] [WHERE e]` | `TableIndex` (`IsUnique`, `Method`, `Columns`→`IndexColumn`, `Include`, `Predicate`) |
-| `GRANT … ON s.t TO r`                                         | `TableGrant`                                                                         |
-| `GRANT USAGE ON SCHEMA s TO r`                                | `SchemaGrant`                                                                        |
-| `CREATE MATERIALIZED VIEW s.v AS …`                           | `View` with `IsMaterialized = true`                                                  |
-| `CREATE [UNIQUE] INDEX n ON s.rel (…)`                        | `TableIndex` on the table (`Table.Indexes`) or materialized view (`View.Indexes`)    |
-| `CREATE ENUM s.e ('a', 'b')`                                  | `Schema` + `EnumType` (ordered `EnumLabel` values)                                   |
-| `CREATE DOMAIN s.d AS t [NOT NULL] [CHECK] [DEFAULT]`         | `DomainType` (`DataType`, `NotNull`, `Checks`, `Default`)                            |
-| `CREATE TYPE s.t AS (f1 t1, f2 t2)`                           | `CompositeType` (ordered `CompositeField`s)                                          |
-| `CREATE SEQUENCE s.q (…)`                                     | `Schema` + `Sequence` (`SequenceOptions`)                                            |
-| `CREATE FUNCTION s.f(…) …`                                    | `Routine` (`Kind` = `Function`; opaque)                                              |
-| `CREATE PROCEDURE s.p(…) …`                                   | `Routine` (`Kind` = `Procedure`; opaque)                                             |
-| `CREATE EXTENSION e [VERSION 'v']`                            | `Extension` on the `Database` (root-level)                                           |
-| `CREATE TRIGGER t … ON s.tbl …`                               | `Trigger` on the named table (`Table.Triggers`)                                      |
-| `RENAME <kind> <source> TO n`                                 | a rename directive on the project (never part of the schema model)                   |
-| `SCRIPT … ON PRE\|POST DEPLOYMENT`                            | `DeploymentScript` (`DeploymentPhase`, `RunCondition`)                               |
-| `SCRIPT … ON <change> <path>`                                 | `ChangeScript` (`ChangeTarget`, `RunCondition`)                                      |
-| `TEMPLATE n [FOR …] BEGIN … END` / `APPLY TEMPLATE` / `INCLUDE n` | expanded at load into concrete objects per target — no model construct survives  |
-| `ENGINE` / `PLUGIN` / `DATABASE` / `STATE`                    | the project's configuration, not its schema                                          |
-| `---` / `/** */` before a declaration                         | that object's `Comment`                                                              |
+| NSQL construct                                                    | Model target                                                                          |
+|-------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| `CREATE SCHEMA s`                                                 | `Schema` on the `Database`                                                            |
+| `CREATE TABLE s.t (…)`                                            | `Schema` + `Table`                                                                    |
+| `CREATE VIEW s.v AS …`                                            | `Schema` + `View` (`Body` opaque `SqlText`, `DependsOn` derived)                      |
+| `name type [NOT NULL] [DEFAULT e]`                                | `Column` (`Type`→`SqlType`, `IsNullable`, `DefaultExpression`→`SqlDefaultExpression`) |
+| `IDENTITY (…)`                                                    | `Column.IsIdentity` + `IdentityOptions`                                               |
+| `GENERATED ALWAYS AS (e) STORED`                                  | `Column.GeneratedExpression` (opaque; excludes `DEFAULT`)                             |
+| `CONSTRAINT n PRIMARY KEY (…)`                                    | `Table.PrimaryKey` (`PrimaryKey`)                                                     |
+| `CONSTRAINT n FOREIGN KEY … REFERENCES …`                         | `ForeignKey` (`OnDelete`/`OnUpdate`→`ReferentialAction`)                              |
+| `CONSTRAINT n UNIQUE (…)`                                         | `UniqueConstraint`                                                                    |
+| `CONSTRAINT n CHECK (e)`                                          | `CheckConstraint` (`Expression` = `e`, opaque)                                        |
+| `CONSTRAINT n EXCLUDE [USING m] (c WITH op, …)`                   | `ExclusionConstraint` (`Method`, `Elements`→`ExclusionElement`, `Predicate`)          |
+| `[UNIQUE] INDEX n [USING m] (key, …) [INCLUDE (…)] [WHERE e]`     | `TableIndex` (`IsUnique`, `Method`, `Columns`→`IndexColumn`, `Include`, `Predicate`)  |
+| `GRANT … ON s.t TO r`                                             | `TableGrant`                                                                          |
+| `GRANT USAGE ON SCHEMA s TO r`                                    | `SchemaGrant`                                                                         |
+| `CREATE MATERIALIZED VIEW s.v AS …`                               | `View` with `IsMaterialized = true`                                                   |
+| `CREATE [UNIQUE] INDEX n ON s.rel (…)`                            | `TableIndex` on the table (`Table.Indexes`) or materialized view (`View.Indexes`)     |
+| `CREATE ENUM s.e ('a', 'b')`                                      | `Schema` + `EnumType` (ordered `EnumLabel` values)                                    |
+| `CREATE DOMAIN s.d AS t [NOT NULL] [CHECK] [DEFAULT]`             | `DomainType` (`DataType`, `NotNull`, `Checks`, `Default`)                             |
+| `CREATE TYPE s.t AS (f1 t1, f2 t2)`                               | `CompositeType` (ordered `CompositeField`s)                                           |
+| `CREATE SEQUENCE s.q (…)`                                         | `Schema` + `Sequence` (`SequenceOptions`)                                             |
+| `CREATE FUNCTION s.f(…) …`                                        | `Routine` (`Kind` = `Function`; opaque)                                               |
+| `CREATE PROCEDURE s.p(…) …`                                       | `Routine` (`Kind` = `Procedure`; opaque)                                              |
+| `CREATE EXTENSION e [VERSION 'v']`                                | `Extension` on the `Database` (root-level)                                            |
+| `CREATE TRIGGER t … ON s.tbl …`                                   | `Trigger` on the named table (`Table.Triggers`)                                       |
+| `RENAME <kind> <source> TO n`                                     | a rename directive on the project (never part of the schema model)                    |
+| `SCRIPT … ON PRE\|POST DEPLOYMENT`                                | `DeploymentScript` (`DeploymentPhase`, `RunCondition`)                                |
+| `SCRIPT … ON <change> <path>`                                     | `ChangeScript` (`ChangeTarget`, `RunCondition`)                                       |
+| `TEMPLATE n [FOR …] BEGIN … END` / `APPLY TEMPLATE` / `INCLUDE n` | expanded at load into concrete objects per target — no model construct survives       |
+| `ENGINE` / `PLUGIN` / `DATABASE` / `STATE`                        | the project's configuration, not its schema                                           |
+| `---` / `/** */` before a declaration                             | that object's `Comment`                                                               |

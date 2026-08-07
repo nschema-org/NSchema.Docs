@@ -112,17 +112,15 @@ Both attributes are optional. `new` writes a `version` assertion pinned to the C
 
 ## Where configuration files live
 
-Configuration statements go in `.sql` files alongside your schema. Two rules:
-
-- A file named **`*.env.<name>.sql` is an environment overlay** — read only when that environment is selected, and never
-  read as schema.
-- **Every other `.sql` file is the base**: its schema declarations build the project, and its configuration statements
-  build the configuration. By convention (and what `new` writes) configuration goes in `config.sql`.
+Configuration can live in any of the `.sql` files alongside your schema, but I'd recommend keeping them separate in a 
+well-known file. All of mine are stored in `config.sql`. Environment files (files named **`*.env.<name>.sql`) are only 
+read when that environment is selected, so put environment-specific configuration in a file with the `.env.<name>.sql` 
+suffix.
 
 ## Environments
 
 Select an environment with [`--environment <name>`](/cli/#global-flags) (or `NSCHEMA_ENVIRONMENT`) and every
-`*.env.<name>.sql` file is layered over the base configuration:
+`*.env.<name>.sql` file is layered over the base:
 
 ```sh
 nschema plan --environment prod    # base + *.env.prod.sql
@@ -130,7 +128,9 @@ nschema plan --environment staging # base + *.env.staging.sql
 nschema plan                       # base only
 ```
 
-An overlay **refines** the statement it restates, setting by setting, so it carries only what differs:
+### Configuration in an overlay
+
+An overlay merges with any configuration in the base files, overwriting any re-declared config keys:
 
 ```sql
 -- config.sql
@@ -143,6 +143,18 @@ STATE s3 ( key = 'prod/nschema.state.json' );
 Restating it under a **different label** replaces it outright instead, because a different label is a different plugin
 and there is nothing meaningful to merge — that is how an overlay swaps the state store for another. `PLUGIN`
 declarations from both layers carry through.
+
+### Schema in an overlay
+
+Schema declarations can also appear in overlays, and add to the base project. It's a relatively niche use case, but it can
+be useful for things like a set of test tables to run integration tests against:
+
+```sql
+-- fixtures.env.test.sql — planned only under --environment test
+CREATE TABLE test.orders_fixture (
+  id INT NOT NULL
+);
+```
 
 ## Precedence
 

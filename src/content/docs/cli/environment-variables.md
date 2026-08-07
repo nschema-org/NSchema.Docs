@@ -24,9 +24,9 @@ export NSCHEMA_DATABASE_CONNECTION_STRING="Host=localhost;Database=app;Username=
 
 ## The rest
 
-| Variable                            | Overrides                     | Notes                                                                                                                  |
-|-------------------------------------|-------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| `NSCHEMA_DESTRUCTIVE_ACTION_POLICY` | The destructive-action policy | `error` (default), `warn`, `allow`, or `ignore`. Equivalent to `--destructive-actions`.                                |
-| `NSCHEMA_DATA_HAZARD_POLICY`        | The data-hazard policy        | `error`, `warn` (default), `allow`, or `ignore`. Equivalent to `--data-hazards`.                                       |
-| `NSCHEMA_ENVIRONMENT`               | The target environment        | Selects the `*.env.<name>.sql` [configuration files](/cli/configuration/#environments). Equivalent to `--environment`. |
-| `NO_COLOR`                          | Colored output                | The well-known [`NO_COLOR`](https://no-color.org) convention; any value disables color. Equivalent to `--no-color`.    |
+| Variable                            | Overrides                     | Notes                                                                                                               |
+|-------------------------------------|-------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| `NSCHEMA_DESTRUCTIVE_ACTION_POLICY` | The destructive-action policy | `error` (default), `warn`, `allow`, or `ignore`. Equivalent to `--destructive-actions`.                             |
+| `NSCHEMA_DATA_HAZARD_POLICY`        | The data-hazard policy        | `error`, `warn` (default), `allow`, or `ignore`. Equivalent to `--data-hazards`.                                    |
+| `NSCHEMA_ENVIRONMENT`               | The target environment        | Selects the `*.env.<name>.sql` [overlay files](/cli/configuration/#environments). Equivalent to `--environment`.    |
+| `NO_COLOR`                          | Colored output                | The well-known [`NO_COLOR`](https://no-color.org) convention; any value disables color. Equivalent to `--no-color`. |
