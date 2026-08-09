@@ -72,7 +72,9 @@ accepts brackets on input too, as an alternative spelling of a [quoted identifie
 SQL Server is a full server database, so this provider covers most of NSchema's model:
 
 - **Supported:** schemas, tables, columns (with `DEFAULT`, `IDENTITY`, and persisted computed columns), primary keys,
-  foreign keys, unique constraints, check constraints, indexes (including `INCLUDE` columns and filtered indexes), views,
+  foreign keys, unique constraints, check constraints, indexes (including `INCLUDE` columns, filtered indexes,
+  [clustering](/nsql/grammar/#clustering) and [XML indexes](/nsql/grammar/#xml-indexes)), views (including schema-bound
+  and indexed views), [XML schema collections](/nsql/grammar/#xml-schema-collections) and typed `xml` columns,
   sequences, scalar/table functions and stored procedures, table-level `GRANT`s, triggers, and documentation comments
   (stored as `MS_Description` extended properties).
 - **Not supported:** schema renames, materialized views, exclusion constraints, in-place identity/computed-column
