@@ -71,6 +71,7 @@ SQLite has a deliberately small surface, so this provider only allows what SQLit
   `INSERT OR UPDATE`), no `TRUNCATE`, and no `INSTEAD OF`.
 - **Not supported (SQLite has no equivalent):** schemas other than `main`, sequences, enums, domains, composite types,
   stored functions/procedures, grants, and materialized views.
+- **Clustering is skipped with a warning.** SQLite has no clustered indexes.
 - **Comments are skipped with a warning.** SQLite has no `COMMENT ON`, so a declared comment emits no SQL and carries a
   warning explaining that the change can never converge.
 

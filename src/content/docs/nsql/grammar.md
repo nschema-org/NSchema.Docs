@@ -114,8 +114,9 @@ CREATE TABLE app.users
 
 ```ebnf
 document      = { [ doc-comment ] , ( declaration | directive | configuration ) } ;
-declaration   = ( create-schema | create-table | create-view | create-enum | create-domain | create-sequence
-                | create-function | create-procedure | create-extension | create-trigger | create-index
+declaration   = ( create-schema | create-table | create-view | create-enum | create-domain | create-type
+                | create-sequence | create-function | create-procedure | create-extension | create-trigger
+                | create-index | create-xml-index | create-xml-schema-collection
                 | grant | template | apply-template ) , ";" ;
 directive     = ( rename | script ) , ";" ;
 configuration = ( engine | plugin | database | state ) , ";" ;
@@ -335,16 +336,17 @@ A **`GENERATED ALWAYS AS (expr) STORED`** column is computed from other columns 
 Names are mandatory; structural changes drop-and-recreate, but a doc-comment change alone is applied in place (`COMMENT ON CONSTRAINT`), never a recreate.
 
 ```ebnf
-pk-def     = "CONSTRAINT" , ident , "PRIMARY" , "KEY" , "(" , col-list , ")" ;
+pk-def     = "CONSTRAINT" , ident , "PRIMARY" , "KEY" , [ clustering ] , "(" , col-list , ")" ;
 fk-def     = "CONSTRAINT" , ident , "FOREIGN" , "KEY" , "(" , col-list , ")" ,
              "REFERENCES" , qualified-name , "(" , col-list , ")" ,
              [ "ON" , "DELETE" , ref-action ] , [ "ON" , "UPDATE" , ref-action ] ;
-unique-def = "CONSTRAINT" , ident , "UNIQUE" , "(" , col-list , ")" ;
+unique-def = "CONSTRAINT" , ident , "UNIQUE" , [ clustering ] , "(" , col-list , ")" ;
 check-def  = "CONSTRAINT" , ident , "CHECK" , paren-expr ;
 exclude-def = "CONSTRAINT" , ident , "EXCLUDE" , [ "USING" , ident ] ,
               "(" , excl-elem , { "," , excl-elem } , ")" , [ "WHERE" , paren-expr ] ;
 excl-elem  = ( ident | paren-expr ) , "WITH" , operator ;
 
+clustering = "CLUSTERED" | "NONCLUSTERED" ;
 ref-action = "NO" , "ACTION" | "CASCADE" | "SET" , "NULL" | "SET" , "DEFAULT" ;
 col-list   = ident , { "," , ident } ;
 ```
@@ -353,10 +355,12 @@ An **`EXCLUDE`** constraint guarantees that no two rows have all of the given op
 elements. Each element is a column or parenthesized expression paired with an `operator` (raw text up to the `,` or `)`); 
 `USING method` is optional, as is a partial `WHERE`. Dropping one is a destructive change.
 
+`CLUSTERED` / `NONCLUSTERED` is described under [Clustering](/nsql/grammar/#clustering).
+
 ### Indexes (inline)
 
 ```ebnf
-index-def  = [ "UNIQUE" ] , "INDEX" , ident , [ "USING" , ident ] ,
+index-def  = [ "UNIQUE" ] , [ clustering ] , "INDEX" , ident , [ "USING" , ident ] ,
              "(" , index-key , { "," , index-key } , ")" ,
              [ "INCLUDE" , "(" , col-list , ")" ] , [ "WHERE" , paren-expr ] ;
 index-key  = ( ident | paren-expr ) , [ "ASC" | "DESC" ] , [ "NULLS" , ( "FIRST" | "LAST" ) ] ;
@@ -369,6 +373,39 @@ Each `index-key` is a plain column or a parenthesized **expression** (`(lower(em
 `NULLS FIRST`/`NULLS LAST`. `USING method` selects the access method (`gin`, `gist`, `brin`, …; omitted → B-tree), and 
 `INCLUDE (…)` lists covering non-key columns. Any structural change (a key, its ordering, the method, or the include set)
 drops and recreates the index; a doc-comment change alone is applied in place.
+
+### Clustering
+
+A **clustered** index *is* the relation's rows, held in its order, rather than a structure sitting beside them. It can be
+written on a primary key, a unique constraint, or an index, inline or standalone, in the spelling T-SQL uses:
+
+```sql
+CREATE TABLE app.bom
+(
+    id           bigint NOT NULL IDENTITY,
+    assembly_id  bigint NOT NULL,
+    component_id bigint NOT NULL,
+    CONSTRAINT bom_pkey PRIMARY KEY NONCLUSTERED (id)
+);
+
+CREATE UNIQUE CLUSTERED INDEX bom_assembly_ix ON app.bom (assembly_id, component_id);
+```
+
+**Saying nothing is its own state**, distinct from writing `NONCLUSTERED`. The engines disagree on the default — a SQL
+Server primary key clusters, an index does not — so an omitted keyword means *whatever the engine would do*, and is left
+to it. That is what keeps a schema written without the keyword and one read back by [`import`](/cli/commands/import/) the
+same: import records clustering only where it differs from the engine's own default, so it never writes noise you did not
+ask for, and never loses a choice you did.
+
+Two rules follow from what clustering is:
+
+- **At most one per relation.** A second clustered index has nothing left to order, so it is an error
+  (`multiple-clustered-indexes`).
+- **A change to it is a drop and a recreate.** No engine reorders a table in place.
+
+On an engine with no such concept — Postgres's `CLUSTER` is a one-off reordering rather than a property of the index, and
+SQLite has nothing equivalent — declared clustering is not applied, and the plan says so
+(`clustering-not-supported`) rather than dropping it silently.
 
 ### Grants
 
@@ -385,8 +422,9 @@ table-priv = "SELECT" | "INSERT" | "UPDATE" | "DELETE" ;
 
 ```ebnf
 create-view = "CREATE" , [ "MATERIALIZED" ] , "VIEW" , qualified-name ,
+              [ "WITH" , "SCHEMABINDING" ] ,
               "AS" , view-body ;                            (* view-body: opaque text up to the top-level ';' *)
-create-index = "CREATE" , [ "UNIQUE" ] , "INDEX" , ident , "ON" , qualified-name , [ "USING" , ident ] ,
+create-index = "CREATE" , [ "UNIQUE" ] , [ clustering ] , "INDEX" , ident , "ON" , qualified-name , [ "USING" , ident ] ,
                "(" , index-key , { "," , index-key } , ")" ,
                [ "INCLUDE" , "(" , col-list , ")" ] , [ "WHERE" , paren-expr ] ;
 ```
@@ -406,15 +444,29 @@ or converting a view to/from materialized, is planned as a drop + recreate, wher
 in-place `CREATE OR REPLACE`.
 
 A standalone `CREATE [UNIQUE] INDEX … ON s.relation` statement attaches an index to its relation when the document is 
-built (like a `GRANT`): a table equivalent to declaring the index inline in the table body or a materialized view.
-A plain view cannot be indexed, and targeting an unknown relation is an error. A materialized view's indexes *must* 
-be standalone (its body is opaque, so there is nowhere inline to put them); a table's may be written either way. 
-There is no `DROP INDEX`: an index absent from its relation's declaration is dropped.
+built (like a `GRANT`): a table equivalent to declaring the index inline in the table body or a view. Targeting an unknown 
+relation is an error. A view's indexes *must* be standalone (its body is opaque, so there is nowhere inline to put them); 
+a table's may be written either way. There is no `DROP INDEX`: an index absent from its relation's declaration is dropped.
 
 ```sql
 CREATE MATERIALIZED VIEW app.daily_totals AS SELECT date, sum(amount) FROM app.sales GROUP BY date;
 CREATE UNIQUE INDEX daily_totals_date_ix ON app.daily_totals (date);
 ```
+
+A view need not be materialized to carry indexes. SQL Server's *indexed view* is a plain view with a unique clustered
+index on it, which is what makes its result set stored, so an index attaches to either kind:
+
+```sql
+CREATE VIEW app.order_customers WITH SCHEMABINDING AS
+    SELECT o.id, o.customer_id FROM app.orders o;
+
+CREATE UNIQUE CLUSTERED INDEX order_customers_ix ON app.order_customers (id);
+```
+
+**`WITH SCHEMABINDING`** binds the view to the schema of what it reads, so the objects behind it cannot be altered out
+from under it. It is required before a view can be indexed on SQL Server. Changing the binding, like changing the body,
+recreates the view — and because a view's indexes hang off its stored form, a view carrying indexes is dropped and
+recreated rather than replaced in place, with its indexes rebuilt from the declaration.
 
 ### Enums
 
@@ -466,6 +518,66 @@ CREATE TYPE app.address AS (street text, zip int);
 A composite type is a schema-scoped named tuple of `field name + type` pairs. Like a domain, a column uses it by naming 
 it as its type, so it is **created before**, and **dropped after**, the tables that may use it. Every change applies in 
 place with `ALTER TYPE`. Fields are matched by name.
+
+### XML schema collections
+
+```ebnf
+create-xml-schema-collection = "CREATE" , "XML" , "SCHEMA" , "COLLECTION" , qualified-name ,
+                               "AS" , collection-body ;   (* opaque text up to the top-level ';' *)
+
+xml-type = "xml" , [ "(" , ( "DOCUMENT" | "CONTENT" ) , qualified-name , ")" ] ;
+```
+
+An XML schema collection is a named bundle of XSD that a typed `xml` column is validated against. Its body is captured
+**verbatim** and never interpreted, exactly like a view body — one document however many namespaces it declares, because
+an engine merges what is added to a collection and reports the whole thing back as a single document.
+
+A column binds to one by naming it as the argument of the `xml` type, saying whether the column holds a whole
+`DOCUMENT` or any `CONTENT` fragment:
+
+```sql
+CREATE XML SCHEMA COLLECTION app.survey_schema AS '
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:survey">
+        <xsd:element name="survey" type="xsd:anyType"/>
+    </xsd:schema>';
+
+CREATE TABLE app.responses
+(
+    id     bigint NOT NULL IDENTITY,
+    survey xml(DOCUMENT app.survey_schema) NULL,
+    notes  xml NULL,
+    CONSTRAINT responses_pkey PRIMARY KEY (id)
+);
+```
+
+A collection is **created before**, and **dropped after**, the tables whose columns bind to it. Because its contents can
+only be added to and never taken away, a change to the body is a drop and a recreate rather than an alteration. A bare
+`xml` column is untyped and binds to nothing.
+
+### XML indexes
+
+```ebnf
+create-xml-index = "CREATE" , [ "PRIMARY" ] , "XML" , "INDEX" , ident ,
+                   "ON" , qualified-name , "(" , ident , ")" ,
+                   [ "USING" , "XML" , "INDEX" , ident ,
+                     "FOR" , ( "PATH" | "VALUE" | "PROPERTY" ) ] ;
+```
+
+An XML index indexes the shredded contents of an `xml` column rather than a value. A **primary** XML index is the node
+table itself; every **secondary** is a B-tree over one that already exists, and names both the primary it reads and which
+form it takes:
+
+```sql
+CREATE PRIMARY XML INDEX responses_survey_pxml ON app.responses (survey);
+CREATE XML INDEX responses_survey_path ON app.responses (survey)
+    USING XML INDEX responses_survey_pxml FOR PATH;
+```
+
+The key names the single `xml` column being indexed. The facets of an ordinary index have nothing to mean here: an XML
+index takes no `UNIQUE`, no `INCLUDE`, no `WHERE` and no access method, and each is refused with a diagnostic rather than
+dropped silently. [Clustering](/nsql/grammar/#clustering) does not apply either — an XML index indexes a shredded
+document, not the table's rows — so none is ever reported for one. A secondary is created after its primary and dropped
+before it.
 
 ### Sequences
 
@@ -657,16 +769,20 @@ objects. See [Templates](/guides/templates/) for the practical guide.
 | `name type [NOT NULL] [DEFAULT e]`                                | `Column` (`Type`→`SqlType`, `IsNullable`, `DefaultExpression`→`SqlDefaultExpression`) |
 | `IDENTITY (…)`                                                    | `Column.IsIdentity` + `IdentityOptions`                                               |
 | `GENERATED ALWAYS AS (e) STORED`                                  | `Column.GeneratedExpression` (opaque; excludes `DEFAULT`)                             |
-| `CONSTRAINT n PRIMARY KEY (…)`                                    | `Table.PrimaryKey` (`PrimaryKey`)                                                     |
+| `CONSTRAINT n PRIMARY KEY [CLUSTERED\|NONCLUSTERED] (…)`           | `Table.PrimaryKey` (`PrimaryKey`, `Clustered`)                                        |
 | `CONSTRAINT n FOREIGN KEY … REFERENCES …`                         | `ForeignKey` (`OnDelete`/`OnUpdate`→`ReferentialAction`)                              |
-| `CONSTRAINT n UNIQUE (…)`                                         | `UniqueConstraint`                                                                    |
+| `CONSTRAINT n UNIQUE [CLUSTERED\|NONCLUSTERED] (…)`                | `UniqueConstraint` (`Clustered`)                                                      |
 | `CONSTRAINT n CHECK (e)`                                          | `CheckConstraint` (`Expression` = `e`, opaque)                                        |
 | `CONSTRAINT n EXCLUDE [USING m] (c WITH op, …)`                   | `ExclusionConstraint` (`Method`, `Elements`→`ExclusionElement`, `Predicate`)          |
-| `[UNIQUE] INDEX n [USING m] (key, …) [INCLUDE (…)] [WHERE e]`     | `TableIndex` (`IsUnique`, `Method`, `Columns`→`IndexColumn`, `Include`, `Predicate`)  |
+| `[UNIQUE] [CLUSTERED\|NONCLUSTERED] INDEX n [USING m] (key, …) …`  | `TableIndex` (`IsUnique`, `Clustered`, `Method`, `Columns`→`IndexColumn`, `Include`)  |
 | `GRANT … ON s.t TO r`                                             | `TableGrant`                                                                          |
 | `GRANT USAGE ON SCHEMA s TO r`                                    | `SchemaGrant`                                                                         |
 | `CREATE MATERIALIZED VIEW s.v AS …`                               | `View` with `IsMaterialized = true`                                                   |
-| `CREATE [UNIQUE] INDEX n ON s.rel (…)`                            | `TableIndex` on the table (`Table.Indexes`) or materialized view (`View.Indexes`)     |
+| `CREATE [UNIQUE] INDEX n ON s.rel (…)`                            | `TableIndex` on the table (`Table.Indexes`) or view (`View.Indexes`)                  |
+| `CREATE [PRIMARY] XML INDEX n ON s.t (col) …`                      | `TableIndex.Xml` (`XmlIndexDefinition`: `Kind`, `PrimaryIndex`)                       |
+| `CREATE VIEW s.v WITH SCHEMABINDING AS …`                          | `View.IsSchemaBound = true`                                                           |
+| `CREATE XML SCHEMA COLLECTION s.c AS '…'`                          | `Schema` + `XmlSchemaCollection` (`Body` opaque `SqlText`)                            |
+| `xml(DOCUMENT\|CONTENT s.c)` as a column type                      | `SqlType.Xml` bound to the collection (`XmlTypeBinding`)                              |
 | `CREATE ENUM s.e ('a', 'b')`                                      | `Schema` + `EnumType` (ordered `EnumLabel` values)                                    |
 | `CREATE DOMAIN s.d AS t [NOT NULL] [CHECK] [DEFAULT]`             | `DomainType` (`DataType`, `NotNull`, `Checks`, `Default`)                             |
 | `CREATE TYPE s.t AS (f1 t1, f2 t2)`                               | `CompositeType` (ordered `CompositeField`s)                                           |

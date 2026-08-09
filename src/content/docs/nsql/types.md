@@ -60,3 +60,18 @@ CREATE TABLE app.orders (
 ```
 
 See the [grammar reference](/nsql/grammar/#enums) for declaring these types.
+
+## Typed `xml` columns
+
+An `xml` column may name an [XML schema collection](/nsql/grammar/#xml-schema-collections) to validate against, saying
+whether it holds a whole `DOCUMENT` or any `CONTENT` fragment:
+
+```sql
+CREATE TABLE app.responses (
+  survey xml(DOCUMENT app.survey_schema) NULL,
+  notes  xml NULL
+);
+```
+
+A bare `xml` is untyped and binds to nothing. The binding is carried structurally rather than folded into the type name,
+so the collection is a real dependency: it is created before, and dropped after, the columns that use it.
