@@ -37,7 +37,7 @@ STATE file (
 | Statement          | Purpose                                                                     |
 |--------------------|-----------------------------------------------------------------------------|
 | `ENGINE`           | Asserts the engine (and optionally host-tool) version the project requires. |
-| `PLUGIN <label>`   | Declares a plugin dependency and pins its package version.                  |
+| `PLUGIN <label>`   | Declares a plugin dependency: a package and version, or a path to a build.  |
 | `DATABASE <label>` | The live database. See [Databases](/databases/).                            |
 | `STATE <label>`    | The state store. See [State](/state/).                                      |
 
@@ -79,6 +79,34 @@ A `version` is either an exact pin (`'5.0.0'`) or a NuGet-style range (`'[5.0,6.
 To see which plugins a project declares and whether each is restored, use [`plugin list`](/cli/commands/plugin-list/);
 the shared on-disk cache is inspected and pruned with the [`plugin cache`](/cli/commands/plugin-cache/) commands.
 
+### Loading a plugin from a path
+
+A plugin can name a built .NET assembly instead of a package, which skips the package resolution and the shared cache
+entirely:
+
+```sql
+PLUGIN pg (
+  path = './artifacts/NSchema.Postgres.dll'
+);
+```
+
+This is for working on a plugin, and for build pipelines that want to test what they have just built rather than what
+they last published. Relative paths resolve against the project root, not the working directory.
+
+The assembly needs its dependency closure beside it, that is, a `.deps.json` and the packages it references, which is
+what a provider project produces when it sets:
+
+```xml
+<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+```
+
+Without it, only the plugin's own assembly lands in `bin` and loading fails.
+
+:::caution
+A plugin loaded from a path is not reproducible. Nothing pins the bits behind the path, so the project no longer
+describes something reliable.
+:::
+
 ## The lockfile
 
 While the declared range indicates the acceptable plugin versions, the actually resolved version is pinned in the lockfile.
@@ -95,6 +123,11 @@ LOCK (
 - [`plugin update [<label>]`](/cli/commands/plugin-update/) re-resolves ranges and rewrites the lockfile; [`plugin outdated`](/cli/commands/plugin-outdated/) shows what an update would change without doing it.
 
 Check `nschema.lock` in to version control: it is what makes a plan reproducible across machines and CI.
+
+A plugin declared by [`path`](#loading-a-plugin-from-a-path) never appears in the lockfile. There is no version to
+record, and writing one in would claim a reproducibility the path cannot offer. For the same reason
+[`plugin update`](/cli/commands/plugin-update/) and [`plugin outdated`](/cli/commands/plugin-outdated/) skip it: there
+is no range to widen and no feed to ask.
 
 ## The engine assertion
 
