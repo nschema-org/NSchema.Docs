@@ -22,7 +22,7 @@ nschema script hash seed-users
 ```
 
 Without a name, every run-once declaration is listed with its hash (`--json` emits a single array of`{name, hash}` objects).
-The hashes are computed from the declarations in your `.sql` files — template-expanded, exactly as an apply would record them.
+The hashes are computed from the declarations in your project files — template-expanded, exactly as an apply would record them.
 
 ## Arguments
 

@@ -16,9 +16,9 @@ through configuring them. Answer everything up front and it asks nothing.
 
 This writes:
 
-- `config.sql` — the project's [configuration](/cli/configuration/).
-- `config.env.prod.sql` — a starter [environment overlay](/cli/configuration/#environments) for `prod`.
-- `schemas/example.sql` — a starter [schema](/nsql/defining-schemas/) file.
+- `config.nsql` — the project's [configuration](/cli/configuration/).
+- `config.env.prod.nsql` — a starter [environment overlay](/cli/configuration/#environments) for `prod`.
+- `schemas/example.nsql` — a starter [schema](/nsql/defining-schemas/) file.
 
 Edit those to point at your database and describe the schema you want, then [`plan`](/cli/commands/plan/) and [`apply`](/cli/commands/apply/).
 

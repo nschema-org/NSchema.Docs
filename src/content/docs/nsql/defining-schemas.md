@@ -49,9 +49,11 @@ A few things to note, each covered in full by the [grammar reference](/nsql/gram
 
 ## Where the files live
 
-The schema is every `*.sql` file found recursively under the project directory, including the
-[environment overlays](/cli/configuration/#environments) (`*.env.<name>.sql`) for the selected environment. Split your 
-schema across as many files as you like.
+The schema is every project file found recursively under the project directory, including the [environment overlays](/cli/configuration/#environments) 
+(`*.env.<name>`) for the selected environment. Split your schema across as many files as you like.
+
+A project file can have either a **`.nsql`** or **`.sql`** extension. `.nsql` names the language, so it's NSchema's default
+and it has better syntax highlighting support than base SQL. The `.sql` extension is mostly kept for backwards compatibility.
 
 ## Doc-comments become catalog comments
 

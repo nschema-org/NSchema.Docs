@@ -7,12 +7,12 @@ sidebar:
 
 The core of working with NSchema is a short loop, the same shape as Terraform's and other declarative management tools:
 
-1. **Edit.** Declare your desired schema in `*.sql` files under your project.
+1. **Edit.** Declare your desired schema in `*.nsql` files under your project.
 2. **Plan.** Use `nschema plan` to see exactly what would change, and what SQL would be executed.
 3. **Apply.** Use `nschema apply` to execute the changes against the target database.
 
 ```sh
-# edit schemas/*.sql ...
+# edit schemas/*.nsql ...
 nschema plan
 nschema apply
 ```

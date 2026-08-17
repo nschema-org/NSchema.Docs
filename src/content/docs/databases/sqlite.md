@@ -33,7 +33,7 @@ SQLite is file-based, so the connection string is its only setting.
 
 A SQLite connection string usually points at a file (`Data Source=app.db`). Unlike a Postgres connection string it is
 not a secret, so keeping it in the `DATABASE sqlite` statement is fine. You can still override it from the environment (handy
-in CI) or to point at a different database file per [environment](/cli/configuration/#environments) without editing the checked-in `.sql`:
+in CI) or to point at a different database file per [environment](/cli/configuration/#environments) without editing the checked-in project files:
 
 ```sh
 export NSCHEMA_DATABASE_CONNECTION_STRING="Data Source=/var/data/app.db"
