@@ -107,6 +107,14 @@ A plugin loaded from a path is not reproducible. Nothing pins the bits behind th
 describes something reliable.
 :::
 
+That is reported on every run as `plugin-from-path`, so a CI log shows when a run used a build rather than a release.
+A project that loads one deliberately — a plugin's own test harness, say — can silence it in `.editorconfig`:
+
+```ini
+[*]
+nschema_diagnostic.plugin-from-path.severity = none
+```
+
 ## The lockfile
 
 While the declared range indicates the acceptable plugin versions, the actually resolved version is pinned in the lockfile.
