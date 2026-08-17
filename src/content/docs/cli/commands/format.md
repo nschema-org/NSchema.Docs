@@ -1,20 +1,20 @@
 ---
 title: format
-description: Reformat your .sql DDL files to a canonical layout.
+description: Reformat your NSQL files to a canonical layout.
 sidebar:
   order: 4
 ---
 
-Reformats your `.sql` DDL files to a canonical layout.
+Reformats your NSQL files to a canonical layout.
 
 ```sh
-nschema format                       # format every .sql file under the current directory
-nschema format ./schemas/users.sql   # format a single file
+nschema format                       # format every project file under the current directory
+nschema format ./schemas/users.nsql  # format a single file
 nschema format --check               # CI: fail if anything is unformatted
-cat users.sql | nschema format -     # format stdin to stdout
+cat users.nsql | nschema format -    # format stdin to stdout
 ```
 
-`nschema format [path]` rewrites a single `.sql` file, or every `.sql` file found recursively under a directory, in place, 
+`nschema format [path]` rewrites a single project file, or every project file found recursively under a directory, in place, 
 and lists the files it changed. `path` defaults to the current directory.
 
 ## Options

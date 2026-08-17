@@ -14,7 +14,7 @@ every command in detail; the pages below cover the cross-cutting pieces they all
 | [`new`](/cli/commands/new/)               | Scaffold a new project in the current directory.                       |
 | [`init`](/cli/commands/init/)             | Resolve and lock the declared plugins, and restore them.               |
 | [`validate`](/cli/commands/validate/)     | Check that the desired-schema files are well-formed.                   |
-| [`format`](/cli/commands/format/)         | Reformat `.sql` files to a canonical layout.                           |
+| [`format`](/cli/commands/format/)         | Reformat project files to a canonical layout.                          |
 | [`plan`](/cli/commands/plan/)             | Compute and show the migration plan, changing nothing.                 |
 | [`apply`](/cli/commands/apply/)           | Compute the plan and apply it to the database.                         |
 | [`refresh`](/cli/commands/refresh/)       | Read the live schema and write it to the state store.                  |
@@ -33,7 +33,7 @@ every command in detail; the pages below cover the cross-cutting pieces they all
 Every command accepts these:
 
 - **`-C`, `--directory <dir>`** Sets the current working directory for `nschema`.
-- **`-e`, `--environment <name>`** Sets the target environment. Layers the matching `*.env.<name>.sql` env files over the base. *(env `NSCHEMA_ENVIRONMENT`)* See [Environments](/cli/configuration/#environments).
+- **`-e`, `--environment <name>`** Sets the target environment. Layers the matching `*.env.<name>` env files over the base. *(env `NSCHEMA_ENVIRONMENT`)* See [Environments](/cli/configuration/#environments).
 - **`--no-color`** Disables colored output. *(env `NO_COLOR`)*
 - **`--no-init`** Skips the implicit plugin restore and requires the pinned plugins to be cached already. See [`init`](/cli/commands/init/#skipping-the-implicit-restore).
 - **`--format <text|json|markdown>`** Selects the output format. `text` (the default) is the formatted console output; `json` is machine-readable NDJSON; `markdown` renders the result for a PR comment or CI job summary. See [Output formats](#output-formats).
@@ -57,7 +57,7 @@ nschema plan --format markdown >> "$GITHUB_STEP_SUMMARY"
 
 Two kinds of setting are resolved separately:
 
-- **Where the schema lives** — the database and the state store — comes only from the **[`DATABASE` / `STATE` statements](/cli/configuration/)** in your `.sql` files. (A database plugin then reads its own settings, including its `NSCHEMA_<ENGINE>_*` environment variables.)
+- **Where the schema lives** — the database and the state store — comes only from the **[`DATABASE` / `STATE` statements](/cli/configuration/)** in your project files. (A database plugin then reads its own settings, including its `NSCHEMA_<ENGINE>_*` environment variables.)
 - **Command behavior** — the flags documented on each command page — is resolved per flag as **[environment variable](/cli/environment-variables/) < command-line option** (the flag wins).
 
 ## The exit-code contract

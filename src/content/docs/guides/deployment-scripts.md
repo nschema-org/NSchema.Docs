@@ -8,7 +8,7 @@ sidebar:
 Some database configuration can't be expressed declaratively, or isn't yet supported by the engine. For this, NSchema
 supports deployment scripts that run arbitrary SQL on either side of a migration.
 
-Scripts are declared **inline** in your `.sql` files with the `SCRIPT` statement, with a dollar-quoted body:
+Scripts are declared **inline** in your project files with the `SCRIPT` statement, with a dollar-quoted body:
 
 ```nsql
 SCRIPT 'enable_citext' RUN ON PRE DEPLOYMENT AS $$

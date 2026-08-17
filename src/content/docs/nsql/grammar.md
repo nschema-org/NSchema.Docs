@@ -272,7 +272,7 @@ Notes on the shape:
   `table.member` instead, and the script instantiates per applied schema (see the
   [guide](/guides/data-migrations/#migrations-in-templates)).
 - Change-event matching is structural (the event plus the path), never positional, and the script can live in any
-  `.sql` file. Declaring two scripts for the same event and path is an error.
+  project file. Declaring two scripts for the same event and path is an error.
 - A matched script is carried **on the diff**, at the change it supports, and runs there — a deployment script bookends
   the migration, a change-event script splices in at its change.
 - An optional `( … )` clause carries script options. The only option today is `run_outside_transaction = true`, for

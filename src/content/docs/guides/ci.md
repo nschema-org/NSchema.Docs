@@ -59,7 +59,7 @@ live database.
 
 ## Enforce formatting
 
-Fail the build if any `.sql` file isn't canonically formatted:
+Fail the build if any project file isn't canonically formatted:
 
 ```sh
 nschema format --check    # exits 2 if files need formatting, 1 on error

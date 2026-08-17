@@ -32,5 +32,5 @@ nschema drift --detailed-exitcode
 ## Reconciling drift
 
 Once you've reviewed the drift, you can choose to either adopt the drift using [`refresh`](/cli/commands/refresh/), then
-updating your `.sql` files to match, or you can revert the drift using [`apply`](/cli/commands/apply/) to bring the 
+updating your project files to match, or you can revert the drift using [`apply`](/cli/commands/apply/) to bring the 
 database back in line with your declared desired state.

@@ -27,16 +27,16 @@ It assumes you [meet the pre-requisites](/start/installation/) and have a connec
 
    The [`new`](/cli/commands/new/) command sets up the boilerplate for a fresh project:
 
-   - `config.sql` — holds [configuration](/cli/configuration/) for stuff like database providers, or state backends.
-   - `config.env.prod.sql` — the configuration to layer on top when running with `--environment prod`.
-   - `schemas/example.sql` — your hello world sample schema.
+   - `config.nsql` — holds [configuration](/cli/configuration/) for stuff like database providers, or state backends.
+   - `config.env.prod.nsql` — the configuration to layer on top when running with `--environment prod`.
+   - `schemas/example.nsql` — your hello world sample schema.
 
    It then runs [`init`](/cli/commands/init/), to install the required plugins and pin them in the `nschema.lock` lockfile.
 
    Create or edit the SQL files to describe the schema you want, using [NSQL](/nsql/defining-schemas/):
 
    ```nsql
-   -- schemas/example.sql
+   -- schemas/example.nsql
    CREATE SCHEMA app;
 
    CREATE TABLE app.widgets (
@@ -49,7 +49,7 @@ It assumes you [meet the pre-requisites](/start/installation/) and have a connec
 2. **Set up the database connection.**
 
    ```nsql
-   -- config.sql
+   -- config.nsql
    ENGINE (
      version = '[5.0,6.0)'
    );
@@ -73,7 +73,7 @@ It assumes you [meet the pre-requisites](/start/installation/) and have a connec
    );
    ```
 
-   The value in `config.sql` is the default, so you could enter `connection_string` directly, but connection strings
+   The value in `config.nsql` is the default, so you could enter `connection_string` directly, but connection strings
    need to remain secret, so the safer approach is to set the connection string by environment variable instead:
 
    ```sh

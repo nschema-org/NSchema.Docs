@@ -7,7 +7,7 @@ sidebar:
 
 Record a [`RUN ONCE` script](/guides/deployment-scripts/#run-conditions) as executed without running it, so later plans 
 skip it. The recorded entry is indistinguishable from a real execution — the same name and body hash an apply would have
-written, taken from the script's declaration in your `.sql` files.
+written, taken from the script's declaration in your project files.
 
 ```sh
 nschema script untaint seed-users

@@ -3,10 +3,10 @@ title: Configuration
 description: Declare the engine version, the plugins, the database, and the state store in SQL-shaped configuration statements.
 ---
 
-Project configuration lives in your `.sql` files, in SQL-statement-shaped blocks. They declare the engine version the
+Project configuration lives in your project files, in SQL-statement-shaped blocks. They declare the engine version the
 project needs, the plugins it depends on, which database to connect to, and where to keep state.
 
-[`nschema new`](/cli/commands/new/) puts these in a `config.sql`.
+[`nschema new`](/cli/commands/new/) puts these in a `config.nsql`.
 
 ## The four statements
 
@@ -153,19 +153,19 @@ Both attributes are optional. `new` writes a `version` assertion pinned to the C
 
 ## Where configuration files live
 
-Configuration can live in any of the `.sql` files alongside your schema, but I'd recommend keeping them separate in a 
-well-known file. All of mine are stored in `config.sql`. Environment files (files named **`*.env.<name>.sql`) are only 
-read when that environment is selected, so put environment-specific configuration in a file with the `.env.<name>.sql` 
-suffix.
+Configuration can live in any of the [project files](/nsql/defining-schemas/#where-the-files-live) alongside your schema, but I'd recommend keeping them separate in a 
+well-known file. All of mine are stored in `config.nsql`. Environment files (files named **`*.env.<name>.nsql`**) are
+only read when that environment is selected, so put environment-specific configuration in a file with the
+`.env.<name>` marker.
 
 ## Environments
 
 Select an environment with [`--environment <name>`](/cli/#global-flags) (or `NSCHEMA_ENVIRONMENT`) and every
-`*.env.<name>.sql` file is layered over the base:
+`*.env.<name>` file is layered over the base:
 
 ```sh
-nschema plan --environment prod    # base + *.env.prod.sql
-nschema plan --environment staging # base + *.env.staging.sql
+nschema plan --environment prod    # base + *.env.prod.nsql
+nschema plan --environment staging # base + *.env.staging.nsql
 nschema plan                       # base only
 ```
 
@@ -174,10 +174,10 @@ nschema plan                       # base only
 An overlay merges with any configuration in the base files, overwriting any re-declared config keys:
 
 ```nsql
--- config.sql
+-- config.nsql
 STATE s3 ( bucket = 'acme-state', key = 'nschema.state.json' );
 
--- config.env.prod.sql — the bucket carries through
+-- config.env.prod.nsql — the bucket carries through
 STATE s3 ( key = 'prod/nschema.state.json' );
 ```
 
@@ -191,7 +191,7 @@ Schema declarations can also appear in overlays, and add to the base project. It
 be useful for things like a set of test tables to run integration tests against:
 
 ```nsql
--- fixtures.env.test.sql — planned only under --environment test
+-- fixtures.env.test.nsql — planned only under --environment test
 CREATE TABLE test.orders_fixture (
   id INT NOT NULL
 );
