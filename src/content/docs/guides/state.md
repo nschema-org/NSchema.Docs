@@ -21,7 +21,7 @@ can be reviewed, audited, or saved as its own independent artifact.
 
 Write a [`STATE` statement](/state/) in your configuration. The simplest option is a local file:
 
-```sql
+```nsql
 STATE file (
   path = './nschema.state.json'
 );
@@ -29,7 +29,7 @@ STATE file (
 
 For a team, or in a CI environment, you'll want somewhere more persistent, like Amazon S3:
 
-```sql
+```nsql
 PLUGIN s3 (
   source  = 'NSchema.Aws',
   version = '[5.0,6.0)'

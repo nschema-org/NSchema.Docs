@@ -6,6 +6,24 @@ import starlightChangelogs, {
 } from "starlight-changelogs";
 import starlightVersions from "starlight-versions";
 import starlightLinksValidator from "starlight-links-validator";
+import sql from "@shikijs/langs/sql";
+
+// The NSQL grammar is authored in NSchema.Core, beside the parser and the tests that keep the two in
+// step, and is read straight from `main` so no copy of it lives here to go stale. The cost is a network
+// call at build time: if GitHub is unreachable the build fails rather than quietly shipping NSQL as
+// plain text, and a grammar change reaches the site on the next deploy without a commit here.
+const nsql = {
+  ...(await fetch(
+    "https://raw.githubusercontent.com/nschema-org/NSchema.Core/main/grammar/nsql.tmLanguage.json",
+  ).then((response) => response.json())),
+  // Shiki keys a language by `name`; the grammar's own name is its display name in an editor.
+  name: "nsql",
+  // Script and routine bodies embed SQL. Shiki only resolves that include if the grammar is loaded
+  // alongside, and an include that resolves to nothing takes the whole body rule down with it — which
+  // would leave a body reading as NSQL rather than as the engine SQL it is. Hence `sql` in `langs`
+  // below: a declared dependency is not loaded on demand, it has to be there already.
+  embeddedLangs: ["sql"],
+};
 
 // https://astro.build/config
 export default defineConfig({
@@ -51,8 +69,10 @@ export default defineConfig({
       ],
       // The DDL grammar pages use ```ebnf fences; Shiki has no EBNF grammar, so
       // render them as plain monospace rather than emitting a warning per block.
+      // ```nsql fences are the project language itself; ```sql stays for the engine
+      // SQL a script body or a plan is made of.
       expressiveCode: {
-        shiki: { langAlias: { ebnf: "txt" } },
+        shiki: { langAlias: { ebnf: "txt" }, langs: [...sql, nsql] },
       },
       social: [
         {

@@ -9,7 +9,7 @@ found over at the  [grammar reference](/nsql/grammar/). Type support is describe
 
 ## A schema in NSQL
 
-```sql
+```nsql
 --- The application schema.
 CREATE SCHEMA app;
 
@@ -58,7 +58,7 @@ schema across as many files as you like.
 A `---` doc-comment (or a `/** … */` block) immediately before a declaration becomes that object's database comment by 
 emitting a `COMMENT ON …` in the migration. Ordinary `--` comments are notes for the reader and are never persisted:
 
-```sql
+```nsql
 -- internal: revisit index strategy             (stripped; it's just a note)
 --- All registered users.                       (becomes the table's catalog comment)
 CREATE TABLE app.users

@@ -49,7 +49,7 @@ introspection:
 Types you declare with `CREATE ENUM`, `CREATE DOMAIN`, or `CREATE TYPE` are used by naming them as a column's type, 
 schema-qualified:
 
-```sql
+```nsql
 CREATE ENUM app.order_status ('pending', 'shipped', 'delivered');
 
 CREATE TABLE app.orders (
@@ -66,7 +66,7 @@ See the [grammar reference](/nsql/grammar/#enums) for declaring these types.
 An `xml` column may name an [XML schema collection](/nsql/grammar/#xml-schema-collections) to validate against, saying
 whether it holds a whole `DOCUMENT` or any `CONTENT` fragment:
 
-```sql
+```nsql
 CREATE TABLE app.responses (
   survey xml(DOCUMENT app.survey_schema) NULL,
   notes  xml NULL

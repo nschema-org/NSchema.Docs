@@ -16,7 +16,7 @@ hold table members (columns, constraints, indexes) and are `INCLUDE`ed from with
 
 A schema template declares a named group of objects; `APPLY TEMPLATE` applies it into each listed schema:
 
-```sql
+```nsql
 TEMPLATE outbox
 BEGIN
   CREATE ENUM outbox_status ('pending', 'sent');
@@ -48,7 +48,7 @@ templated tables and the functions templated triggers execute.
 
 A table template (`FOR TABLE`) declares reusable table members, and a table pulls them in with an `INCLUDE` member:
 
-```sql
+```nsql
 TEMPLATE audit_columns FOR TABLE
 BEGIN
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -84,7 +84,7 @@ it declares, so a backfill travels with the template instead of being repeated f
 
 A schema template body may also carry object-level [`RENAME` directives](/nsql/grammar/#directives), so renaming a templated table can be done in one place:
 
-```sql
+```nsql
 TEMPLATE outbox
 BEGIN
   RENAME TABLE outbox_messages TO outbox;

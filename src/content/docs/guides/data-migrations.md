@@ -9,7 +9,7 @@ NSchema's core engine helps guide the transition of a database to a desired sche
 script, whether it's a backfill, a data fix, or a de-duplication, that runs exactly once, when the change is applied.
 A [`SCRIPT`](/guides/deployment-scripts/) declared `ON` a structural change attaches that SQL to the change itself:
 
-```sql
+```nsql
 CREATE TABLE app.users (
     id int NOT NULL,
     email varchar(320) NOT NULL,
@@ -87,7 +87,7 @@ Because we treat provider-native SQL as opaque, NSchema can't automatically atta
 Instead, the `{schema}` token stands in for the target schema — in the name as well as the SQL, since instantiated
 script names must stay unique:
 
-```sql
+```nsql
 TEMPLATE outbox
 BEGIN
     CREATE TABLE outbox_events (
@@ -118,7 +118,7 @@ with a hand-written one for the same change is rejected as a duplicate.
 `run_outside_transaction = true` works exactly as it does for deployment scripts, for statements the database forbids
 inside a transaction:
 
-```sql
+```nsql
 SCRIPT 'dedupe emails' RUN ON ADD CONSTRAINT app.users.users_email_uq (run_outside_transaction = true) AS $$
     DELETE FROM app.users a USING app.users b
     WHERE a.id > b.id AND a.email = b.email;

@@ -10,7 +10,7 @@ project needs, the plugins it depends on, which database to connect to, and wher
 
 ## The four statements
 
-```sql
+```nsql
 -- the engine version this project needs
 ENGINE (
   version = '[5.0,6.0)'
@@ -48,7 +48,7 @@ STATE file (
 Every plugin the project uses is declared explicitly by a `PLUGIN` statement, which pairs a **label** (your local name
 for it) with the package it comes from:
 
-```sql
+```nsql
 PLUGIN pg (
   source  = 'NSchema.Postgres',
   version = '[5.0,6.0)'
@@ -62,7 +62,7 @@ PLUGIN s3 (
 
 `DATABASE` and `STATE` then reference a label:
 
-```sql
+```nsql
 DATABASE pg ( connection_string = '' );
 
 STATE s3 (
@@ -84,7 +84,7 @@ the shared on-disk cache is inspected and pruned with the [`plugin cache`](/cli/
 A plugin can name a built .NET assembly instead of a package, which skips the package resolution and the shared cache
 entirely:
 
-```sql
+```nsql
 PLUGIN pg (
   path = './artifacts/NSchema.Postgres.dll'
 );
@@ -107,12 +107,20 @@ A plugin loaded from a path is not reproducible. Nothing pins the bits behind th
 describes something reliable.
 :::
 
+That is reported on every run as `plugin-from-path`, so a CI log shows when a run used a build rather than a release.
+A project that loads one deliberately — a plugin's own test harness, say — can silence it in `.editorconfig`:
+
+```ini
+[*]
+nschema_diagnostic.plugin-from-path.severity = none
+```
+
 ## The lockfile
 
 While the declared range indicates the acceptable plugin versions, the actually resolved version is pinned in the lockfile.
 [`nschema init`](/cli/commands/init/) resolves every declaration and records the result in `nschema.lock`, beside your configuration:
 
-```sql
+```nsql
 LOCK (
   source  = 'NSchema.Postgres',
   version = '5.0.0'
@@ -134,7 +142,7 @@ is no range to widen and no feed to ask.
 `ENGINE` states which engine a project is written against, so an incompatible tool fails immediately with a clear
 message rather than mis-planning:
 
-```sql
+```nsql
 ENGINE (
   version      = '[5.0,6.0)',   -- the engine (NSchema.Core)
   host_version = '[5.0,6.0)'    -- the host tool (the nschema CLI)
@@ -165,7 +173,7 @@ nschema plan                       # base only
 
 An overlay merges with any configuration in the base files, overwriting any re-declared config keys:
 
-```sql
+```nsql
 -- config.sql
 STATE s3 ( bucket = 'acme-state', key = 'nschema.state.json' );
 
@@ -182,7 +190,7 @@ declarations from both layers carry through.
 Schema declarations can also appear in overlays, and add to the base project. It's a relatively niche use case, but it can
 be useful for things like a set of test tables to run integration tests against:
 
-```sql
+```nsql
 -- fixtures.env.test.sql — planned only under --environment test
 CREATE TABLE test.orders_fixture (
   id INT NOT NULL
