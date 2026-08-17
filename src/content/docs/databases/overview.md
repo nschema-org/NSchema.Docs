@@ -16,7 +16,7 @@ computed against. This section covers the live-database providers; see [State](/
 Each provider ships as a **plugin**: a NuGet package declared by a `PLUGIN` statement and referenced by label from the
 `DATABASE` statement, which `nschema` restores on first use:
 
-```sql
+```nsql
 PLUGIN postgres (
   source  = 'NSchema.Postgres',
   version = '[5.0,6.0)'

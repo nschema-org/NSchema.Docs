@@ -7,7 +7,7 @@ sidebar:
 
 Declare the plugin, then point a `DATABASE` [statement](/cli/configuration/) at it:
 
-```sql
+```nsql
 PLUGIN sqlserver (
   source  = 'NSchema.SqlServer',
   version = '[5.0,6.0)'

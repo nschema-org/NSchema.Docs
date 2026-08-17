@@ -33,7 +33,7 @@ Database providers and remote state stores aren't bundled with the CLI: each shi
 to use a plugin, declare it in a `PLUGIN` block, pinning the package source and version. NSchema will pin the selected
 version in a lockfile so runs are consistent. Source accepts any NuGet package ID, so third party plugins are supported.
 
-```sql
+```nsql
 PLUGIN postgres (
   source  = 'NSchema.Postgres',
   version = '[5.0,6.0)'

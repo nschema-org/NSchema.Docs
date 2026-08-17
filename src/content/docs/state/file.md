@@ -10,7 +10,7 @@ operator, or for checking state into source control.
 
 Declare it with a `STATE file` [statement](/cli/configuration/):
 
-```sql
+```nsql
 STATE file (
   path = './nschema.state.json'
 );

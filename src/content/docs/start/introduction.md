@@ -19,7 +19,7 @@ and the tool replays them, usually either requiring the scripts to be idempotent
 scripts have already been run. NSchema works the other way around. You maintain a single, declarative description 
 of the desired schema, and NSchema's planner derives the steps to reach it:
 
-```sql
+```nsql
 CREATE SCHEMA app;
 
 CREATE TABLE app.widgets (

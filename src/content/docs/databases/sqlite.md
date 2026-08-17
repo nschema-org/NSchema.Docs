@@ -7,7 +7,7 @@ sidebar:
 
 Declare the plugin, then point a `DATABASE` [statement](/cli/configuration/) at it:
 
-```sql
+```nsql
 PLUGIN sqlite (
   source  = 'NSchema.Sqlite',
   version = '[5.0,6.0)'
@@ -45,7 +45,7 @@ export NSCHEMA_DATABASE_CONNECTION_STRING="Data Source=/var/data/app.db"
 
 SQLite has a single primary database, surfaced as the schema **`main`**. Declare every object as `main.<name>`:
 
-```sql
+```nsql
 CREATE TABLE main.widgets (
   id   bigint NOT NULL,
   name text,

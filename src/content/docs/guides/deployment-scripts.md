@@ -10,7 +10,7 @@ supports deployment scripts that run arbitrary SQL on either side of a migration
 
 Scripts are declared **inline** in your `.sql` files with the `SCRIPT` statement, with a dollar-quoted body:
 
-```sql
+```nsql
 SCRIPT 'enable_citext' RUN ON PRE DEPLOYMENT AS $$
     CREATE EXTENSION IF NOT EXISTS citext;
 $$;
@@ -52,7 +52,7 @@ CREATE EXTENSION IF NOT EXISTS citext;
 
 A `RUN ONCE` script is for work that... well, only needs to be run once, like seeding reference data, or bootstrapping.
 
-```sql
+```nsql
 SCRIPT 'seed currencies' RUN ONCE ON POST DEPLOYMENT AS $$
     INSERT INTO app.currencies (code) VALUES ('GBP'), ('USD'), ('EUR');
 $$;
@@ -86,7 +86,7 @@ as executed without running it (e.g. after [rebuilding lost state](/guides/state
 A [schema template](/guides/templates/) can declare deployment scripts, instantiated once per applied schema, with the
 `{schema}` token substituted in the name and the SQL:
 
-```sql
+```nsql
 TEMPLATE currency_zone
 BEGIN
     CREATE TABLE currencies ( code char(3) NOT NULL, CONSTRAINT pk_currencies PRIMARY KEY (code) );

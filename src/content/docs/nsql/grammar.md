@@ -62,7 +62,7 @@ tables. Keywords stay case-insensitive — `create table` and `CREATE TABLE` are
 Quoting lets a name carry characters a bare identifier can't, or collide with a keyword. Double quotes and square
 brackets are two spellings of the same thing, each doubling its own closing delimiter to escape it:
 
-```sql
+```nsql
 CREATE TABLE app."Order Details" ("weird ""col""" int);
 CREATE TABLE app.[Order Details] ([weird ]]col]]] int);   -- the same two names
 ```
@@ -98,7 +98,7 @@ Both regular commands and doc comments are supported, and work the same way as `
 
 A doc-comment may precede any commentable declaration: a `CREATE SCHEMA`, a `CREATE TABLE`, a column, or a constraint.
 
-```sql
+```nsql
 -- internal: revisit index strategy           (stripped)
 --- All registered users.                       (becomes the table's catalog comment)
 CREATE TABLE app.users
@@ -151,7 +151,7 @@ attr-key       = ident , { "." , ident } ;
 attr-value     = string | [ "-" ] , integer | "true" | "false" | ident ;
 ```
 
-```sql
+```nsql
 ENGINE (
   version = '[5.0,6.0)'
 );
@@ -209,7 +209,7 @@ rename-source = ident                               (* SCHEMA: a bare schema nam
               | ident , "." , ident , "." , ident   (* COLUMN: schema.table.column *) ;
 ```
 
-```sql
+```nsql
 RENAME SCHEMA billing TO invoicing;
 RENAME TABLE app.users TO accounts;
 RENAME COLUMN app.accounts.email TO email_address;
@@ -243,7 +243,7 @@ script-option  = ident , "=" , config-value ;
 dollar-body    = "$$" , … , "$$" | "$" , tag , "$" , … , "$" , tag , "$" ;
 ```
 
-```sql
+```nsql
 SCRIPT 'reindex' RUN ON POST DEPLOYMENT (run_outside_transaction = true) AS $$
     CREATE INDEX CONCURRENTLY idx_widgets_name ON app.widgets (name);
 $$;
@@ -379,7 +379,7 @@ drops and recreates the index; a doc-comment change alone is applied in place.
 A **clustered** index *is* the relation's rows, held in its order, rather than a structure sitting beside them. It can be
 written on a primary key, a unique constraint, or an index, inline or standalone, in the spelling T-SQL uses:
 
-```sql
+```nsql
 CREATE TABLE app.bom
 (
     id           bigint NOT NULL IDENTITY,
@@ -448,7 +448,7 @@ built (like a `GRANT`): a table equivalent to declaring the index inline in the 
 relation is an error. A view's indexes *must* be standalone (its body is opaque, so there is nowhere inline to put them); 
 a table's may be written either way. There is no `DROP INDEX`: an index absent from its relation's declaration is dropped.
 
-```sql
+```nsql
 CREATE MATERIALIZED VIEW app.daily_totals AS SELECT date, sum(amount) FROM app.sales GROUP BY date;
 CREATE UNIQUE INDEX daily_totals_date_ix ON app.daily_totals (date);
 ```
@@ -456,7 +456,7 @@ CREATE UNIQUE INDEX daily_totals_date_ix ON app.daily_totals (date);
 A view need not be materialized to carry indexes. SQL Server's *indexed view* is a plain view with a unique clustered
 index on it, which is what makes its result set stored, so an index attaches to either kind:
 
-```sql
+```nsql
 CREATE VIEW app.order_customers WITH SCHEMABINDING AS
     SELECT o.id, o.customer_id FROM app.orders o;
 
@@ -475,7 +475,7 @@ create-enum = "CREATE" , "ENUM" , qualified-name ,
               "(" , [ string , { "," , string } ] , ")" ;
 ```
 
-```sql
+```nsql
 CREATE ENUM app.order_status ('pending', 'shipped', 'delivered');
 ```
 
@@ -492,7 +492,7 @@ create-domain = "CREATE" , "DOMAIN" , qualified-name , "AS" , type ,
                 [ "DEFAULT" , expr ] ;
 ```
 
-```sql
+```nsql
 CREATE DOMAIN app.email AS text NOT NULL CONSTRAINT email_fmt CHECK (VALUE ~ '@') DEFAULT 'x@y';
 ```
 
@@ -511,7 +511,7 @@ create-type = "CREATE" , "TYPE" , qualified-name ,
 field       = ident , type ;
 ```
 
-```sql
+```nsql
 CREATE TYPE app.address AS (street text, zip int);
 ```
 
@@ -535,7 +535,7 @@ an engine merges what is added to a collection and reports the whole thing back 
 A column binds to one by naming it as the argument of the `xml` type, saying whether the column holds a whole
 `DOCUMENT` or any `CONTENT` fragment:
 
-```sql
+```nsql
 CREATE XML SCHEMA COLLECTION app.survey_schema AS '
     <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:survey">
         <xsd:element name="survey" type="xsd:anyType"/>
@@ -567,7 +567,7 @@ An XML index indexes the shredded contents of an `xml` column rather than a valu
 table itself; every **secondary** is a B-tree over one that already exists, and names both the primary it reads and which
 form it takes:
 
-```sql
+```nsql
 CREATE PRIMARY XML INDEX responses_survey_pxml ON app.responses (survey);
 CREATE XML INDEX responses_survey_path ON app.responses (survey)
     USING XML INDEX responses_survey_pxml FOR PATH;
@@ -589,7 +589,7 @@ seq-option      = "AS" , ident
                 | "CYCLE" ;
 ```
 
-```sql
+```nsql
 CREATE SEQUENCE app.order_id (AS bigint, START 100, INCREMENT 5, MAXVALUE 999999, CACHE 10, CYCLE);
 ```
 
@@ -603,7 +603,7 @@ create-extension = "CREATE" , "EXTENSION" , ext-name , [ "VERSION" , string ] ;
 ext-name         = ident ;                                  (* quoted when it is not a bare identifier *)
 ```
 
-```sql
+```nsql
 CREATE EXTENSION citext;
 CREATE EXTENSION postgis VERSION '3.4';
 CREATE EXTENSION "uuid-ossp";
@@ -626,7 +626,7 @@ create-procedure = "CREATE" , "PROCEDURE" , qualified-name ,
                    "(" , [ arg-text ] , ")" , definition-text ;
 ```
 
-```sql
+```nsql
 CREATE FUNCTION app.add_tax(amount numeric, rate numeric) RETURNS numeric LANGUAGE sql AS $$
   SELECT amount * (1 + rate);
 $$;
@@ -661,7 +661,7 @@ func-name      = ident , [ "." , ident ] ;
 A trigger's action is written in one of two forms. The first executes a function (like PostgreSQL), where the trigger's 
 logic lives in a separate function it calls:
 
-```sql
+```nsql
 CREATE TRIGGER users_audit
   AFTER INSERT OR UPDATE OF (email)
   ON app.users
@@ -672,7 +672,7 @@ CREATE TRIGGER users_audit
 
 The second runs an inline body (like SQL Server), where the trigger carries its statements directly:
 
-```sql
+```nsql
 CREATE TRIGGER users_guard
   INSTEAD OF DELETE
   ON app.users
@@ -712,7 +712,7 @@ apply-template  = "APPLY" , "TEMPLATE" , ident , "IN" , "SCHEMA" , ident , { ","
 include-member  = "INCLUDE" , ident ;                  (* a table-body member naming a FOR TABLE template *)
 ```
 
-```sql
+```nsql
 TEMPLATE outbox
 BEGIN
   CREATE TABLE outbox (
