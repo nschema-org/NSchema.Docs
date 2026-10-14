@@ -61,6 +61,8 @@ discrete overrides are layered on top. See [Environment variables](/cli/environm
 The SQL dialect is determined by the provider, so there is nothing to configure. NSchema's canonical [types](/nsql/types/) are
 translated to PostgreSQL's spelling on output, and any opaque expressions in `DEFAULT` / `CHECK` / etc. are passed through verbatim.
 
+[Publications](/guides/replication/) are supported in PostgreSQL 15 or later.
+
 The provider also registers **equivalence rules** for comparison, so spellings the catalog and your project may
 legitimately disagree on (`bool` against `boolean`, a default the server has rewritten with a cast) compare equal in
 either direction and don't show up as drift.

@@ -24,8 +24,8 @@ nschema import --out-dir ./schemas
 ## What it writes
 
 One file per major object, grouped by type under a directory per schema — `app/schema.nsql` for the schema's own
-declarations, `app/tables/orders.nsql`, `app/views/…`, `app/routines/…`, and a top-level `extensions.nsql` for the
-database-global extensions.
+declarations, `app/tables/orders.nsql`, `app/views/…`, `app/routines/…`, and top-level `extensions.nsql` and
+`publications.nsql` files for the database-global extensions and publications.
 
 A re-import merges into the files that are already there rather than replacing them, and a file it merges into **keeps
 the name it has**: a project imported before the [`.nsql` extension](/nsql/defining-schemas/#where-the-files-live)

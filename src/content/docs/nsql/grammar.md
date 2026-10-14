@@ -203,8 +203,8 @@ says it is the same object under a new name, so the existing object is carried a
 ```ebnf
 rename        = "RENAME" , rename-kind , rename-source , "TO" , ident ;
 rename-kind   = "SCHEMA" | "TABLE" | "COLUMN" | [ "MATERIALIZED" ] , "VIEW" | "ENUM" | "DOMAIN"
-              | "TYPE" | "SEQUENCE" | "FUNCTION" | "PROCEDURE" | "ROUTINE" ;
-rename-source = ident                               (* SCHEMA: a bare schema name *)
+              | "TYPE" | "SEQUENCE" | "FUNCTION" | "PROCEDURE" | "ROUTINE" | "PUBLICATION" ;
+rename-source = ident                               (* SCHEMA, PUBLICATION: a bare name *)
               | qualified-name                      (* an object: schema.name *)
               | ident , "." , ident , "." , ident   (* COLUMN: schema.table.column *) ;
 ```
@@ -213,6 +213,7 @@ rename-source = ident                               (* SCHEMA: a bare schema nam
 RENAME SCHEMA billing TO invoicing;
 RENAME TABLE app.users TO accounts;
 RENAME COLUMN app.accounts.email TO email_address;
+RENAME PUBLICATION orders_feed TO order_changes;
 ```
 
 The **source is fully qualified and the target is always a bare name**: a rename never moves an object between
@@ -221,7 +222,10 @@ materialized view; the concrete kind is resolved from the current state when the
 
 Write the directive alongside the *new* declaration, and delete it once the rename has been applied everywhere.
 
-A [template](#templates) body may carry object-level renames (everything except `RENAME SCHEMA`), so one edit renames the
+A publication's subscribers name it and aren't managed by NSchema, so renaming one raises a `publication-renamed`
+warning: they need updating separately.
+
+A [template](#templates) body may carry object-level renames (everything except `RENAME SCHEMA` and `RENAME PUBLICATION`), so one edit renames the
 object in every schema the template is applied to.
 
 ### Scripts
@@ -304,11 +308,29 @@ was reaching for.
 
 ```ebnf
 create-table = "CREATE" , "TABLE" , qualified-name ,
-               "(" , table-item , { "," , table-item } , ")" ;
+               "(" , table-item , { "," , table-item } , ")" , [ replica-identity ] ;
 
 table-item   = [ doc-comment ] , ( column-def | pk-def | fk-def | unique-def | check-def | exclude-def
                                  | index-def | include-member ) ;
 ```
+
+### Replica identity
+
+```ebnf
+replica-identity = "REPLICA" , "IDENTITY" , ( "FULL" | "NOTHING" | "USING" , "INDEX" , ident ) ;
+```
+
+```nsql
+CREATE TABLE app.events (
+  id int NOT NULL,
+  kind varchar(20) NOT NULL
+) REPLICA IDENTITY FULL;
+```
+
+What identifies a row to a [publication](#publications)'s subscribers when it is updated or deleted: every column
+(`FULL`), nothing (`NOTHING`), or a unique index declared on the table (`USING INDEX`). Omitting the clause means the
+engine's default — on PostgreSQL, the primary key — so going back to the default is a matter of deleting the clause.
+See [Logical replication](/guides/replication/#replica-identity).
 
 ### Columns
 
@@ -617,6 +639,36 @@ An extension you declare becomes [managed](/guides/state/#the-managed-set) when 
 delete the declaration, like any other object. An extension NSchema never created is never dropped — extensions are
 shared infrastructure, so one that was already there stays there.
 
+### Publications
+
+```ebnf
+create-publication = "CREATE" , "PUBLICATION" , ident ,
+                     [ "FOR" , ( "ALL" , "TABLES" | publication-item , { "," , publication-item } ) ] ,
+                     [ "PUBLISH" , "(" , [ operation , { "," , operation } ] , ")" ] ;
+publication-item   = [ "TABLE" ] , qualified-name , [ "(" , col-list , ")" ] , [ "WHERE" , paren-expr ]
+                   | [ "TABLES" , "IN" , "SCHEMA" ] , ident ;
+operation          = "INSERT" | "UPDATE" | "DELETE" | "TRUNCATE" ;
+```
+
+```nsql
+CREATE PUBLICATION orders_feed
+  FOR TABLE sales.orders (id, status) WHERE (status <> 'draft'), sales.order_lines,
+      TABLES IN SCHEMA audit
+  PUBLISH (INSERT, UPDATE);
+
+CREATE PUBLICATION everything FOR ALL TABLES;
+```
+
+A publication names the tables whose row changes are sent to subscribers. An item without `TABLE` or `TABLES IN SCHEMA`
+continues the kind of the item before it, as in PostgreSQL. A table's column list and its `WHERE` filter narrow what is
+sent from it; the filter is opaque, like a `CHECK`. Omitting `PUBLISH` publishes every operation, and `PUBLISH ()`
+publishes none.
+
+Publications are **database-global**, like [extensions](#extensions): declared at the top level, never qualified, and not
+allowed in a template. Only a declared publication is [managed](/guides/state/#the-managed-set), so one created outside the
+project is never dropped. Switching between `FOR ALL TABLES` and a list recreates the publication. See [Logical
+replication](/guides/replication/).
+
 ### Functions and procedures
 
 ```ebnf
@@ -791,6 +843,8 @@ objects. See [Templates](/guides/templates/) for the practical guide.
 | `CREATE PROCEDURE s.p(…) …`                                       | `Routine` (`Kind` = `Procedure`; opaque)                                              |
 | `CREATE EXTENSION e [VERSION 'v']`                                | `Extension` on the `Database` (root-level)                                            |
 | `CREATE TRIGGER t … ON s.tbl …`                                   | `Trigger` on the named table (`Table.Triggers`)                                       |
+| `CREATE PUBLICATION p …`                                          | `Publication` on the `Database` (root-level; `Tables`→`PublishedTable`, `Operations`) |
+| `REPLICA IDENTITY …` after a table's body                         | `Table.ReplicaIdentity` (`ReplicaIdentity`; omitted = engine default)                 |
 | `RENAME <kind> <source> TO n`                                     | a rename directive on the project (never part of the schema model)                    |
 | `SCRIPT … ON PRE\|POST DEPLOYMENT`                                | `DeploymentScript` (`DeploymentPhase`, `RunCondition`)                                |
 | `SCRIPT … ON <change> <path>`                                     | `ChangeScript` (`ChangeTarget`, `RunCondition`)                                       |

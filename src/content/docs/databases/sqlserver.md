@@ -77,6 +77,6 @@ SQL Server is a full server database, so this provider covers most of NSchema's 
   and indexed views), [XML schema collections](/nsql/grammar/#xml-schema-collections) and typed `xml` columns,
   sequences, scalar/table functions and stored procedures, table-level `GRANT`s, triggers, and documentation comments
   (stored as `MS_Description` extended properties).
-- **Not supported:** schema renames, materialized views, exclusion constraints, in-place identity/computed-column
+- **Not supported:** schema renames, materialized views, exclusion constraints, publications and replica identity, in-place identity/computed-column
   changes, and `BEFORE` / row-level / `WHEN` / function-style triggers. Each is reported as an **error diagnostic on the
   plan** — the plan still renders in full, so you can see everything else it would do.
