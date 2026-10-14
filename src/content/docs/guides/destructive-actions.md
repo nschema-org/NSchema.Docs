@@ -37,6 +37,11 @@ The option applies to both [`plan`](/cli/commands/plan/) and [`apply`](/cli/comm
 - When you _intend_ a destructive change, make it explicit: review the plan, then re-run that specific apply with `--destructive-actions allow` (or `warn`).
 - Prefer **renames over drop+recreate** where you can. A [`RENAME` directive](/nsql/grammar/#directives) tells the comparer to match the existing object instead of dropping it.
 
+## Publications
+
+Dropping a [publication](/guides/replication/) doesn't destroy data, but it does
+cut off whatever subscribes to it, which NSchema can't see.
+
 ## Related: data hazards
 
 Destructive-action safety guards changes that succeed and lose data. Its counterpart, [data-hazard

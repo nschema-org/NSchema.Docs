@@ -63,7 +63,7 @@ that precise file later, so you can keep an audit of the executed SQL, and guara
 
 NSchema covers most major structures supported by relational databases, including: schemas, tables, columns, primary and 
 foreign keys, constraints, indexes, views, functions, procedures, triggers, sequences, extensions, grants, enums, 
-domains and composite types. For anything more niche, NSchema also supports arbitrary [pre-deployment and post-deployment scripts](/guides/deployment-scripts).
+domains, composite types and publications. For anything more niche, NSchema also supports arbitrary [pre-deployment and post-deployment scripts](/guides/deployment-scripts).
 
 It's important to note that while your NSchema files might _look_ like SQL, the language is **NSQL**: a provider-neutral
 DSL meant to feel familiar to SQL authors. That's how it supports features like deployment scripts and configuration. 
